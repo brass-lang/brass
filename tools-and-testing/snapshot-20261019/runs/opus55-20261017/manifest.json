@@ -1,0 +1,110 @@
+{
+ "small-P1": {
+  "size": "small",
+  "arm": "P",
+  "prompt_sha256": "85962ebea277b808",
+  "prompt_chars": 4167
+ },
+ "grown-K1": {
+  "size": "grown",
+  "arm": "K",
+  "prompt_sha256": "a571c586a219bf0c",
+  "prompt_chars": 21678
+ },
+ "small-KC1": {
+  "size": "small",
+  "arm": "KC",
+  "prompt_sha256": "b2170d4a1b973e8d",
+  "prompt_chars": 25108
+ },
+ "grown-P1": {
+  "size": "grown",
+  "arm": "P",
+  "prompt_sha256": "d9afba8dc2c8306e",
+  "prompt_chars": 4167
+ },
+ "small-K1": {
+  "size": "small",
+  "arm": "K",
+  "prompt_sha256": "7d68b04d79ced623",
+  "prompt_chars": 21678
+ },
+ "grown-KC1": {
+  "size": "grown",
+  "arm": "KC",
+  "prompt_sha256": "168a08e1e5bfc093",
+  "prompt_chars": 27155
+ },
+ "small-P2": {
+  "size": "small",
+  "arm": "P",
+  "prompt_sha256": "a2985962156ffbed",
+  "prompt_chars": 4167
+ },
+ "grown-K2": {
+  "size": "grown",
+  "arm": "K",
+  "prompt_sha256": "98c76e3d0c418bb2",
+  "prompt_chars": 21678
+ },
+ "small-KC2": {
+  "size": "small",
+  "arm": "KC",
+  "prompt_sha256": "78db0cad7660931c",
+  "prompt_chars": 25108
+ },
+ "grown-P2": {
+  "size": "grown",
+  "arm": "P",
+  "prompt_sha256": "83a0549ec405bc36",
+  "prompt_chars": 4167
+ },
+ "small-K2": {
+  "size": "small",
+  "arm": "K",
+  "prompt_sha256": "c74de88e2bbe5117",
+  "prompt_chars": 21678
+ },
+ "grown-KC2": {
+  "size": "grown",
+  "arm": "KC",
+  "prompt_sha256": "985e8c03a76bf26c",
+  "prompt_chars": 27155
+ },
+ "small-P3": {
+  "size": "small",
+  "arm": "P",
+  "prompt_sha256": "bc3ecb6fe363af27",
+  "prompt_chars": 4167
+ },
+ "grown-K3": {
+  "size": "grown",
+  "arm": "K",
+  "prompt_sha256": "a0a4139c82709090",
+  "prompt_chars": 21678
+ },
+ "small-KC3": {
+  "size": "small",
+  "arm": "KC",
+  "prompt_sha256": "a99d0f558d2be96b",
+  "prompt_chars": 25108
+ },
+ "grown-P3": {
+  "size": "grown",
+  "arm": "P",
+  "prompt_sha256": "c014302c14871ef4",
+  "prompt_chars": 4167
+ },
+ "small-K3": {
+  "size": "small",
+  "arm": "K",
+  "prompt_sha256": "7a35e112a4649ac7",
+  "prompt_chars": 21678
+ },
+ "grown-KC3": {
+  "size": "grown",
+  "arm": "KC",
+  "prompt_sha256": "c93e7d7990054fa1",
+  "prompt_chars": 27155
+ }
+}

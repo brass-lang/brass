@@ -1,0 +1,16 @@
+# desk/ids.brass
+module desk.ids
+
+interface
+  type Money        = Int where it in 0 to 1000000000
+  type Period       = Int where it in 1 to 1200
+  type Badge        = Text where it.length in 1 to 20
+  type Reason       = Text where it.length in 1 to 200
+  type Description  = Text where it.length in 1 to 200
+  type ReportId     = Text
+  type AdvanceId    = Text
+  type DepartmentId = Text
+  type Role         = Staff | Supervisor | Director | Finance
+  type Category     = Feed | Veterinary | Containment | Equipment | Travel | Other
+  type Step         = Draft | Submitted | Approved | Rejected | ChangesRequested | Paid | Requested | Settled
+body

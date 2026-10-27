@@ -1,0 +1,20 @@
+# park/staff.brass
+module park.staff
+import park.ids as ids
+interface
+  machine Shift
+    states  Off, On
+    initial Off
+    Off enters On
+    On  enters Off
+
+  type Staff   = { badge: ids.BadgeId, shift: Shift }
+  type OnShift = Staff where it.shift in {Shift.On}
+
+  fn clock_in(s: Staff) -> OnShift
+    before s.shift in {Shift.Off}
+private
+  fn badge_of(s: Staff) -> ids.BadgeId
+body
+  fn clock_in(s) = s with { shift enters Shift.On }
+  fn badge_of(s) = s.badge

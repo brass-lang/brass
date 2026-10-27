@@ -1,0 +1,43 @@
+# park/doors.brass — the door controller as a door, and the lockdown that uses it.
+module park.doors
+import park.staff as staff
+import park.enclosures as enclosures
+
+interface
+  access Doors { paddocks: Set<enclosures.PaddockId>, deadline_ms: Int }
+    allow enclosure(paddock: enclosures.PaddockId) -> Outcome<enclosures.Paddock>
+      before paddock in paddocks                        # authority check: the runtime enforces it
+      after  result.id == paddock
+    allow close(operator: staff.DoorOperator, paddock: enclosures.PaddockId) -> Outcome<Done>
+      before paddock in paddocks                        # authority check: the runtime enforces it
+
+  # The requirement sits on close. lockdown forwards the operator and cannot be called without one; it is public so a caller
+  # that already holds an open paddock and an operator can use it.
+  fn lockdown(doors: Doors, operator: staff.DoorOperator, p: enclosures.OpenPaddock) -> Outcome<enclosures.SecuredPaddock>
+    after result.id == p.id and result.species == p.species
+
+  # The boundary receives plain staff and a paddock id: it establishes the role by test, reads the paddock, tests its state, then calls.
+  fn lockdown_request(doors: Doors, who: staff.Staff, paddock: enclosures.PaddockId) -> Outcome<enclosures.SecuredPaddock>
+    after result.id == paddock
+
+private
+  fn lockdown_as(doors: Doors, operator: staff.DoorOperator, paddock: enclosures.PaddockId) -> Outcome<enclosures.SecuredPaddock>
+    after result.id == paddock
+
+body
+  fn lockdown(doors, operator, p) =
+    let last: Outcome<Done> = Err(FailureCode.Unavailable, "not tried")   # starts as a failure, so the loop has something to replace
+    for attempt in 1 to 3
+      last = doors.close(operator, p.id)                                    # closing is safe to repeat, so any failure may be retried
+      if last is Ok then break
+    if last is Ok then Ok(p with { status enters enclosures.Enclosure.Secured })
+    else Err(FailureCode.Unavailable, "door did not close in three attempts")
+
+  fn lockdown_as(doors, operator, paddock) =
+    let p: enclosures.Paddock = doors.enclosure(paddock)?
+    if p is enclosures.OpenPaddock then lockdown(doors, operator, p)
+    else Err(FailureCode.Conflict, "paddock is not open")
+
+  fn lockdown_request(doors, who, paddock) =
+    if who is staff.DoorOperator then lockdown_as(doors, who, paddock)
+    else Err(FailureCode.Unauthorized, "not a door operator")

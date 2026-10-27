@@ -1,0 +1,17 @@
+{
+ "PC1": {
+  "arm": "PC",
+  "prompt_sha256": "4a8847f559c80312",
+  "prompt_chars": 9053
+ },
+ "PC2": {
+  "arm": "PC",
+  "prompt_sha256": "417f5f78db2fdc42",
+  "prompt_chars": 9053
+ },
+ "PC3": {
+  "arm": "PC",
+  "prompt_sha256": "3efcb34ebd80a40a",
+  "prompt_chars": 9053
+ }
+}

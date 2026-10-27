@@ -1,0 +1,7 @@
+# system.brass — the entry point and the registry it may read and write.
+system park
+  grants park.control.deliver_feeding: registry = Registry { paddocks: {1, 2, 3, 4, 5} }
+  limit  cpu_ms 5000
+  limit  memory_bytes 268435456                       # 256 MiB
+  limit  transcript_bytes 67108864, drop oldest       # 64 MiB
+  limit  impact_modules 4

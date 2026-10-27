@@ -1,0 +1,7 @@
+# system.brass — the entry point, its door, and the paddocks that door may close.
+system park
+  grants park.doors.lockdown_request: doors = Doors { paddocks: {1, 2, 3}, deadline_ms: 2000 }
+  limit  cpu_ms 5000
+  limit  memory_bytes 268435456                       # 256 MiB
+  limit  transcript_bytes 67108864, drop oldest       # 64 MiB
+  limit  impact_modules 4

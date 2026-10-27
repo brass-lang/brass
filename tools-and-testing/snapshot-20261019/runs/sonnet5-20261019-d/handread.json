@@ -1,0 +1,213 @@
+[
+ {
+  "number": "294",
+  "language": "Python",
+  "legality": {
+   "when_reads": null,
+   "when_literals": null,
+   "converters_listed": null,
+   "loosened": null
+  },
+  "requirements": {
+   "overage_reason": "pass: src/desk/trip_desk.py:87: \"reconciled; actual exceeds committed\"",
+   "closed_reason": "pass: src/desk/trip_desk.py:99: store.append_audit(Entry(finance_badge, Subject.TRIP, t.id, before, TripStatus.CLOSED, reason)) -- Finance's reason passed through unchanged",
+   "write_order": "pass: src/desk/trip_desk.py:71-82 all checks and refusals before the first write; :85 store.save_trip once; :88 store.append_audit after; a failed save raises at :85 so no audit is attempted",
+   "invented": []
+  },
+  "repeat_compares": "the whole Reconciliation dataclass (committed, actual, report, transactions tuple): src/desk/trip_desk.py:86 if previous != recon (previous is None for a first reconciliation). Always saves (:85).",
+  "notes": "Items 1-4 not applicable (Python). Outside the rubric: same tuple-vs-host-Sequence equality caveat at trip_desk.py:86 as any whole-record comparison (host-dependent). file_trip's one-open-trip check scans store.trips_in(period) (trip_desk.py:35) rather than the department's trips; same result since a staff member has one department. Approval routing is re-implemented in trip_desk.py:122-139 (_required_badge) rather than reusing review's helper.",
+  "batch": "rows-D1"
+ },
+ {
+  "number": "429",
+  "language": "Brass",
+  "legality": {
+   "when_reads": [
+    "src/desk/trip_desk.brass:101: t.reconciliation.actual / .committed / .report read under `if t is trips.Reconciled` (line 100); state fixed; pass"
+   ],
+   "when_literals": [
+    "src/desk/trip_desk.brass:46: save_trip literal with status trips.TripStatus.Requested (initial), no `reconciliation`; legal; pass"
+   ],
+   "converters_listed": "not listed: audit.of_trip (src/desk/audit.brass:32, body :56) is absent from converters.txt (unchanged from start: audit.of_report, audit.of_advance). Count: 1 new converter, 0 listed",
+   "loosened": [
+    "src/desk/audit.brass:11: audit.Entry.reason widened from ids.Reason (Text, length 1 to 200) to Text"
+   ]
+  },
+  "requirements": {
+   "overage_reason": "pass: \"reconciled; actual exceeds committed\" (src/desk/trip_desk.brass:109)",
+   "closed_reason": "pass: Finance's `reason` passed as the audit reason (src/desk/trip_desk.brass:123)",
+   "write_order": "pass: Finance, trip state, report owner/period, report Counted checked first (:83-88); save_trip once with `?` at :106; audit at :110 only after a successful save",
+   "invented": []
+  },
+  "repeat_compares": "actual, committed and report id of the old and new reconciliation (src/desk/trip_desk.brass:101); the counted transaction ids are not compared",
+  "notes": "Inherited/not findings: the statement row literal src/desk/queries.brass:46 uses audit.Step.Approved (shared Step vocabulary, not a machine state). Outside the rubric: a repeated reconciliation whose counted transaction ids change but whose total does not is saved without an audit entry.",
+  "batch": "rows-D2"
+ },
+ {
+  "number": "488",
+  "language": "Python",
+  "legality": {
+   "when_reads": null,
+   "when_literals": null,
+   "converters_listed": null,
+   "loosened": null
+  },
+  "requirements": {
+   "overage_reason": "pass: src/desk/trip_desk.py:80: \"reconciled; actual exceeds committed\"",
+   "closed_reason": "pass: src/desk/trip_desk.py:92: store.append_audit(Entry(who.badge, Subject.TRIP, t.id, before, TripStatus.CLOSED, reason)) -- Finance's reason passed through unchanged",
+   "write_order": "pass: src/desk/trip_desk.py:64-75 all checks and refusals (finance, status, report owner/period, report status) before the first write; :78 store.save_trip once; :81 store.append_audit after; a failed save raises at :78 so no audit is attempted",
+   "invented": []
+  },
+  "repeat_compares": "the whole Reconciliation dataclass (committed, actual, report, transactions tuple): src/desk/trip_desk.py:77 unchanged = t.reconciliation == recon; audits when the trip was Approved or the result differs (:79). Always saves (:78).",
+  "notes": "Items 1-4 not applicable (Python). Outside the rubric: the equality at trip_desk.py:77 compares the stored transactions against a freshly built tuple; if the host returns the saved Sequence as a list, a repeat with unchanged inputs would be audited again (depends on the host; undecidable from the tree). Reuses review.may_act/required_for (review.py) on a Trip by duck typing; required_for added as a public wrapper over _required_for.",
+  "batch": "rows-D1"
+ },
+ {
+  "number": "636",
+  "language": "Brass",
+  "legality": {
+   "when_reads": [
+    "src/desk/trip_desk.brass:134: t.reconciliation.actual and t.reconciliation.report read on the right of `t.status in {trips.TripStatus.Reconciled} and ...`; the left operand fixes the state (spec \u00a77.2 l.421, l.733): pass"
+   ],
+   "when_literals": [],
+   "converters_listed": "not listed: audit.of_trip (src/desk/audit.brass:32,56) is a new Step converter; converters.txt lists only audit.of_report and audit.of_advance. Count: 1 new converter, 0 listed.",
+   "loosened": []
+  },
+  "requirements": {
+   "overage_reason": "pass: src/desk/trip_desk.brass:138: \"reconciled; actual spend exceeds the committed amount\"",
+   "closed_reason": "pass: src/desk/trip_desk.brass:153: store.append_audit(audit.trip_entry(who.badge, t.id, was, trips.TripStatus.Closed, reason)) -- Finance's reason passed through unchanged",
+   "write_order": "pass: src/desk/trip_desk.brass:117-136 all checks and refusals before the first write; :137 store.save_trip(...)? once; :139 store.append_audit after; `?` on :137 returns a failed save before any audit",
+   "invented": []
+  },
+  "repeat_compares": "actual and report id only: src/desk/trip_desk.brass:134 unchanged = status Reconciled and t.reconciliation.actual == actual and t.reconciliation.report == r.id. Not the counted transaction ids, not committed. When unchanged it returns Ok without saving (:135).",
+  "notes": "Item 2: no new literal names a conditional field or a non-initial state. trip_desk.brass:44 constructs a Trip in the initial state Requested with no reconciliation: legal. The reconciliation enters only through `with { status enters Reconciled, reconciliation: r }` (trips.brass:82), legal under \u00a79.4. Reconciled -> Reconciled is declared (trips.brass:14). Item 4: no type widened. review.required_for moves from private to interface (review.brass:23), same type: a visibility change, not a type change. Outside the rubric: (a) on a repeat with the same actual and report but a different set of counted transactions, the trip keeps the stale transaction list and nothing is saved, against 'recomputes everything and replaces'. (b) An unchanged repeat skips the save, where the task says it 'saves the same reconciliation'. (c) delegated_reason (trip_desk.brass:112-114) silently falls back to the base reason without the badge and period when the text exceeds 200 characters.",
+  "batch": "rows-D1"
+ },
+ {
+  "number": "721",
+  "language": "Python",
+  "legality": {
+   "when_reads": null,
+   "when_literals": null,
+   "converters_listed": null,
+   "loosened": null
+  },
+  "requirements": {
+   "overage_reason": "pass: \"reconciled; the actual amount exceeds the committed amount\" (src/desk/trip_desk.py:126-128)",
+   "closed_reason": "pass: Finance's `reason` passed as the audit reason (src/desk/trip_desk.py:140)",
+   "write_order": "pass: all checks and refusals at :110-118; save_trip once at :124 (an exception skips the audit); audit at :129",
+   "invented": []
+  },
+  "repeat_compares": "the whole Reconciliation dataclass, `t.reconciliation != recon` (src/desk/trip_desk.py:122): committed, actual, report and the counted transaction ids",
+  "notes": "Items 1 to 4 do not apply (Python). Host operations used: Store.trip/trips_for/trips_in/save_trip, Registry.txns_for/delegations_from; all declared. Outside the rubric: reconcile counts every unmatched transaction as `status is not CardStatus.MATCHED` (:119), which is Open or Disputed given the three-state enum; equivalent. review.py renames _required_for's pieces into public nominal_approver/stand_in (refactor folded in, behavior equivalent by reading).",
+  "batch": "rows-D2"
+ },
+ {
+  "number": "845",
+  "language": "Brass",
+  "legality": {
+   "when_reads": [
+    "src/desk/trips.brass:157: t.reconciliation.actual and t.reconciliation.report read inside `else if t is records.TripReconciled` (:154), whose declared type fixes status Reconciled: pass"
+   ],
+   "when_literals": [],
+   "converters_listed": "not listed: audit.of_trip (src/desk/audit.brass:32,56) is a new Step converter; converters.txt lists only audit.of_report and audit.of_advance. Count: 1 new converter, 0 listed.",
+   "loosened": []
+  },
+  "requirements": {
+   "overage_reason": "pass: src/desk/trips.brass:151: \"reconciled; actual exceeds committed\" (repeat: :158 \"reconciled again; actual exceeds committed\")",
+   "closed_reason": "pass: src/desk/trips.brass:171 and :174: store.append_audit(audit.trip_entry(finance_badge, t.id, <was>, records.TripStatus.Closed, reason)) -- Finance's reason passed through unchanged",
+   "write_order": "pass: src/desk/trips.brass:145-149 and :155 (compute_reconciliation :128-142, which only reads) hold every check and refusal before the first write; :150 or :156 store.save_trip(...)? once; then :152 or :159 store.append_audit; `?` returns a failed save before any audit",
+   "invented": []
+  },
+  "repeat_compares": "actual and report id only: src/desk/trips.brass:157 recon.actual != t.reconciliation.actual or recon.report != t.reconciliation.report. Not the counted transaction ids or committed. Always saves the recomputed reconciliation first (:156).",
+  "notes": "Item 2: no new literal names a conditional field or a non-initial state. trips.brass:43 constructs a Trip in the initial state Requested with no reconciliation: legal. The reconciliation enters through `with { status enters Reconciled, reconciliation: r }` (records.brass:141) and is replaced within the state by `with { reconciliation: r }` (records.brass:142); both are legal under \u00a79.4. The machine declares no Reconciled -> Reconciled edge, and none is needed because no `enters` is used. Item 4: no type widened relative to the start tree. The new Trip and TripReconciliation declare days, km, committed and actual as plain Int (records.brass:66-69), where ids.Money and range types were available; these are new declarations, not loosened ones. The ranges are carried only by `before` clauses on file_trip and amend_trip (trips.brass:18,20). Trip machine and types live in records.brass, not a trips module. Outside the rubric: (a) a repeat that changes only the counted transactions is saved but not audited. (b) The delegated final approval reason (trips.brass:122) drops the 'budget override' marker when an override happens under a delegation. (c) required_for and stand_in are copied from review.brass into trips.brass:88-106.",
+  "batch": "rows-D1"
+ },
+ {
+  "number": "901",
+  "language": "Python",
+  "legality": {
+   "when_reads": null,
+   "when_literals": null,
+   "converters_listed": null,
+   "loosened": null
+  },
+  "requirements": {
+   "overage_reason": "pass: src/desk/trip_desk.py:90: \"reconciled; the actual amount exceeds the committed amount\"",
+   "closed_reason": "pass: src/desk/trip_desk.py:104: store.append_audit(Entry(finance_badge, Subject.TRIP, t.id, before, TripStatus.CLOSED, reason)) -- reason validated at :100-101, then passed through unchanged",
+   "write_order": "pass: src/desk/trip_desk.py:72-84 all checks and refusals before the first write; :88 store.save_trip once; :91 store.append_audit after; a failed save raises at :88 so no audit is attempted",
+   "invented": []
+  },
+  "repeat_compares": "the whole Reconciliation dataclass (committed, actual, report, transactions tuple): src/desk/trip_desk.py:87 changed = t.reconciliation != recon; audits when the trip was not Reconciled or the result changed (:89). Always saves (:88).",
+  "notes": "Items 1-4 not applicable (Python). Outside the rubric: review.py renames the private helpers _required_for -> required_for and _stand_in -> stand_in (review.py:76,119,128-132) to reuse them; a change to existing code, behavior unchanged. budget.spend_of gains an optional trips parameter (budget.py:27). Same tuple-vs-host-Sequence equality caveat at trip_desk.py:87.",
+  "batch": "rows-D1"
+ },
+ {
+  "number": "904",
+  "language": "Brass",
+  "legality": {
+   "when_reads": [
+    "src/desk/trip_desk.brass:92: t.reconciliation.committed / .actual / .report / .txns read under `if t.status in {trips.TripStatus.Reconciled}` (line 91); state fixed; pass"
+   ],
+   "when_literals": [
+    "src/desk/trip_desk.brass:45-46: save_trip literal with status trips.TripStatus.Requested (initial), no `reconciliation`; legal; pass"
+   ],
+   "converters_listed": "not listed: audit.of_trip (src/desk/audit.brass:32, body :59) is absent from converters.txt (unchanged from start). Count: 1 new converter, 0 listed",
+   "loosened": []
+  },
+  "requirements": {
+   "overage_reason": "pass: \"reconciled; the actual amount exceeds the committed amount\" (src/desk/trip_desk.brass:97)",
+   "closed_reason": "pass: Finance's `reason` passed as the audit reason (src/desk/trip_desk.brass:116, via close_open from :109)",
+   "write_order": "pass: Finance, trip state, report owner/period, report Approved or Paid at :75-80; save_trip once at :94 with `?`; audit at :98 after it",
+   "invented": []
+  },
+  "repeat_compares": "committed, actual, report id, and the number of counted transactions (txns.length), src/desk/trip_desk.brass:92; not the transaction ids themselves",
+  "notes": "trips.reconcile (trips.brass:57) writes `reconciliation` in the else branch of `t.status in {Approved}` on a ReconcileReady trip, i.e. Reconciled: a write, legal. Outside the rubric: (a) src/desk/host.brass:36 and :39 declare `access Ledger` twice (the session added a second copy of the existing block); likely a duplicate-declaration rejection, no new operation. (b) Entry-point `before days > 0 or km > 0` (trip_desk.brass:19, :21) puts InvalidInput ahead of amend_trip's Unauthorized and Conflict refusals. (c) A repeat whose counted ids change but whose count and total do not is not audited.",
+  "batch": "rows-D2"
+ },
+ {
+  "number": "926",
+  "language": "Brass",
+  "legality": {
+   "when_reads": [
+    "src/desk/trip_desk.brass:171: t.actual and t.report_id read in reconcile_repeat, whose parameter is declared trips.Reconciled (:37); state fixed by declared type; pass",
+    "src/desk/trips.brass:42 and :44: result.actual and result.report_id read in `after` clauses behind the conjunct `result.status in {TripStatus.Reconciled}`; state fixed by the preceding in-test; pass"
+   ],
+   "when_literals": [
+    "src/desk/trip_desk.brass:51: save_trip literal with status trips.TripStatus.Requested (initial), no conditional fields; legal; pass"
+   ],
+   "converters_listed": "not listed: audit.of_trip (src/desk/audit.brass:32, body :56) is absent from converters.txt (unchanged from start). Count: 1 new converter, 0 listed",
+   "loosened": [
+    "src/desk/review.brass:148: local `reason` in final_approval widened from ids.Reason to Text (still passed to audit.report_entry, whose parameter is ids.Reason)"
+   ]
+  },
+  "requirements": {
+   "overage_reason": "pass: \"reconciled; the actual amount exceeds the committed amount\" (first) or \"reconciled again; the actual amount exceeds the committed amount\" (repeat), src/desk/trip_desk.brass:180-182",
+   "closed_reason": "pass: Finance's `reason` passed as the audit reason (src/desk/trip_desk.brass:95)",
+   "write_order": "pass: Finance and trip state checked at :82-86, report owner/period and Counted at :157-158 / :168-169; save_trip once at :160 / :172 with `?`; audit at :161 / :174 after it",
+   "invented": []
+  },
+  "repeat_compares": "actual and report id only (src/desk/trip_desk.brass:171); counted transaction ids are not compared (committed cannot change while Reconciled)",
+  "notes": "Trip carries three conditional fields (actual, report_id, counted_txns) instead of one reconciliation record; the committed amount is the trip's own field. review.required_for moved from private to interface (src/desk/review.brass:23), a visibility widening, not a type widening. Outside the rubric: (a) file_trip and amend_trip enforce 'days or km positive' as an entry-point `before` (trip_desk.brass:20, :22), so the boundary returns InvalidInput before amend_trip's Unauthorized and Conflict refusals run; the task orders amend refusals as Unauthorized then Conflict. (b) Trip.committed is ids.Money (trips.brass:19) while amend_requested/amend_approved take committed: Int (trips.brass:37, :39) and write it into that field. (c) A repeat whose counted transaction ids change but whose actual does not is not audited.",
+  "batch": "rows-D2"
+ },
+ {
+  "number": "969",
+  "language": "Python",
+  "legality": {
+   "when_reads": null,
+   "when_literals": null,
+   "converters_listed": null,
+   "loosened": null
+  },
+  "requirements": {
+   "overage_reason": "pass: \"reconciled; the actual amount exceeds the committed amount\" (src/desk/trip_desk.py:105-107)",
+   "closed_reason": "pass: Finance's `reason` passed as the audit reason (src/desk/trip_desk.py:119)",
+   "write_order": "pass: all checks and refusals at :89-97; save_trip once at :103; audit at :108 only after it returns",
+   "invented": []
+  },
+  "repeat_compares": "the whole Reconciliation dataclass, `prior != recon` (src/desk/trip_desk.py:104): committed, actual, report and the counted transaction ids",
+  "notes": "Items 1 to 4 do not apply (Python). Outside the rubric, likely defect: src/desk/advance_desk.py:41 passes the advance's badge and amount as the pending amount to within_budget, so approving an advance lowers that staff member's trip commitment by the advance amount (budget.py department_commitment). The task counts a trip down only by approved and paid reports, and advances 'count as they do today'; this undercounts spend at an advance's final approval when the same staff member has an Approved trip.",
+  "batch": "rows-D2"
+ }
+]

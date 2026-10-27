@@ -1,0 +1,163 @@
+{
+ "run_id": "sonnet5-20261019",
+ "task": "C",
+ "label": "small-KC5",
+ "size": "small",
+ "arm": "KC",
+ "lang": "brass",
+ "started": "2026-10-19T06:22:30+00:00",
+ "collected": "2026-10-19T06:36:40+00:00",
+ "provenance": {
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "cap": 150,
+  "claude_version": "2.1.302 (Claude Code)",
+  "git_head": "c4793c030ab686fd720ab2abd93e94ee3ab965cf",
+  "tool_hash": "1e611b1327ba33d3",
+  "prompt_sha256": "ab25857a9730d281",
+  "prompt_chars": 28467,
+  "freeze": [
+   "| baselines | `rerun/baseline` | `37e9e7815c64d173` |",
+   "| case evaluator | `rerun/tools/evaluate.py` | `753e74281565ae52` |",
+   "| cases | `rerun/cases` | `eed967342bfa8c3b` |",
+   "| frozen tool lean 8 | `rerun/tools/brass-lean8` | `3a2d086df0fcc20b` |",
+   "| launcher | `rerun/tools/launch.sh` | `72d3b2edcc748c25` |",
+   "| live evaluator | `validation/proxy/bin/brasseval.py` | `c6936b3bfc179282` |",
+   "| live stand-in | `validation/proxy/bin/brass` | `1e611b1327ba33d3` |",
+   "| material port | `rerun/tools/port_materials.py` | `df257bb6eeff9b60` |",
+   "| materials | `rerun/materials` | `234607275a4e57bc` |",
+   "| references | `rerun/reference` | `e96c7d75cebcc572` |",
+   "| respeller | `rerun/tools/respell.py` | `9af47db8a46e5511` |",
+   "| runner | `rerun/tools/run.py` | `854a93192a38d849` |",
+   "| session builder | `rerun/tools/build.py` | `215a37b0764cb9d0` |",
+   "| task d builder | `rerun/tools/build_d.py` | `9401f9a2b2624d68` |",
+   "| task d evaluator | `rerun/tools/evaluate_d.py` | `1c0627a9b48a60c1` |",
+   "| task d inputs | `rerun/D` | `90d0403c71563f04` |",
+   "| task d variants | `rerun/tools/variants_d.py` | `b3e201eab181c8a1` |",
+   "| variants | `rerun/tools/variants.py` | `15295894f63c7312` |"
+  ]
+ },
+ "session_id": "8473fde6-da73-45a3-8bb2-667a157f752b",
+ "own_instance": true,
+ "shares_id_with": null,
+ "is_error": false,
+ "subtype": "success",
+ "terminal_reason": "completed",
+ "api_error_status": null,
+ "num_turns": 11,
+ "duration_ms": 446489,
+ "cost_usd": 1.0179736000000001,
+ "models": [
+  "claude-sonnet-5"
+ ],
+ "model_ok": true,
+ "thinking_tokens": 38917,
+ "output_tokens": 51973,
+ "cache_read": 763218,
+ "cache_write": 86389,
+ "input_uncached": 22,
+ "transcript_saved": true,
+ "leaks": [
+  "Bash: /tmp/fullpatch.txt",
+  "Bash: /tmp/fullpatch.txt\\nwc",
+  "Bash: /tmp/patch.txt",
+  "Bash: /tmp/patch2.txt",
+  "Bash: /tmp/patch3.txt"
+ ],
+ "harness_paths": [],
+ "telemetry": {
+  "models": {
+   "claude-sonnet-5": 21
+  },
+  "calls": 11,
+  "ctx_first": 41617,
+  "ctx_second": 44095,
+  "ctx_final": 107717,
+  "task_tokens": 63622,
+  "input_total": 849629,
+  "fresh_input": 86411,
+  "output_written_chars": 30590,
+  "output_tokens_logged_unreliable": 51973,
+  "tools": {
+   "Bash": 10
+  },
+  "shell": {
+   "brass show": 3,
+   "cat": 5,
+   "echo": 1,
+   "ls": 1,
+   "Submitted": 1,
+   "Approved": 1,
+   "Rejected": 1,
+   "ChangesRequested": 1,
+   "Paid": 1,
+   "Requested": 1,
+   "Settled": 1,
+   "awaiting": 2,
+   "budget": 2,
+   "brass apply": 1,
+   "brass check": 1
+  },
+  "files_read": [],
+  "edits": 0,
+  "tool_errors": 0,
+  "seconds": 446,
+  "answer_chars": 2494
+ },
+ "brass_log_verbs": {
+  "show": 3,
+  "apply": 1,
+  "check": 1
+ },
+ "scores": {
+  "C.json": {
+   "held": 122,
+   "total": 122,
+   "could_not_run": 0,
+   "failed": [],
+   "by_kind": {
+    "edge": [
+     9,
+     9
+    ],
+    "integration": [
+     5,
+     5
+    ],
+    "invariant": [
+     1,
+     1
+    ],
+    "new": [
+     25,
+     25
+    ],
+    "preserved": [
+     82,
+     82
+    ]
+   }
+  },
+  "baseline.json": {
+   "held": 82,
+   "total": 82,
+   "could_not_run": 0,
+   "failed": [],
+   "by_kind": {
+    "preserved": [
+     82,
+     82
+    ]
+   }
+  }
+ },
+ "apply_calls": 1,
+ "edits_outside_apply": [
+  "Bash: cat > /tmp/patch.txt << 'PATCHEOF'\n@@@ new src/desk/advances.brass\n# desk/advances.brass\nmodule desk",
+  "Bash: cat > /tmp/patch2.txt << 'PATCHEOF'\n@@@ new src/desk/review.brass\n# desk/review.brass\nmodule desk.re",
+  "Bash: cat > /tmp/patch3.txt << 'PATCHEOF'\n@@@ new src/desk/payment.brass\n# desk/payment.brass\nmodule desk."
+ ],
+ "thinking_before_first_edit": 116596,
+ "final_check": "done        nothing else to run",
+ "check_warnings": []
+}

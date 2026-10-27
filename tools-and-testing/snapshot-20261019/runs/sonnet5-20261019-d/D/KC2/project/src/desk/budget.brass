@@ -1,0 +1,62 @@
+# desk/budget.brass
+module desk.budget
+import desk.ids as ids
+import desk.lines as lines
+import desk.reports as reports
+import desk.advances as advances
+import desk.trips as trips
+import desk.host as host
+
+interface
+  type Bump = { badge: ids.Badge, amount: Int }
+
+  fn spend_of(rs: reports.Reports, advs: advances.Advances) -> Int
+    after result >= 0
+  fn reports_total_for_badge(rs: reports.Reports, badge: ids.Badge) -> Int
+    after result >= 0
+  fn trip_commitment(t: trips.Trip, reports_total: Int) -> Int
+    after result >= 0
+  fn trips_spend(rs: reports.Reports, ts: trips.Trips, bump: Maybe<Bump>) -> Int
+    after result >= 0
+  fn department_spend(store: host.Store, department: ids.DepartmentId, period: ids.Period) -> Outcome<Int>
+  fn department_spend_if_approved(store: host.Store, department: ids.DepartmentId, period: ids.Period, badge: ids.Badge, amount: Int) -> Outcome<Int>
+body
+  fn spend_of(rs, advs) =
+    let sum: Int = 0
+    for r in rs
+      if r is reports.Counted then sum = sum + lines.budgeted_total(r.lines)
+    for a in advs
+      if a is advances.Counted then sum = sum + a.amount
+    sum
+
+  fn reports_total_for_badge(rs, badge) =
+    let sum: Int = 0
+    for r in rs
+      if r.badge == badge and r is reports.Counted then sum = sum + lines.budgeted_total(r.lines)
+    sum
+
+  fn trip_commitment(t, reports_total) =
+    if t.status in {trips.TripStatus.Approved} then
+      let left: Int = t.committed - reports_total
+      if left > 0 then left else 0
+    else 0
+
+  fn trips_spend(rs, ts, bump) =
+    let sum: Int = 0
+    for t in ts
+      let base: Int = reports_total_for_badge(rs, t.badge)
+      let bumped: Int = if bump != None and bump.badge == t.badge then base + bump.amount else base
+      sum = sum + trip_commitment(t, bumped)
+    sum
+
+  fn department_spend(store, department, period) =
+    let rs: reports.Reports = store.reports_for(department, period)?
+    let advs: advances.Advances = store.advances_for(department, period)?
+    let ts: trips.Trips = store.trips_for(department, period)?
+    Ok(spend_of(rs, advs) + trips_spend(rs, ts, None))
+
+  fn department_spend_if_approved(store, department, period, badge, amount) =
+    let rs: reports.Reports = store.reports_for(department, period)?
+    let advs: advances.Advances = store.advances_for(department, period)?
+    let ts: trips.Trips = store.trips_for(department, period)?
+    Ok(spend_of(rs, advs) + amount + trips_spend(rs, ts, { badge: badge, amount: amount }))

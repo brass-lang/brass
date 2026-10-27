@@ -1,0 +1,70 @@
+{
+ "label": "small-KC1",
+ "size": "small",
+ "arm": "KC",
+ "collected": "2026-10-17T06:54:03+00:00",
+ "started": "2026-10-17T06:48:33+00:00",
+ "session_id": "cd57c46f-b481-5b37-9466-887a6d309201",
+ "is_error": false,
+ "subtype": "success",
+ "terminal_reason": "completed",
+ "api_error_status": null,
+ "num_turns": 10,
+ "duration_ms": 309503,
+ "cost_usd": 1.428202,
+ "models": [
+  "claude-opus-5-5"
+ ],
+ "model_ok": true,
+ "thinking_tokens": 17105,
+ "output_tokens": 36700,
+ "cache_read": 573410,
+ "cache_write": 72431,
+ "input_uncached": 18,
+ "transcript_saved": true,
+ "leaks": [
+  "Bash: /tmp/claude-0/-tmp-rerun-opus55-20261017-small-KC1-project/cd57c46f-b481-5b37-9466-887a6d309201/scratchpad/patch.txt",
+  "Write: /tmp/claude-0/-tmp-rerun-opus55-20261017-small-KC1-project/cd57c46f-b481-5b37-9466-887a6d309201/scratchpad/patch.txt"
+ ],
+ "scores": {
+  "C.json": {
+   "held": 122,
+   "total": 122,
+   "could_not_run": 0,
+   "by_kind": {
+    "edge": [
+     9,
+     9
+    ],
+    "integration": [
+     5,
+     5
+    ],
+    "invariant": [
+     1,
+     1
+    ],
+    "new": [
+     25,
+     25
+    ],
+    "preserved": [
+     82,
+     82
+    ]
+   }
+  },
+  "baseline.json": {
+   "held": 82,
+   "total": 82,
+   "could_not_run": 0,
+   "by_kind": {
+    "preserved": [
+     82,
+     82
+    ]
+   }
+  }
+ },
+ "final_check": "done        nothing else to run"
+}

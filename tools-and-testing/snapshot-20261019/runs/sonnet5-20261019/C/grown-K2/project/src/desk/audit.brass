@@ -1,0 +1,43 @@
+# desk/audit.brass
+module desk.audit
+import desk.ids as ids
+import desk.reports as reports
+import desk.advances as advances
+
+interface
+  type Status = Draft | Submitted | Approved | Rejected | ChangesRequested | Paid | Requested | Settled
+
+  type Entry = { who: ids.Badge, report: ids.ReportId, was: Status, now: Status, reason: ids.Reason }
+
+  fn entry(who: ids.Badge, report: ids.ReportId, was: Status, now: Status, reason: ids.Reason) -> Entry
+    after result.who == who and result.report == report
+
+  fn of_report(s: reports.ReportStatus) -> Status
+    example of_report(reports.ReportStatus.Draft) == Status.Draft
+    example of_report(reports.ReportStatus.Submitted) == Status.Submitted
+    example of_report(reports.ReportStatus.Approved) == Status.Approved
+    example of_report(reports.ReportStatus.Rejected) == Status.Rejected
+    example of_report(reports.ReportStatus.ChangesRequested) == Status.ChangesRequested
+    example of_report(reports.ReportStatus.Paid) == Status.Paid
+
+  fn of_advance(s: advances.AdvanceStatus) -> Status
+    example of_advance(advances.AdvanceStatus.Requested) == Status.Requested
+    example of_advance(advances.AdvanceStatus.Approved) == Status.Approved
+    example of_advance(advances.AdvanceStatus.Paid) == Status.Paid
+    example of_advance(advances.AdvanceStatus.Settled) == Status.Settled
+body
+  fn entry(who, report, was, now, reason) = { who: who, report: report, was: was, now: now, reason: reason }
+
+  fn of_report(s) =
+    if s in {reports.ReportStatus.Draft} then Status.Draft
+    else if s in {reports.ReportStatus.Submitted} then Status.Submitted
+    else if s in {reports.ReportStatus.Approved} then Status.Approved
+    else if s in {reports.ReportStatus.Rejected} then Status.Rejected
+    else if s in {reports.ReportStatus.ChangesRequested} then Status.ChangesRequested
+    else Status.Paid
+
+  fn of_advance(s) =
+    if s in {advances.AdvanceStatus.Requested} then Status.Requested
+    else if s in {advances.AdvanceStatus.Approved} then Status.Approved
+    else if s in {advances.AdvanceStatus.Paid} then Status.Paid
+    else Status.Settled

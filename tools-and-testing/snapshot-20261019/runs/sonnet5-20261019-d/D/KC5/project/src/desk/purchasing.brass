@@ -1,0 +1,117 @@
+# desk/purchasing.brass
+module desk.purchasing
+import desk.ids as ids
+import desk.staff as staff
+import desk.routing as routing
+import desk.records as records
+import desk.host as host
+import desk.registry as registry
+import desk.delegation as delegation
+
+interface
+  fn raise_po(store: host.Store, reg: registry.Registry, badge: ids.Badge, vendor_id: records.VendorId, amount: Int, period: ids.Period) -> Outcome<records.PoId>
+  fn approve_po(store: host.Store, reg: registry.Registry, po_id: records.PoId, approver: ids.Badge) -> Outcome<records.PoStatus>
+  fn reject_po(store: host.Store, reg: registry.Registry, po_id: records.PoId, approver: ids.Badge) -> Outcome<Done>
+  fn receive_po(store: host.Store, reg: registry.Registry, po_id: records.PoId, badge: ids.Badge, received_amount: Int) -> Outcome<Done>
+  fn close_po(store: host.Store, reg: registry.Registry, po_id: records.PoId, finance_badge: ids.Badge) -> Outcome<Done>
+  fn po_commitments(store: host.Store, reg: registry.Registry, department: ids.DepartmentId, period: ids.Period) -> Outcome<Int>
+private
+  type PoGate = { po: records.PoRequested, who: staff.Active }
+  fn gate(store: host.Store, reg: registry.Registry, po_id: records.PoId, approver: ids.Badge) -> Outcome<PoGate>
+  fn accepted(store: host.Store, reg: registry.Registry, po: records.PoRequested, who: staff.Active) -> Outcome<Bool>
+  fn required_person(store: host.Store, po: records.PoRequested) -> Outcome<ids.Badge>
+body
+  fn raise_po(store, reg, badge, vendor_id, amount, period) =
+    let who: staff.Staff = store.staff(badge)?
+    if who is staff.Active then
+      let v: records.Vendor = reg.vendor(vendor_id)?
+      if v.active then
+        if amount >= 1 and amount <= 1000000000 then
+          let closed: Bool = store.period_closed(period)?
+          if not closed then
+            let id: records.PoId = store.next_id()?
+            reg.save_po({ id: id, vendor: vendor_id, requested_by: badge, department: who.department, period: period, amount: amount, status: records.PoStatus.Requested, approvals: [], received: 0 })?
+            Ok(id)
+          else Err(FailureCode.Conflict, "the period is closed")
+        else Err(FailureCode.InvalidInput, "a PO is for at least 1 cent")
+      else Err(FailureCode.Conflict, "the vendor is not active")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn approve_po(store, reg, po_id, approver) =
+    let g: PoGate = gate(store, reg, po_id, approver)?
+    if g.po.approvals.length + 1 >= routing.steps_for(g.po.amount) then
+      let limit: ids.Money = reg.allowance(g.po.department, g.po.period)?
+      let pos: records.POs = reg.pos_for(g.po.department, g.po.period)?
+      if records.commitments(pos) + g.po.amount <= limit then
+        reg.save_po(records.approve_po(g.po))?
+        Ok(records.PoStatus.Approved)
+      else Err(FailureCode.Conflict, "the department's PO allowance for this period would be exceeded")
+    else
+      reg.save_po(records.add_po_approval(g.po, g.who.badge))?
+      Ok(records.PoStatus.Requested)
+
+  fn reject_po(store, reg, po_id, approver) =
+    let g: PoGate = gate(store, reg, po_id, approver)?
+    reg.save_po(records.reject_po(g.po))
+
+  fn receive_po(store, reg, po_id, badge, received_amount) =
+    let who: staff.Staff = store.staff(badge)?
+    if who is staff.Active then
+      let po: records.PurchaseOrder = reg.po(po_id)?
+      if po.requested_by == badge then
+        if po is records.PoApproved then
+          if received_amount >= 1 and received_amount <= po.amount then reg.save_po(records.receive_po(po, received_amount))
+          else Err(FailureCode.InvalidInput, "the received amount is 1 to the PO's amount")
+        else Err(FailureCode.Conflict, "the PO is not approved")
+      else Err(FailureCode.Unauthorized, "only the requester may receive a PO")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn close_po(store, reg, po_id, finance_badge) =
+    let who: staff.Staff = store.staff(finance_badge)?
+    if who is staff.Finance then
+      let po: records.PurchaseOrder = reg.po(po_id)?
+      if po is records.PoReceived then reg.save_po(records.close_po(po))
+      else Err(FailureCode.Conflict, "the PO is not received")
+    else Err(FailureCode.Unauthorized, "only active finance staff may close a PO")
+
+  fn po_commitments(store, reg, department, period) =
+    let dept: staff.Department = store.department(department)?
+    let pos: records.POs = reg.pos_for(dept.id, period)?
+    Ok(records.commitments(pos))
+
+  fn gate(store, reg, po_id, approver) =
+    let who: staff.Staff = store.staff(approver)?
+    if who is staff.Active then
+      let po: records.PurchaseOrder = reg.po(po_id)?
+      if po is records.PoRequested then
+        let closed: Bool = store.period_closed(po.period)?
+        if not closed then
+          if who.badge != po.requested_by then
+            let ok: Bool = accepted(store, reg, po, who)?
+            if ok then Ok({ po: po, who: who })
+            else Err(FailureCode.Unauthorized, "not this PO's next approver")
+          else Err(FailureCode.Unauthorized, "a PO cannot be approved by its requester")
+        else Err(FailureCode.Conflict, "the period is closed")
+      else Err(FailureCode.Conflict, "the PO is not awaiting approval")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn accepted(store, reg, po, who) =
+    let role: ids.Role = routing.role_for(po.approvals.length + 1)
+    if role in {ids.Role.Finance} then Ok(who.role in {ids.Role.Finance})
+    else
+      let required: ids.Badge = required_person(store, po)?
+      let person: staff.Staff = store.staff(required)?
+      let deputy: Maybe<ids.Badge> = delegation.delegate_in_force(reg, required, po.period)?
+      if person.active then Ok(who.badge == required or (deputy != None and who.badge == deputy))
+      else if deputy != None then Ok(who.badge == deputy)
+      else Err(FailureCode.Conflict, "the required approver is inactive and has no delegate")
+
+  fn required_person(store, po) =
+    let role: ids.Role = routing.role_for(po.approvals.length + 1)
+    if role in {ids.Role.Supervisor} then
+      let requester: staff.Staff = store.staff(po.requested_by)?
+      if requester.supervisor != None then Ok(requester.supervisor)
+      else Err(FailureCode.Conflict, "the requester has no supervisor")
+    else
+      let dept: staff.Department = store.department(po.department)?
+      Ok(dept.director)

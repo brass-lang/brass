@@ -1,0 +1,17 @@
+# support/refund.brass — a merchant refunds an open case through a processor it was handed.
+module support.refund
+import payments.core as payments
+
+interface
+  type Merchant  = { id: Int, refund_limit: payments.Money }
+  type StripePay = payments.Pay where it.processor in {payments.Processor.Stripe} and it.per_txn_max in 0 to 50000
+
+  fn issue(pay: StripePay, who: Merchant, case: payments.OpenCase, amount: payments.Money) -> Outcome<payments.Receipt>
+    before amount > 0
+    before case.merchant == who.id
+    before amount <= who.refund_limit
+    before amount <= case.paid_total
+    after  result.amount == amount
+
+body
+  fn issue(pay, who, case, amount) = pay.refund(case, amount)

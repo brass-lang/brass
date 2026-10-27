@@ -1,0 +1,17 @@
+# desk/audit.brass
+module desk.audit
+import desk.ids as ids
+import desk.reports as reports
+import desk.advances as advances
+import desk.states as states
+
+interface
+  type Entry = { who: ids.Badge, report: ids.ReportId, was: states.State, now: states.State, reason: ids.Reason }
+
+  fn entry(who: ids.Badge, report: ids.ReportId, was: reports.ReportStatus, now: reports.ReportStatus, reason: ids.Reason) -> Entry
+    after result.who == who and result.report == report
+  fn advance_entry(who: ids.Badge, advance: ids.ReportId, was: advances.AdvanceStatus, now: advances.AdvanceStatus, reason: ids.Reason) -> Entry
+    after result.who == who and result.report == advance
+body
+  fn entry(who, report, was, now, reason) = { who: who, report: report, was: states.of_report(was), now: states.of_report(now), reason: reason }
+  fn advance_entry(who, advance, was, now, reason) = { who: who, report: advance, was: states.of_advance(was), now: states.of_advance(now), reason: reason }

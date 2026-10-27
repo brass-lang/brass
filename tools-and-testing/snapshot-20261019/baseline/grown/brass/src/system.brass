@@ -1,0 +1,43 @@
+# system.brass
+system expenses
+  grants desk.review.open_draft: store = Store
+  grants desk.review.add_line: store = Store
+  grants desk.review.submit: store = Store
+  grants desk.review.approve: store = Store
+  grants desk.review.reject: store = Store
+  grants desk.review.request_changes: store = Store
+  grants desk.review.resubmit: store = Store
+  grants desk.payment.pay: store = Store, ledger = Ledger
+  grants desk.payment.close_period: store = Store
+  grants desk.queries.spend: store = Store
+  grants desk.queries.statement: store = Store
+  grants desk.queries.pending_for: store = Store
+  limit  cpu_ms 5000
+  limit  memory_bytes 268435456
+  limit  transcript_bytes 100000000, drop oldest
+  limit  impact_modules 12
+  grants desk.delegation.grant_delegation: store = Store, reg = Registry
+  grants desk.delegation.revoke_delegation: store = Store, reg = Registry
+  grants desk.purchasing.raise_po: store = Store, reg = Registry
+  grants desk.purchasing.approve_po: store = Store, reg = Registry
+  grants desk.purchasing.reject_po: store = Store, reg = Registry
+  grants desk.purchasing.receive_po: store = Store, reg = Registry
+  grants desk.purchasing.close_po: store = Store, reg = Registry
+  grants desk.purchasing.po_commitments: store = Store, reg = Registry
+  grants desk.cards.import_txn: store = Store, reg = Registry
+  grants desk.cards.match_txn: store = Store, reg = Registry
+  grants desk.cards.dispute_txn: store = Store, reg = Registry
+  grants desk.cards.unmatched: reg = Registry
+  grants desk.allowances.add_per_diem: store = Store
+  grants desk.allowances.add_mileage: store = Store
+  grants desk.entities.cost_center_summary: store = Store, reg = Registry
+  grants desk.reporting.period_summary: store = Store, reg = Registry
+  grants desk.vendors.onboard_vendor: store = Store, reg = Registry
+  grants desk.vendors.deactivate_vendor: store = Store, reg = Registry
+  grants desk.vendors.vendor_spend: reg = Registry
+  grants desk.card_limits.set_card_limit: store = Store, reg = Registry
+  grants desk.card_limits.over_limit: reg = Registry
+  grants desk.readiness.period_readiness: store = Store, reg = Registry
+  grants desk.exceptions.request_exception: store = Store, reg = Registry
+  grants desk.exceptions.decide_exception: store = Store, reg = Registry
+  grants desk.forecasting.forecast: store = Store, reg = Registry

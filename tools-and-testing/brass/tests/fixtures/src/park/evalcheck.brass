@@ -1,0 +1,56 @@
+# park/evalcheck.brass
+# Regression cases for the stand-in evaluator: None, ++ on text and arrays, a one-line body holding a ")", a has-field on enters.
+module park.evalcheck
+
+interface
+  machine Light
+    states  Off, On
+    initial Off
+    Off enters On
+
+  type Lamp  = { id: Text, light: Light, since: Int when it.light in {Light.On} }
+  type Names = Array<Text> where it.length in 0 to 10
+
+  fn label(note: Maybe<Text>) -> Text
+    example label(None) == "none"
+    example label("x") == "x!"
+  fn all_short(ns: Names) -> Bool
+    example all_short(["a", "bb"]) == true
+    example all_short(["a", "bbbb"]) == false
+  fn join(ns: Names, n: Text) -> Names
+    example join(["a"], "b") == ["a", "b"]
+  fn split_count(ns: Names, n: Int) -> Int
+    example split_count(["a", "bbb", "cc"], 2) == 21
+  fn block_if(ns: Names, n: Int) -> Int
+    example block_if(["a", "bbb", "cc"], 2) == 3
+  fn nested_if(ns: Names, n: Int) -> Names
+    example nested_if(["a", "bbb", "cc"], 2) == ["one", "more"]
+  fn switch_on(l: Lamp, t: Int) -> Lamp
+    example switch_on({ id: "l1", light: Light.Off }, 5) == { id: "l1", light: Light.On, since: 5 }
+body
+  fn label(note) = if note == None then "none" else note ++ "!"
+  fn all_short(ns) = all n in ns where n.length <= 2
+  fn join(ns, n) = ns ++ [n]
+  fn switch_on(l, t) = l with { light enters Light.On, since: t }
+
+  fn split_count(ns, n) =
+    let short: Int = 0
+    let long: Int = 0
+    for x in ns
+      if x.length <= n then short = short + 1 else long = long + 1
+    short * 10 + long
+
+  fn block_if(ns, n) =
+    let total: Int = 0
+    for x in ns
+      total = if x.length <= n then
+          let add: Int = x.length
+          total + add
+        else total
+    total
+
+  fn nested_if(ns, n) =
+    let out: Names = []
+    for x in ns
+      if x.length <= n then out = out ++ [(if x.length == 1 then "one" else "more")]
+    out

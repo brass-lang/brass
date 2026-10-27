@@ -1,0 +1,33 @@
+# park/control.brass — the entry point: a keeper delivers the pending feeding for one paddock.
+module park.control
+import park.ids as ids
+import park.staff as staff
+import park.feeding as feeding
+
+interface
+  access Registry { paddocks: Set<ids.PaddockId> }
+    allow pending(paddock: ids.PaddockId) -> Outcome<feeding.PendingFeeding>
+      before paddock in paddocks                        # authority check: the runtime enforces it
+      after  result.paddock == paddock
+    allow save(f: feeding.Feeding) -> Outcome<Done>
+      before f.paddock in paddocks                      # authority check: the runtime enforces it
+
+  # Establishes that who is a keeper by test, then hands over to deliver_as.
+  fn deliver_feeding(registry: Registry, who: staff.Staff, paddock: ids.PaddockId) -> Outcome<feeding.DeliveredFeeding>
+    after result.paddock == paddock and result.delivered_by == who.badge
+
+private
+  # Reads the pending feeding, delivers it, saves it, and returns it.
+  fn deliver_as(registry: Registry, by: feeding.Deliverer, paddock: ids.PaddockId) -> Outcome<feeding.DeliveredFeeding>
+    after result.paddock == paddock and result.delivered_by == by.badge
+
+body
+  fn deliver_feeding(registry, who, paddock) =
+    if who is feeding.Deliverer then deliver_as(registry, who, paddock)
+    else Err(FailureCode.Unauthorized, "not a keeper")
+
+  fn deliver_as(registry, by, paddock) =
+    let f: feeding.PendingFeeding = registry.pending(paddock)?
+    let done: feeding.DeliveredFeeding = feeding.deliver(f, by)
+    registry.save(done)?
+    Ok(done)

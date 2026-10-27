@@ -1,0 +1,76 @@
+# desk/payment.brass
+module desk.payment
+import desk.ids as ids
+import desk.lines as lines
+import desk.staff as staff
+import desk.reports as reports
+import desk.advances as advances
+import desk.audit as audit
+import desk.host as host
+
+interface
+  fn pay(store: host.Store, ledger: host.Ledger, report_id: ids.ReportId, finance_badge: ids.Badge) -> Outcome<Text>
+  fn close_period(store: host.Store, period: ids.Period, finance_badge: ids.Badge) -> Outcome<Done>
+
+  fn pay_advance(store: host.Store, ledger: host.Ledger, advance_id: ids.ReportId, finance_badge: ids.Badge) -> Outcome<Text>
+  fn pay_against(store: host.Store, ledger: host.Ledger, report_id: ids.ReportId, advance_id: ids.ReportId, finance_badge: ids.Badge) -> Outcome<Text>
+body
+  fn pay(store, ledger, report_id, finance_badge) =
+    let who: staff.Staff = store.staff(finance_badge)?
+    if who is staff.Finance then
+      let r: reports.Report = store.report(report_id)?
+      if r is reports.Approved then
+        let reference: Text = ledger.pay(r.badge, lines.total(r.lines), r.id)?
+        store.save_report(reports.pay(r, reference))?
+        store.append_audit(audit.entry(who.badge, r.id, audit.of_report(reports.ReportStatus.Approved), audit.of_report(reports.ReportStatus.Paid), "paid"))?
+        Ok(reference)
+      else Err(FailureCode.Conflict, "the report is not approved")
+    else Err(FailureCode.Unauthorized, "only active finance staff may pay")
+
+  fn close_period(store, period, finance_badge) =
+    let who: staff.Staff = store.staff(finance_badge)?
+    if who is staff.Finance then
+      let closed: Bool = store.period_closed(period)?
+      if closed then Err(FailureCode.Conflict, "the period is already closed")
+      else store.close_period(period)
+    else Err(FailureCode.Unauthorized, "only active finance staff may close a period")
+
+  fn pay_advance(store, ledger, advance_id, finance_badge) =
+    let who: staff.Staff = store.staff(finance_badge)?
+    if who is staff.Finance then
+      let a: advances.Advance = store.advance(advance_id)?
+      if a is advances.Approved then
+        let reference: Text = ledger.pay(a.badge, a.amount, a.id)?
+        store.save_advance(advances.pay(a, reference))?
+        store.append_audit(audit.entry(who.badge, a.id, audit.of_advance(advances.AdvanceStatus.Approved), audit.of_advance(advances.AdvanceStatus.Paid), "paid"))?
+        Ok(reference)
+      else Err(FailureCode.Conflict, "the advance is not approved")
+    else Err(FailureCode.Unauthorized, "only active finance staff may pay")
+
+  fn pay_against(store, ledger, report_id, advance_id, finance_badge) =
+    let who: staff.Staff = store.staff(finance_badge)?
+    if who is staff.Finance then
+      let r: reports.Report = store.report(report_id)?
+      if r is reports.Approved then
+        let a: advances.Advance = store.advance(advance_id)?
+        if a is advances.Paid then
+          if a.badge == r.badge and a.period == r.period then
+            let total: Int = lines.total(r.lines)
+            if a.amount >= total then
+              store.save_report(reports.pay(r, a.reference))?
+              store.append_audit(audit.entry(who.badge, r.id, audit.of_report(reports.ReportStatus.Approved), audit.of_report(reports.ReportStatus.Paid), "paid"))?
+              store.save_advance(advances.settle(a, a.amount - total))?
+              store.append_audit(audit.entry(who.badge, a.id, audit.of_advance(advances.AdvanceStatus.Paid), audit.of_advance(advances.AdvanceStatus.Settled), "settled"))?
+              Ok("settled")
+            else
+              let remainder: Int = total - a.amount
+              let reference: Text = ledger.pay(r.badge, remainder, r.id)?
+              store.save_report(reports.pay(r, reference))?
+              store.append_audit(audit.entry(who.badge, r.id, audit.of_report(reports.ReportStatus.Approved), audit.of_report(reports.ReportStatus.Paid), "paid"))?
+              store.save_advance(advances.settle(a, 0))?
+              store.append_audit(audit.entry(who.badge, a.id, audit.of_advance(advances.AdvanceStatus.Paid), audit.of_advance(advances.AdvanceStatus.Settled), "settled"))?
+              Ok(reference)
+          else Err(FailureCode.Conflict, "the advance does not belong to the same staff member and period as the report")
+        else Err(FailureCode.Conflict, "the advance has not been paid")
+      else Err(FailureCode.Conflict, "the report is not approved")
+    else Err(FailureCode.Unauthorized, "only active finance staff may pay")

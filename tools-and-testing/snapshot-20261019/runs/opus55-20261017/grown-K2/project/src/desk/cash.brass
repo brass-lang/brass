@@ -1,0 +1,107 @@
+# desk/cash.brass
+module desk.cash
+import desk.ids as ids
+import desk.lines as lines
+import desk.staff as staff
+import desk.reports as reports
+import desk.audit as audit
+import desk.host as host
+import desk.routing as routing
+import desk.review as review
+import desk.advances as advances
+
+interface
+  fn request_advance(store: host.Store, badge: ids.Badge, period: ids.Period, amount: Int) -> Outcome<advances.AdvanceId>
+  fn approve_advance(store: host.Store, advance_id: advances.AdvanceId, approver: ids.Badge) -> Outcome<advances.AdvanceStatus>
+  fn pay_advance(store: host.Store, ledger: host.Ledger, advance_id: advances.AdvanceId, finance_badge: ids.Badge) -> Outcome<Text>
+  fn pay_against(store: host.Store, ledger: host.Ledger, report_id: ids.ReportId, advance_id: advances.AdvanceId, finance_badge: ids.Badge) -> Outcome<Text>
+  fn outstanding_advances(store: host.Store, today: ids.Period) -> Outcome<advances.AdvanceIds>
+private
+  type AdvanceGate = { a: advances.Requested, who: staff.Active }
+
+  fn gate(store: host.Store, advance_id: advances.AdvanceId, approver: ids.Badge) -> Outcome<AdvanceGate>
+  fn final_approval(store: host.Store, a: advances.Requested, who: staff.Active) -> Outcome<advances.AdvanceStatus>
+body
+  fn request_advance(store, badge, period, amount) =
+    let who: staff.Staff = store.staff(badge)?
+    if who is staff.Active then
+      if amount >= 1 and amount <= 1000000000 then
+        let closed: Bool = store.period_closed(period)?
+        if not closed then
+          let id: advances.AdvanceId = store.next_id()?
+          store.save_advance({ id: id, badge: badge, department: who.department, period: period, amount: amount, status: advances.AdvanceStatus.Requested, approvals: [] })?
+          Ok(id)
+        else Err(FailureCode.Conflict, "the period is closed")
+      else Err(FailureCode.InvalidInput, "an advance is for at least 1 cent")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn approve_advance(store, advance_id, approver) =
+    let g: AdvanceGate = gate(store, advance_id, approver)?
+    if g.a.approvals.length + 1 >= routing.steps_for(g.a.amount) then final_approval(store, g.a, g.who)
+    else
+      store.save_advance(advances.add_approval(g.a, g.who.badge))?
+      store.append_audit(audit.entry(g.who.badge, g.a.id, reports.ReportStatus.Submitted, reports.ReportStatus.Submitted, "approved; awaiting the next approver"))?
+      Ok(advances.AdvanceStatus.Requested)
+
+  fn pay_advance(store, ledger, advance_id, finance_badge) =
+    let who: staff.Staff = store.staff(finance_badge)?
+    if who is staff.Finance then
+      let a: advances.Advance = store.advance(advance_id)?
+      if a is advances.Approved then
+        let reference: Text = ledger.pay(a.badge, a.amount, a.id)?
+        store.save_advance(advances.pay(a, reference))?
+        store.append_audit(audit.entry(who.badge, a.id, reports.ReportStatus.Approved, reports.ReportStatus.Paid, "paid"))?
+        Ok(reference)
+      else Err(FailureCode.Conflict, "the advance is not approved")
+    else Err(FailureCode.Unauthorized, "only active finance staff may pay")
+
+  fn pay_against(store, ledger, report_id, advance_id, finance_badge) =
+    let who: staff.Staff = store.staff(finance_badge)?
+    if who is staff.Finance then
+      let r: reports.Report = store.report(report_id)?
+      if r is reports.Approved then
+        let a: advances.Advance = store.advance(advance_id)?
+        if a is advances.Paid and a.badge == r.badge and a.period == r.period then
+          let total: Int = lines.total(r.lines)
+          let covered: Bool = a.amount >= total
+          let reference: Text = if covered then a.reference else ledger.pay(r.badge, total - a.amount, r.id)?
+          store.save_report(reports.pay(r, reference))?
+          store.append_audit(audit.entry(who.badge, r.id, reports.ReportStatus.Approved, reports.ReportStatus.Paid, "paid"))?
+          store.save_advance(advances.settle(a, total))?
+          store.append_audit(audit.entry(who.badge, a.id, reports.ReportStatus.Paid, reports.ReportStatus.Paid, "settled"))?
+          if covered then Ok("settled") else Ok(reference)
+        else Err(FailureCode.Conflict, "the advance is not a paid advance of this report's staff member in its period")
+      else Err(FailureCode.Conflict, "the report is not approved")
+    else Err(FailureCode.Unauthorized, "only active finance staff may pay")
+
+  fn outstanding_advances(store, today) =
+    let held: advances.Advances = store.paid_advances()?
+    let out: advances.AdvanceIds = []
+    for a in held
+      if a.status in {advances.AdvanceStatus.Paid} and a.period + 2 < today then out = out ++ [a.id]
+    Ok(out)
+
+  fn gate(store, advance_id, approver) =
+    let who: staff.Staff = store.staff(approver)?
+    if who is staff.Active then
+      let a: advances.Advance = store.advance(advance_id)?
+      if a is advances.Requested then
+        let closed: Bool = store.period_closed(a.period)?
+        if not closed then
+          if who.badge != a.badge then
+            let allowed: Bool = review.may_approve(store, a.badge, a.department, a.approvals, who)?
+            if allowed then Ok({ a: a, who: who })
+            else Err(FailureCode.Unauthorized, "not this advance's next approver")
+          else Err(FailureCode.Unauthorized, "an advance cannot be approved by its requester")
+        else Err(FailureCode.Conflict, "the period is closed")
+      else Err(FailureCode.Conflict, "the advance is not awaiting approval")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn final_approval(store, a, who) =
+    let within: Bool = review.budget_allows(store, a.department, a.period, a.amount)?
+    if within or who.role in {ids.Role.Finance} then
+      let reason: ids.Reason = if within then "approved" else "approved; budget override"
+      store.save_advance(advances.approve(a))?
+      store.append_audit(audit.entry(who.badge, a.id, reports.ReportStatus.Submitted, reports.ReportStatus.Approved, reason))?
+      Ok(advances.AdvanceStatus.Approved)
+    else Err(FailureCode.Conflict, "the department budget for this period would be exceeded")

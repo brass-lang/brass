@@ -1,0 +1,23 @@
+# system.brass
+system expenses
+  grants desk.review.open_draft: store = Store
+  grants desk.review.add_line: store = Store
+  grants desk.review.submit: store = Store
+  grants desk.review.approve: store = Store
+  grants desk.review.reject: store = Store
+  grants desk.review.request_changes: store = Store
+  grants desk.review.resubmit: store = Store
+  grants desk.payment.pay: store = Store, ledger = Ledger
+  grants desk.payment.close_period: store = Store
+  grants desk.advance_flow.request_advance: store = Store
+  grants desk.advance_flow.approve_advance: store = Store
+  grants desk.advance_flow.pay_advance: store = Store, ledger = Ledger
+  grants desk.advance_flow.pay_against: store = Store, ledger = Ledger
+  grants desk.advance_flow.outstanding_advances: store = Store
+  grants desk.queries.spend: store = Store
+  grants desk.queries.statement: store = Store
+  grants desk.queries.pending_for: store = Store
+  limit  cpu_ms 5000
+  limit  memory_bytes 268435456
+  limit  transcript_bytes 100000000, drop oldest
+  limit  impact_modules 12

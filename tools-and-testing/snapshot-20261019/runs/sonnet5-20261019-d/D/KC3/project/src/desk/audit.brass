@@ -1,0 +1,63 @@
+# desk/audit.brass
+module desk.audit
+import desk.ids as ids
+import desk.reports as reports
+import desk.advances as advances
+import desk.trips as trips
+
+interface
+  type Subject = Report | Advance | Trip
+  type Step    = Draft | Submitted | Approved | Rejected | ChangesRequested | Paid | Requested | Settled | Reconciled | Closed
+  type Entry   = { who: ids.Badge, subject: Subject, subject_id: ids.ReportId, was: Step, now: Step, reason: ids.Reason }
+
+  fn report_entry(who: ids.Badge, id: ids.ReportId, was: reports.ReportStatus, now: reports.ReportStatus, reason: ids.Reason) -> Entry
+    after result.who == who and result.subject_id == id
+  fn advance_entry(who: ids.Badge, id: ids.ReportId, was: advances.AdvanceStatus, now: advances.AdvanceStatus, reason: ids.Reason) -> Entry
+    after result.who == who and result.subject_id == id
+
+  fn of_report(s: reports.ReportStatus) -> Step
+    example of_report(reports.ReportStatus.Draft) == Step.Draft
+    example of_report(reports.ReportStatus.Submitted) == Step.Submitted
+    example of_report(reports.ReportStatus.Approved) == Step.Approved
+    example of_report(reports.ReportStatus.Rejected) == Step.Rejected
+    example of_report(reports.ReportStatus.ChangesRequested) == Step.ChangesRequested
+    example of_report(reports.ReportStatus.Paid) == Step.Paid
+  fn of_advance(s: advances.AdvanceStatus) -> Step
+    example of_advance(advances.AdvanceStatus.Requested) == Step.Requested
+    example of_advance(advances.AdvanceStatus.Approved) == Step.Approved
+    example of_advance(advances.AdvanceStatus.Paid) == Step.Paid
+    example of_advance(advances.AdvanceStatus.Settled) == Step.Settled
+  fn trip_entry(who: ids.Badge, id: ids.ReportId, was: trips.TripStatus, now: trips.TripStatus, reason: ids.Reason) -> Entry
+    after result.who == who and result.subject_id == id
+  fn of_trip(s: trips.TripStatus) -> Step
+    example of_trip(trips.TripStatus.Requested) == Step.Requested
+    example of_trip(trips.TripStatus.Approved) == Step.Approved
+    example of_trip(trips.TripStatus.Reconciled) == Step.Reconciled
+    example of_trip(trips.TripStatus.Closed) == Step.Closed
+
+
+body
+  fn report_entry(who, id, was, now, reason) = { who: who, subject: Subject.Report, subject_id: id, was: of_report(was), now: of_report(now), reason: reason }
+  fn advance_entry(who, id, was, now, reason) = { who: who, subject: Subject.Advance, subject_id: id, was: of_advance(was), now: of_advance(now), reason: reason }
+
+  fn of_report(s) =
+    if s in {reports.ReportStatus.Draft} then Step.Draft
+    else if s in {reports.ReportStatus.Submitted} then Step.Submitted
+    else if s in {reports.ReportStatus.Approved} then Step.Approved
+    else if s in {reports.ReportStatus.Rejected} then Step.Rejected
+    else if s in {reports.ReportStatus.ChangesRequested} then Step.ChangesRequested
+    else Step.Paid
+
+  fn of_advance(s) =
+    if s in {advances.AdvanceStatus.Requested} then Step.Requested
+    else if s in {advances.AdvanceStatus.Approved} then Step.Approved
+    else if s in {advances.AdvanceStatus.Paid} then Step.Paid
+    else Step.Settled
+
+  fn trip_entry(who, id, was, now, reason) = { who: who, subject: Subject.Trip, subject_id: id, was: of_trip(was), now: of_trip(now), reason: reason }
+
+  fn of_trip(s) =
+    if s in {trips.TripStatus.Requested} then Step.Requested
+    else if s in {trips.TripStatus.Approved} then Step.Approved
+    else if s in {trips.TripStatus.Reconciled} then Step.Reconciled
+    else Step.Closed

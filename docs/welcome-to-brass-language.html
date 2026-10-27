@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Welcome to Brass Language</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inconsolata:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap">
+<style>
+/* layout: one reading column with margin notes; code and tool output may run wider */
+:root{
+  --paper:#FFFFF8; --ink:#111110; --soft:#4A4A45; --faint:#8C8B84; --rule:#CFCFC2; --wash:#F2F1EA; --wash2:#E9E8DF;
+  --keel:#1C4FB8; --keel-wash:#E4ECFA; --code-tint:#F6F5EE; --comment:#5B82C9; --amber:#E2A32B; --amber-ink:#1A1408; --hazard:#C23B22; --hazard-wash:#FBE9E4; --sign:"Barlow Condensed","Arial Narrow","Helvetica Neue",sans-serif;
+  --serif:"EB Garamond","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --mono:Inconsolata,ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --paper:#151513; --ink:#ECEAE0; --soft:#B4B2A8; --faint:#85847C; --rule:#3E3D38; --wash:#1E1E1B; --wash2:#2A2A26;
+    --keel:#6FA0FF; --keel-wash:#1B2436; --code-tint:#1C1C1A; --comment:#7FA6E0; --amber:#E8B04A; --amber-ink:#151513; --hazard:#FF7A62; --hazard-wash:#3A1E19; color-scheme:dark; }
+}
+:root[data-theme="dark"]{ --paper:#151513; --ink:#ECEAE0; --soft:#B4B2A8; --faint:#85847C; --rule:#3E3D38; --wash:#1E1E1B; --wash2:#2A2A26;
+  --keel:#6FA0FF; --keel-wash:#1B2436; --code-tint:#1C1C1A; --comment:#7FA6E0; --amber:#E8B04A; --amber-ink:#151513; --hazard:#FF7A62; --hazard-wash:#3A1E19; color-scheme:dark; }
+
+html{ background:var(--paper); }
+body{ background:var(--paper); color:var(--ink); font-family:var(--serif); font-size:19px; line-height:1.5;
+  font-variant-numeric:oldstyle-nums proportional-nums; padding-inline:clamp(16px,5vw,64px); padding-block:48px 80px; }
+article{ max-width:1100px; margin:0 auto; }
+h1{ font-weight:500; font-size:2.6rem; line-height:1.1; margin:0 0 .3rem; letter-spacing:-.005em; text-wrap:balance; }
+.subtitle{ font-style:italic; font-size:1.35rem; color:var(--soft); margin:0 0 2.2rem; max-width:36rem; }
+h2{ font-weight:500; font-style:italic; font-size:1.8rem; line-height:1.2; margin:3.4rem 0 .7rem; text-wrap:balance; }
+h3{ font-weight:500; font-style:italic; font-size:1.35rem; line-height:1.25; margin:2.4rem 0 .5rem; text-wrap:balance; }
+p, ul, ol{ max-width:36rem; margin:0 0 1rem; }
+ul, ol{ padding-left:1.1rem; } li{ margin-bottom:.45rem; }
+li b, p b{ font-weight:500; }
+code{ font-family:var(--mono); font-size:.86em; font-style:normal; color:var(--soft); background:var(--code-tint); padding:.02em .22em; border-radius:2px; }
+.control code{ background:rgba(255,255,255,.08); }
+.step .lab code.cmd{ white-space:nowrap; font-size:.82rem; color:#E8B04A; background:rgba(232,176,74,.12); }
+a{ color:var(--keel); }
+.row{ display:grid; grid-template-columns:minmax(0,36rem) minmax(0,1fr); column-gap:3rem; align-items:start; }
+.row > *{ min-width:0; }
+.mn{ font-size:.82rem; line-height:1.38; color:var(--soft); max-width:19rem; }
+.mn b{ font-weight:500; color:var(--ink); }
+@media (max-width:860px){ .row{ grid-template-columns:1fr; } .mn{ margin:-.4rem 0 1.2rem; padding-left:.8rem; border-left:1px solid var(--rule); } }
+
+/* every code sample: one style */
+pre{ font-family:var(--mono); font-size:.8rem; line-height:1.55; margin:.6rem 0 1rem; padding:.8rem 1rem; background:var(--wash); border-radius:3px;
+  overflow-x:auto; white-space:pre; max-width:100%; font-variant-numeric:lining-nums; color:var(--ink); }
+pre .c{ color:var(--comment); font-style:italic; }
+pre .w{ font-weight:500; }
+pre .f{ color:var(--faint); }
+pre .add{ background:var(--keel-wash); display:inline-block; min-width:100%; }
+pre .add .c{ color:var(--soft); }
+pre .del{ color:var(--faint); text-decoration:line-through; }
+pre .ctx, pre .ctx .w, pre .ctx .c{ color:var(--faint); font-weight:400; font-style:normal; }
+pre.grow .add{ display:inline-block; min-width:100%; }
+pre.out{ background:var(--paper); border:1px solid var(--rule); color:var(--soft); }
+pre.out .ok{ color:var(--keel); }
+pre.out .no{ color:var(--ink); font-weight:600; }
+pre.out .cmd{ color:var(--ink); font-weight:600; }
+.cap{ font-size:.82rem; color:var(--soft); margin:-.5rem 0 1.2rem; max-width:36rem; }
+
+/* the worked session */
+.flow{ display:grid; grid-template-columns:minmax(0,1fr); row-gap:.2rem; margin:1rem 0; }
+.step{ display:grid; grid-template-columns:14rem minmax(0,1fr); column-gap:1.5rem; align-items:start; }
+.step > *{ min-width:0; }
+.step .lab{ font-size:.95rem; line-height:1.35; padding-top:.4rem; }
+.step .lab b{ display:block; font-weight:500; }
+.step .lab span{ color:var(--soft); font-size:.85rem; }
+.step pre{ margin:.4rem 0; }
+@media (max-width:760px){ .step{ grid-template-columns:1fr; } .step .lab{ padding-top:.4rem; } }
+
+/* the one finding that changes how the numbers read */
+.finding{ max-width:36rem; margin:1.2rem 0 1.4rem; padding:.2rem 0 .2rem 1.1rem; border-left:2px solid var(--keel); font-size:1.12rem; line-height:1.45; }
+
+/* three edits */
+.trio{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); column-gap:1.6rem; row-gap:1.6rem; margin:1rem 0; }
+.trio > *{ min-width:0; }
+@media (max-width:980px){ .trio{ grid-template-columns:1fr; } }
+.edit h3{ margin:0 0 .15rem; }
+.lesson{ font-size:.82rem; color:var(--keel); font-variant:small-caps; letter-spacing:.06em; margin:0 0 .3rem; }
+h4.form{ font-weight:500; font-style:italic; font-size:1.1em; line-height:1.3; margin:2.2rem 0 .35rem; }
+.edit pre{ font-size:.74rem; }
+.edit pre span.ln{ display:block; width:max-content; min-width:100%; }
+.verdict{ font-variant:small-caps; letter-spacing:.06em; font-size:1rem; margin:.1rem 0 .1rem; }
+.verdict.yes{ color:var(--soft); font-style:italic; }
+.edit p{ font-size:.9rem; line-height:1.4; }
+.edit p.lead{ margin:.7rem 0 0; color:var(--soft); }
+
+/* tables */
+.tablewrap{ overflow-x:auto; max-width:100%; }
+table{ border-collapse:collapse; font-size:.9rem; line-height:1.38; margin:.6rem 0 1rem; }
+thead th{ font-weight:400; font-style:italic; text-align:left; padding:.2rem 1.2rem .35rem 0; border-top:1.5px solid var(--ink); border-bottom:1px solid var(--ink); white-space:nowrap; }
+tbody td{ padding:.32rem 1.2rem .32rem 0; vertical-align:top; border-bottom:1px solid var(--wash2); }
+tbody tr:last-child td{ border-bottom:1.5px solid var(--ink); }
+td.c, th.c{ font-family:var(--mono); font-size:.82rem; white-space:nowrap; }
+td.kc{ font-family:var(--mono); font-size:.82rem; white-space:nowrap; color:var(--keel); }
+td.why{ min-width:16rem; }
+table.evid td:first-child{ color:var(--soft); white-space:nowrap; }
+table.evid td:nth-child(2){ font-family:var(--mono); font-size:.82rem; color:var(--keel); white-space:nowrap; }
+table.evid td:nth-child(3){ min-width:16rem; max-width:28rem; }
+table.evid td:nth-child(4){ min-width:11rem; color:var(--soft); }
+.grid-presence td, .grid-presence th{ text-align:center; padding-right:1.4rem; }
+.grid-presence td:first-child, .grid-presence th:first-child{ text-align:left; font-family:var(--mono); font-size:.82rem; }
+.dot{ display:inline-block; width:.55rem; height:.55rem; border-radius:50%; background:var(--keel); }
+.nodot{ display:inline-block; width:.55rem; height:1px; background:var(--rule); vertical-align:middle; }
+.kw td:first-child{ white-space:nowrap; font-style:italic; color:var(--soft); }
+.kw td.c{ white-space:normal; line-height:1.9; }
+.kw td.c span{ display:inline-block; background:var(--wash); padding:0 .4rem; border-radius:2px; margin:0 .25rem .2rem 0; }
+
+.two{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:3rem; }
+.two > *{ min-width:0; }
+@media (max-width:760px){ .two{ grid-template-columns:1fr; } }
+.two ul{ font-size:.95rem; }
+
+/* reference: set apart by a rule, at body size */
+.ref{ margin-top:4.5rem; padding-top:1.4rem; border-top:1.5px solid var(--ink); }
+.ref > .eyebrow{ font-variant:small-caps; letter-spacing:.08em; color:var(--soft); font-size:1rem; margin:0 0 .2rem; }
+.ref h2{ margin-top:0; }
+.ref #faq{ margin-top:3.4rem; }
+.ref h3{ margin-top:2.4rem; }
+.foot{ margin-top:3.5rem; font-size:.82rem; color:var(--soft); max-width:36rem; }
+.foot p{ margin-bottom:.5rem; }
+
+/* park signage, the control room, stamps, pull lines */
+.sign{ display:inline-flex; align-items:center; gap:.5rem; margin:3.6rem 0 -.2rem; font-family:var(--sign); font-weight:600; font-size:.82rem; letter-spacing:.14em; text-transform:uppercase; color:var(--amber-ink); background:var(--amber); padding:.18rem .6rem .14rem; border-radius:2px; max-width:100%; }
+.sign + h2{ margin-top:.5rem; }
+.sign.hz{ background:repeating-linear-gradient(-45deg,var(--amber) 0 10px,var(--amber-ink) 10px 20px); color:var(--amber); }
+.sign.hz span{ background:var(--amber-ink); padding:0 .4rem; }
+.pull{ font-style:italic; font-size:1.7rem; line-height:1.25; max-width:30rem; margin:1.8rem 0 1.8rem; padding-left:1rem; border-left:3px solid var(--amber); text-wrap:balance; }
+.machine{ margin:1rem 0 1.2rem; max-width:640px; }
+.machine svg{ width:100%; height:auto; display:block; }
+.machine figcaption{ font-size:.82rem; color:var(--soft); margin-top:.3rem; }
+.machine .node rect{ fill:var(--paper); stroke:var(--ink); stroke-width:1.5; }
+.machine .node.start rect{ fill:var(--keel-wash); stroke:var(--keel); }
+.machine .node.end rect{ stroke:var(--hazard); stroke-dasharray:4 3; }
+.machine text{ font-family:var(--sign); font-weight:600; font-size:17px; letter-spacing:.06em; text-transform:uppercase; fill:var(--ink); }
+.machine .lbl{ font-family:var(--serif); font-weight:400; font-style:italic; font-size:14px; letter-spacing:0; text-transform:none; fill:var(--soft); }
+.machine .edge{ fill:none; stroke:var(--keel); stroke-width:2; }
+.machine .head{ fill:var(--keel); }
+.machine .bad{ fill:none; stroke:var(--hazard); stroke-width:2; stroke-dasharray:6 4; }
+.machine .badhead{ fill:var(--hazard); }
+.machine .x{ stroke:var(--hazard); stroke-width:3; stroke-linecap:round; }
+.machine .badlbl{ font-family:var(--serif); font-style:italic; font-size:14px; letter-spacing:0; text-transform:none; fill:var(--hazard); font-weight:400; }
+.control{ background:#14171A; color:#D9D6CC; border-radius:6px; padding:1.4rem 1.4rem .8rem; margin:1.2rem 0 1.4rem; box-shadow:inset 0 0 0 1px #262B31; }
+.control .bar{ display:flex; align-items:center; gap:.6rem; font-family:var(--sign); font-weight:600; letter-spacing:.14em; text-transform:uppercase; font-size:.8rem; color:#E8B04A; margin:0 0 .6rem; }
+.control .bar i{ width:.55rem; height:.55rem; border-radius:50%; background:#5FD38D; box-shadow:0 0 6px #5FD38D; display:inline-block; }
+.control .step .lab b{ color:#F3F1E8; }
+.control .step .lab span{ color:#9AA1A8; }
+.control .step .lab code{ color:#F3F1E8; }
+.control pre.out{ background:var(--wash); border:1px solid #262B31; color:var(--soft); }
+.control pre.out .cmd{ color:var(--ink); }
+.control pre.out .ok{ color:var(--keel); }
+.control pre.out .no{ color:var(--hazard); }
+.control pre.out .f{ color:var(--faint); }
+.stamp{ display:inline-block; font-family:var(--sign); font-weight:700; font-size:1.05rem; letter-spacing:.16em; text-transform:uppercase; padding:.1rem .6rem; border:2.5px solid currentColor; border-radius:3px; transform:rotate(-4deg); margin:.5rem 0 .5rem .2rem; }
+.stamp.no{ color:var(--hazard); }
+.stamp.yes{ color:var(--soft); }
+.caution{ display:inline-block; margin-left:.7rem; font-family:var(--sign); font-weight:600; font-size:.78rem; letter-spacing:.12em; text-transform:uppercase; color:var(--amber-ink); background:var(--amber); padding:.08rem .45rem; border-radius:2px; vertical-align:2px; }
+
+/* the enclosure machine, drawn as gate plates */
+.gates{ margin:1.4rem 0 1.4rem; max-width:620px; }
+.gates svg{ width:100%; height:auto; display:block; overflow:visible; }
+.gates .plate rect.body{ fill:var(--paper); stroke:var(--ink); stroke-width:1.2; }
+.gates .plate .cap{ fill:var(--ink); }
+.gates .plate.end .cap{ fill:url(#hz); }
+.gates .plate.end rect.body{ stroke:var(--hazard); }
+.gates .plate text.name{ font-family:var(--sign); font-weight:600; font-size:15px; letter-spacing:.14em; text-transform:uppercase; fill:var(--ink); }
+.gates .plate text.no{ font-family:var(--sign); font-weight:600; font-size:9.5px; letter-spacing:.2em; fill:var(--paper); }
+.gates .plate.end text.no{ fill:var(--amber-ink); }
+.gates .move{ fill:none; stroke:var(--keel); stroke-width:1.3; }
+.gates .tip{ fill:none; stroke:var(--keel); stroke-width:1.3; stroke-linecap:round; stroke-linejoin:round; }
+.gates text.verb{ font-family:var(--serif); font-style:italic; font-size:13.5px; fill:var(--keel); }
+.gates text.start{ font-family:var(--sign); font-size:10px; font-weight:600; letter-spacing:.2em; fill:var(--soft); }
+.gates figcaption{ font-size:.82rem; color:var(--soft); margin-top:.5rem; }
+/* what the widened secure would need */
+.needs{ margin:1.2rem 0 1.4rem; max-width:620px; }
+.needs .q{ font-family:var(--sign); font-weight:600; font-size:.8rem; letter-spacing:.14em; text-transform:uppercase; color:var(--soft); margin:0 0 .5rem; }
+.needs .row3{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.8rem; }
+.needs .g{ border:1.2px solid var(--ink); border-radius:3px; overflow:hidden; background:var(--paper); display:flex; flex-direction:column; }
+.needs .g .top{ height:7px; background:var(--ink); }
+.needs .g.breached .top{ background:repeating-linear-gradient(-45deg,var(--amber) 0 6px,var(--amber-ink) 6px 12px); }
+.needs .g .from{ font-family:var(--sign); font-weight:600; letter-spacing:.2em; text-transform:uppercase; font-size:.68rem; color:var(--soft); padding:.45rem .7rem 0; }
+.needs .g .nm{ font-family:var(--sign); font-weight:600; letter-spacing:.14em; text-transform:uppercase; font-size:.95rem; padding:.05rem .7rem .15rem; }
+.needs .g .mv{ font-family:var(--mono); font-size:.74rem; color:var(--soft); padding:0 .7rem .55rem; flex:1; }
+.needs .g .res{ font-size:.85rem; padding:.35rem .7rem .4rem; border-top:1px solid var(--rule); }
+.needs .g .res.ok{ color:var(--keel); background:var(--keel-wash); }
+.needs .g .res.no{ color:var(--hazard); background:var(--hazard-wash); }
+.needs .g .res b{ font-weight:600; }
+.needs figcaption{ font-size:.82rem; color:var(--soft); margin-top:.5rem; }
+/* plaques */
+.plaque{ display:inline-flex; flex-wrap:wrap; align-items:stretch; gap:0; max-width:100%; font-family:var(--sign); font-weight:600; font-size:.78rem; letter-spacing:.18em; text-transform:uppercase; color:var(--ink); background:#fff; border:1px solid var(--ink); border-radius:2px; overflow:hidden; margin:0 0 1.4rem; }
+.plaque span{ padding:.2rem .7rem .16rem; }
+.plaque span + span + span{ border-left:1px solid var(--rule); }
+.plaque .b{ background:var(--ink); color:var(--paper); }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .plaque{ background:var(--wash); } }
+:root[data-theme="dark"] .plaque{ background:var(--wash); }
+.stripe{ height:8px; background:repeating-linear-gradient(-45deg,var(--amber) 0 10px,var(--amber-ink) 10px 20px); border-radius:2px; margin:4.5rem 0 0; max-width:1100px; opacity:.9; }
+.warn{ display:grid; grid-template-columns:auto minmax(0,1fr); gap:.9rem; align-items:center; max-width:36rem; margin:1.4rem 0; padding:.8rem 1rem; background:var(--amber); color:var(--amber-ink); border-radius:3px; box-shadow:inset 0 0 0 2px var(--amber-ink); }
+.warn .tri{ width:2.2rem; height:2rem; }
+.warn .tri path{ fill:var(--amber-ink); }
+.warn .tri text{ fill:var(--amber); font-family:var(--sign); font-weight:700; font-size:15px; }
+.warn .t1{ font-family:var(--sign); font-weight:700; letter-spacing:.14em; text-transform:uppercase; font-size:.95rem; line-height:1.2; }
+.warn .t2{ font-family:var(--sign); font-weight:500; letter-spacing:.06em; font-size:.88rem; line-height:1.3; }
+@media (max-width:600px){ .needs .row3{ grid-template-columns:1fr; } }
+
+.tour{ margin:3.4rem 0 0; padding-top:1.6rem; border-top:1px solid var(--rule); max-width:36rem; }
+.tour .plaque{ margin-bottom:.8rem; }
+.tour p{ font-style:italic; color:var(--soft); }
+.sign.first{ margin-top:2.2rem; }
+.caution-line{ font-size:.95rem; color:var(--soft); margin:1.2rem 0; }
+.caution-line .caution{ margin:0 .5rem 0 0; }
+
+/* a field note: an aside that expands one row of the departures table */
+.control.note{ max-width:46rem; margin:2.2rem 0 1.6rem; padding-bottom:.4rem; }
+.control.note h3{ color:#F3F1E8; margin:.3rem 0 .6rem; }
+.control.note > p, .control.note li{ color:#D9D6CC; font-size:.97rem; }
+.control.note b, .control.note p code, .control.note li code{ color:#F3F1E8; }
+.control.note pre{ background:var(--wash); color:var(--ink); }
+/* highlight: body-color text on a soft yellow band */
+.hl{ color:var(--ink); background:#FAF0C6; padding:0 .15em; border-radius:2px; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .hl{ background:#5C4F27; } }
+:root[data-theme="dark"] .hl{ background:#5C4F27; }
+
+/* the skeptic's questions: each smaller, fainter and further in, like a thought trailing off */
+.ponder{ max-width:36rem; margin:2.6rem 0 3rem; display:grid; gap:1.1rem; }
+.ponder p{ margin:0; font-style:italic; font-weight:400; text-wrap:balance; }
+.ponder p:nth-child(1){ font-size:3.4rem; line-height:1; color:var(--ink); letter-spacing:-.01em; }
+.ponder p:nth-child(2){ font-size:2.2rem; line-height:1.1; color:var(--soft); padding-left:2rem; }
+.ponder p:nth-child(3){ font-size:1.4rem; line-height:1.3; color:var(--faint); padding-left:4rem; max-width:30rem; }
+@media (max-width:520px){
+  .ponder p:nth-child(1){ font-size:2.6rem; }
+  .ponder p:nth-child(2){ font-size:1.8rem; padding-left:1rem; }
+  .ponder p:nth-child(3){ font-size:1.25rem; padding-left:2rem; }
+}
+</style>
+</head>
+<body>
+<article>
+<h1>Welcome to Brass Language</h1>
+<p class="subtitle">A programming language designed for AI to write and humans to trust</p>
+
+<p>Today, AI models write code in programming languages that were never designed for AI. Languages like C++, Python, and Rust were designed for people who did that now-ancient thing of writing code by hand. Because these languages were designed for people, they were also designed with human-level productivity gains in mind, introducing all sorts of clever abstractions and dependencies — the kind of behavior that offers accelerated development when writing code by hand, but brings unnecessary effort and confusion to LLMs trying to reason out a large code base (AKA navigating 5 parent classes to understand one method).</p>
+<p>That is why Brass exists: a programming language designed for AI to efficiently program with.</p>
+<p>By being AI-first, Brass creates code that isolates context as much as possible and offers built-in code navigation tooling, offering concise situational awareness within a couple of files or commands rather than the traditional <i>reason → grep → reason → grep-again</i> AI loop. As a result, an AI model writing code in Brass has less to look up to build context, even if the model is unfamiliar with the language. And curiously enough, by stepping away from traditional coding patterns like inheritance, Brass gains an explicitness that is also easier for people to read and review than the sort of code language models commonly write today.</p>
+<p>That explicitness is also what makes Brass checkable. Each module declares what its functions need, what they promise and which state changes they may make. <span class="hl">Before the code can run, Brass’s checker has to prove that the code does what those declarations say. If it can’t, the code is rejected.</span> What nothing checks is labeled assumed, so a reviewer can see what the program takes on faith.</p>
+<p>Jumping into the language itself, the intention of this document is to introduce Brass and its key features. Think of it as a “getting to know you” guide for a new programming language. As part of this, it’s worth calling out that Brass is still a spec language; nothing compiles yet, so think of Brass as an exploration of an idea and a request for comment.</p>
+<p class="cap" style="margin-top:0">Today there is a grammar rule book for models to follow, and <code>brass</code>, a working tool that checks a program’s structure, runs its examples and helps models find their way around the code (see <a href="#tool"><i>How a model uses the tool</i></a> and <a href="#impact"><i>The impact of this work</i></a>). Next comes the full checker, which proves every function's promises, then a compiled runtime.</p>
+<p>Let’s go exploring!</p>
+
+<!-- 1. the language in one module -->
+<div class="tour">
+<div class="plaque"><span class="b">Language tour</span><span>Visitor guide</span></div>
+<p>To make the idea and rules of Brass more real, the examples use a park of Jurassic creatures. The park’s software has two jobs: decide who may close a paddock’s door, and record when there’s a change to the door state. The program is small, but one wrong edit could leave a door open — great for a media franchise but horrible for people!</p>
+</div>
+<div class="sign first">Code: introducing a first module</div>
+<h2>The basic idea – dinosaur enclosures</h2>
+<p>An alarm has tripped and a paddock’s door has been closed. The park’s record for that paddock now has to change from open to secured. Other systems read this record, so the change must be assigned to the correct paddock.</p>
+<p>In bringing this logic to Brass, let’s first go over what a Brass module looks like. Each Brass module (file) is composed of up to three sections:</p>
+<ul>
+  <li><code>interface</code> holds the declarations that are publicly accessible to other modules.</li>
+  <li><code>private</code> holds declarations that can only be used by the internals of this file. This section is optional.</li>
+  <li><code>body</code> holds the implementations of the code defined in <code>interface</code> and <code>private</code>. Any changes to the body must match declarations outside the body.</li>
+</ul>
+<p>The file below implements the paddock situation described above. Note that there is no private section and the public function <code>secure</code> takes an open paddock and returns a secured one with the same id.</p>
+<pre class="k"># park/enclosures.brass, first version
+module park.enclosures
+
+interface
+  # the states an enclosure can be in, and the moves allowed between them
+  machine Enclosure
+    states  Secured, Open, Breached
+    initial Secured
+    Secured enters Open
+    Open    enters Secured | Breached
+
+  type Paddock        = { id: Int where it in 1 to 40, status: Enclosure }
+  type OpenPaddock    = Paddock where it.status in {Enclosure.Open}
+  type SecuredPaddock = Paddock where it.status in {Enclosure.Secured}
+
+  # a first version: it only updates the record
+  # the code samples that follow build on it, up to closing the real door
+  fn secure(p: OpenPaddock) -> SecuredPaddock
+    after result.id == p.id
+
+body
+  # with copies p; enters changes its status, and only along a declared move
+  fn secure(p) = p with { status enters Enclosure.Secured }</pre>
+<p>Each part of <code>secure</code> has one job:</p>
+<ul>
+  <li><code>p: OpenPaddock</code> accepts only a paddock whose record is open.</li>
+  <li><code>-> SecuredPaddock</code> requires the result to be a secured paddock.</li>
+  <li><code>after result.id == p.id</code> requires the result to have the same id as the paddock passed in. This promise stays in place and must be honored regardless of how the implementation of <code>secure</code> changes inside the body.</li>
+  <li>Here the <code>body</code> implementation of <code>secure</code> is one line: a copy of <code>p</code> with its status changed to <code>Enclosure.Secured</code> by using the <code>enters</code> keyword, allowing the state to change in an explicit manner, and only along a move the machine declares. That one line is also the function’s result; Brass has no <code>return</code> keyword.</li>
+</ul>
+<p><span class="hl">The function can only modify a configuration or subsystem if it is given access to that item as a parameter.</span> <code>secure</code>’s only parameter is the paddock record, so it can return an updated copy of the record, but it cannot do some other arbitrary task like close the actual door unless given access to that behavior. This sort of code access/isolation is central to Brass’s approach towards explicitness.</p>
+<p>Now suppose a model edits the body and leaves in a test value, so every result gets id 1.</p>
+<pre class="k diff">-  fn secure(p) = p with { status enters Enclosure.Secured }
++  fn secure(p) = p with { id: 1, status enters Enclosure.Secured }</pre>
+<p>This edit produces the following error, since p.id is not always 1:</p>
+<pre class="out"><span class="no">fault</span> after not established: result.id == p.id
+  counterexample: p.id = 2
+  at park/enclosures.brass: fn secure
+  fix: leave id as it is in p</pre>
+<p>The result has the right type, but the wrong id for every paddock except 1, breaking the declared promise <code>after result.id == p.id</code> and thus rejecting the code change via a fault.</p>
+
+<h3>State machines: declaring which state changes are allowed</h3>
+<p>The code above makes use of <code>machine</code> to create a state machine named <code>Enclosure</code>. In this context, <code>Enclosure</code> defines the following states and moves: a secured paddock can transition to open, and an open paddock can transition to secured or breached. Once a paddock becomes breached, it is locked in that state. Eventually, adding something like a repair move would allow breached to shift back to secured; that changes the machine, which is part of the interface, so it is a decision for a person.</p>
+<figure class="gates"><svg viewBox="0 0 620 132" role="img" aria-label="The Enclosure machine: Secured to Open, Open back to Secured or on to Breached">
+<defs><pattern id="hz" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" fill="var(--amber)"/><rect width="5" height="10" fill="var(--amber-ink)"/></pattern></defs>
+<text class="start" x="70" y="22" text-anchor="middle">INITIAL</text>
+<path class="move" d="M70 28 L70 38"/><path class="tip" d="M66 34 L70 39 L74 34"/>
+<g class="plate"><rect class="body" x="10" y="42" width="120" height="50" rx="3"/><rect class="cap" x="10" y="42" width="120" height="12" rx="3"/><rect class="cap" x="10" y="48" width="120" height="6"/><text class="no" x="70" y="51.5" text-anchor="middle">STATE 1</text><text class="name" x="70" y="79" text-anchor="middle">Secured</text></g>
+<g class="plate"><rect class="body" x="250" y="42" width="120" height="50" rx="3"/><rect class="cap" x="250" y="42" width="120" height="12" rx="3"/><rect class="cap" x="250" y="48" width="120" height="6"/><text class="no" x="310" y="51.5" text-anchor="middle">STATE 2</text><text class="name" x="310" y="79" text-anchor="middle">Open</text></g>
+<g class="plate end"><rect class="body" x="490" y="42" width="120" height="50" rx="3"/><rect class="cap" x="490" y="42" width="120" height="12" rx="3"/><rect class="cap" x="490" y="48" width="120" height="6"/><text class="name" x="550" y="79" text-anchor="middle">Breached</text></g>
+<path class="move" d="M132 58 C175 40 205 40 246 58"/><path class="tip" d="M240 53 L247 58.5 L239 61"/>
+<path class="move" d="M248 78 C205 96 175 96 134 78"/><path class="tip" d="M141 74 L133 77.5 L140 83"/>
+<path class="move" d="M372 67 L486 67"/><path class="tip" d="M480 62.5 L487 67 L480 71.5"/>
+<text class="verb" x="190" y="36" text-anchor="middle">open</text>
+<text class="verb" x="190" y="112" text-anchor="middle">secure</text>
+<text class="verb" x="429" y="59" text-anchor="middle">breach</text>
+<text class="start" x="550" y="114" text-anchor="middle">NO MOVES OUT</text>
+</svg><figcaption>The <code>Enclosure</code> machine. <code>Secured</code> is its initial state.</figcaption></figure>
+
+<h3><code>brass</code> and what it means when an edit is accepted</h3>
+<p>With the full checker, <code>brass</code> only accepts an edit once it has proven every promise the module makes. It doesn’t matter how the edit was made: whether a model went through <code>brass apply</code> or wrote the file directly, <code>brass check</code> reads the files as they are, and nothing runs until a check passes and <code>brass</code> writes its lock file. For <code>enclosures.brass</code> that is three facts:</p>
+<ul>
+  <li>Any code that calls <code>secure</code> has to hand it a paddock that’s known to be open (an <code>OpenPaddock</code>).</li>
+  <li>What <code>secure</code> returns is of type <code>SecuredPaddock</code> and has the same id.</li>
+  <li>Every <code>Enclosure</code> state change must be a move the machine declares.</li>
+</ul>
+<p>The checker proves only what the declarations say. If there is a rule that is missing, such as closing the physical door, this won’t be caught. See <a href="#catches"><i>What it catches, and what it misses</i></a> for more detail.</p>
+
+<div class="sign ">Concept: before, after and example</div>
+<h2>Writing down a promise</h2>
+<p>A promise is a contract that must prove true for a function to successfully enter or exit its execution. Promises allow critical “this must be true for the function to be useful” logic to be made explicit, allowing the function implementation to focus on business logic rather than the proof required to support this logic.</p>
+<p>You write a promise with <code>before</code> or <code>after</code>. A third line, <code>example</code>, works like a built-in test: one call and the answer it must give.</p>
+<div class="tablewrap"><table class="evid" aria-label="The three kinds of promise line, who keeps each, and examples">
+  <thead><tr><th>who keeps it</th><th>line</th><th>what it says</th><th>in the park</th></tr></thead>
+  <tbody>
+    <tr><td>the caller<br>(or the runtime, for an access)</td><td>before</td><td>What must be true when the function is called.</td><td><code>close</code> is called only for a paddock in its grant: <code>before paddock in paddocks</code>. Since this one checks the grant, the runtime enforces it rather than the caller.</td></tr>
+    <tr><td>the body</td><td>after</td><td>What must be true when the function returns successfully.</td><td><code>secure</code> returns the paddock it was given: <code>after result.id == p.id</code></td></tr>
+    <tr><td>the function</td><td>example</td><td>The expected answer to a specific function call.</td><td><code>example ration(Species.Rex) == 50000</code></td></tr>
+  </tbody>
+</table></div>
+<p class="cap">So far the park has used only <code>after</code>; <code>before</code> and <code>example</code> arrive as it grows.</p>
+<p>Together, the <code>before</code> and <code>after</code> lines are what the spec calls a contract. Once declared, the checker has to prove every contract holds, or it rejects the program, in turn naming the clause it couldn’t prove. For promises connected to outside software boundaries, see <a href="#catches"><i>What it catches, and what it misses</i></a>.</p>
+
+<!-- 3. framing -->
+<div class="sign ">Concept: language design choices</div>
+<h2>Where Brass departs from the usual form</h2>
+<p>Before moving to the next phase of code development, let’s spend a moment to consider the language in broader terms. Though most of Brass will look familiar, core differences come from one of three critical design choices:</p>
+<ol>
+  <li><b>Keep meaning local.</b> Business logic is kept as local to the source file as possible. This means Brass leaves out inheritance, dynamic dispatch and mutable global state, to cut down on the cross-file detective work that generally comes with navigating a pre-AI language.</li>
+  <li><b>Say it one way.</b> Each Brass keyword has one meaning, or a few closely related ones, and tries to narrow its use case to one kind. This means no overloading and no mixing of metaphors (such as using <code>+</code> to mean the summing of numbers <i>and</i> the concatenation of strings).</li>
+  <li><b>Put the rules beside the function.</b> What a function needs, promises and may touch goes in its signature, so a model can read the rules associated with a function before it reads its implementation.</li>
+</ol>
+<p><span class="hl">Together with the <code>brass</code> tooling, these choices mean a model can get what it needs from a module’s declarations in one or two commands instead of reading bodies across many files, and when an edit fails, the checker names the rule it broke.</span></p>
+<div class="tablewrap"><table>
+  <thead><tr><th>Instead of</th><th>Brass has</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>inheritance</td><td class="kc">projects to</td><td class="why">A record declares which smaller record types it can be passed as. Only the fields required by that type are copied, and no behavior is inherited.</td></tr>
+    <tr><td>exceptions</td><td class="kc">Outcome&lt;T&gt;, ?</td><td class="why">Failure is part of the return type, <code>Outcome&lt;T&gt;</code>, with no <code>try</code>, <code>throw</code> or <code>catch</code>. Each caller handles the error or passes it on with <code>?</code>.</td></tr>
+    <tr><td>null by default</td><td class="kc">Maybe&lt;T&gt;</td><td class="why"><code>Maybe&lt;T&gt;</code> makes absence explicit: a value is either a <code>T</code> or <code>None</code>, and the caller checks before using it. You only have to account for missing values where the type says they’re possible.</td></tr>
+    <tr><td>global services</td><td class="kc">access parameters</td><td class="why">A function can only use an outside service if it’s handed access through a parameter. Its signature shows what it can touch; there’s no global connection to reach for.</td></tr>
+    <tr><td>validate() calls</td><td class="kc">where, is</td><td class="why">A type can require a condition, like “this person is on shift.” The caller checks it; the function doesn’t need to check again.</td></tr>
+    <tr><td>a status field and scattered ifs</td><td class="kc">machine, enters</td><td class="why">Legal state changes are declared once, in the machine. A function can move an open paddock to secured only if the machine allows that move.</td></tr>
+    <tr><td>optional fields</td><td class="kc">when</td><td class="why">Some fields only make sense in certain states, such as the time a paddock was breached. <code>when</code> makes the field required in those states and absent in the others, so functions don’t have to manage that relationship themselves.</td></tr>
+    <tr><td>invariants in comments</td><td class="kc">before, after</td><td class="why">What a function needs and promises belongs beside its declaration, where callers and reviewers can see it. <code>before</code> and <code>after</code> make it checkable, so a new implementation has to keep the same promises.</td></tr>
+    <tr><td>tests in another folder</td><td class="kc">example</td><td class="why">A concrete example sits beside the function, so readers can see an expected result without hunting through tests.</td></tr>
+    <tr><td>public and private on each line</td><td class="kc">interface, private</td><td class="why">Grouping public and internal declarations makes a module’s boundary explicit, so a tool can show a model what the module offers without its internal details.</td></tr>
+    <tr><td>while and recursion</td><td class="kc">bounded for</td><td class="why">Every loop has a known upper bound, so the checker can establish that it finishes. Retries and repeated work use one form, and edits to the body can’t accidentally remove the condition that makes it stop.</td></tr>
+    <tr><td>mutation</td><td class="kc">with</td><td class="why"><code>with</code> makes a copy and changes only the fields you name. The original is never touched.</td></tr>
+    <tr><td class="c">"a" + "b"</td><td class="kc">"a" ++ "b"</td><td class="why"><code>+</code> always means addition of numbers, and never joins text.</td></tr>
+    <tr><td class="c">-&gt; for a state change</td><td class="kc">enters</td><td class="why">The arrow <code>-&gt;</code> already means “returns”, so a state change gets its own word.</td></tr>
+    <tr><td class="c">return</td><td>the last line</td><td class="why">A function’s final expression is its result. A function that succeeds always runs to the end.</td></tr>
+    <tr><td class="c">a &lt; b &lt; c</td><td>a rejection</td><td class="why">A chained comparison means different things in different languages. Writing <code>a &lt; b and b &lt; c</code> spells out both checks, so there’s only one way to read it.</td></tr>
+    <tr><td class="c">a and b or c</td><td class="kc">(a and b) or c</td><td class="why">Without parentheses, the writer and the reader can group the condition differently. Brass requires the grouping to be written, so there is one reading.</td></tr>
+  </tbody>
+</table></div>
+
+<aside class="control note" aria-label="Field note: projection instead of inheritance">
+<div class="bar"><i></i>Field note · projection</div>
+<h3>Projection instead of inheritance</h3>
+<p>Brass has no inheritance. Instead, a record type can declare that it <code>projects to</code> a smaller record type. Projection copies just the fields the smaller type has.</p>
+<p>Say the park puts up a visitor board, listing each paddock’s id and species. The board needs just these two fields, not the door’s state. A projection effectively allows a <code>Paddock</code> to act as a <code>BoardEntry</code> in situations where a <code>BoardEntry</code> is expected, all while only exposing the required attributes — there is no class hierarchy to trace. This scenario is shown in the code sample below; it uses <code>PaddockId</code>, <code>Species</code> and <code>ration</code>, defined in the next section.</p>
+<pre class="k"># a sketch: what park/enclosures.brass could add for a visitor board
+import std.text as text
+
+interface
+  # what the visitor board needs: which animal is in which paddock, and nothing about the door
+  type BoardEntry = { id: PaddockId, species: Species }
+
+  type Paddock = { id: PaddockId, species: Species, status: Enclosure }
+    projects to BoardEntry
+
+  # one line of the board, such as "Paddock 2 eats 12000 grams a day"
+  fn board_line(e: BoardEntry) -> Text
+
+body
+  fn board_line(e) = "Paddock " ++ text.of(e.id) ++ " eats " ++ text.of(ration(e.species)) ++ " grams a day"
+
+# the board code may pass a Paddock wherever a BoardEntry is expected: board_line(p)
+# the projection copies id and species, and nothing else</pre>
+
+<p>Though <code>board_line</code> takes a <code>BoardEntry</code>, it also accepts a <code>Paddock</code>, because <code>Paddock</code> has been marked as able to project to that type. The board code receives just the id and species, and the paddock is unchanged.</p>
+</aside>
+
+<h3>Why it is built this way</h3>
+<p>In thinking about the design of Brass, it’s fair to think:</p>
+<div class="ponder" role="group" aria-label="Three questions a skeptic might ask">
+<p>Why?</p>
+<p>What’s the point?</p>
+<p>Current languages are robust and seem to do a good enough job — another language will solve this?</p>
+</div>
+<p>Writing code can mean building lots of things: a game, an operating system, a spreadsheet, the flow logic for a pacemaker… Though these things are the result of software producing a specific behavior, that behavior only exists because code segments were described in relationship with each other.</p>
+<p>Code is about relationships. Or more specifically, code describes relationships between data to produce a result.</p>
+<p>And in today’s world, relationships are complex. Major commercial software easily runs to tens of millions of lines of code (a bad unit of measurement <i>I know</i>, but bear with me), and that number only grows. As a codebase grows, so do the relationships within it, and keeping track of them gets expensive.</p>
+<p>Brass accepts that keeping those relationships correct has a cost, and leans into it with two rules:</p>
+<ul>
+  <li><b>Records repeat shared fields.</b> A record is a type with named fields, like <code>Paddock</code>. Each one lists all its own fields, even ones another record shares, so what a model needs is in one place. The bet is that this costs less than untangling deep inheritance.</li>
+  <li><b>The checker rejects code it cannot prove.</b> It names the clause it couldn’t prove, as the id 1 edit showed, and never guesses what you meant or relaxes a promise to let code through. Sometimes that rejects correct code, and the model tries again. Letting a broken promise through would cost a door left open.</li>
+</ul>
+<p>None of these ideas is new on its own. Cargo locks dependencies, E passes authority around as a value, and Dafny proves contracts before code runs. Yes, Brass borrows from a bunch of languages, and it could easily turn into a Dagwood of a language. So every borrowed idea has to pass one simple test: <span class="hl">can you tell what a module needs, does and promises just by reading its declarations?</span> If yes, it’s in. If not, it’s out.</p>
+
+
+
+
+<!-- 4. finish the example -->
+<div class="sign ">Code: types, authority, failure</div>
+<h2>Dinosaurs continued – building out the park</h2>
+<p>Continuing with the dinosaur park, let’s add more detail to the paddock records, introduce a module that controls the doors, and handle things going wrong. To help tell what’s new from what’s existing, new lines appear in blue, removed lines are shown in <s>strikethrough</s>, and unchanged code is colored gray.</p>
+
+<h3>Types and examples</h3>
+<p>For this code let’s do a few things: give <code>Paddock</code> its own typed ID via <code>PaddockId</code>, add a species to each paddock, and create the scaffolding for staff records. As you’ll see in the code, by using <code>where</code>, a type can carry an extra condition, such as a <code>PaddockId</code> within a specific integer range, or a <code>DoorOperator</code> described as a staff member whose role is <code>Operator</code>.</p>
+<pre class="k grow"># park/enclosures.brass
+ interface
++  type PaddockId = Int where it in 1 to 40
++  type BadgeId   = Int where it in 1 to 9999
++  type Grams     = Int where it in 0 to 50000
++  # a sum type: one of these names, written Species.Rex elsewhere
++  type Species   = Goat | Raptor | Rex      # the goats are lunch
++  type Role      = Keeper | Operator | Guide
++  type Staff        = { badge: BadgeId, role: Role }
++  type DoorOperator = Staff where it.role in {Role.Operator}
+
+   machine Enclosure   # unchanged
+
+-  type Paddock        = { id: Int where it in 1 to 40, status: Enclosure }
++  type Paddock        = { id: PaddockId, species: Species, status: Enclosure }
+   type OpenPaddock    = Paddock where it.status in {Enclosure.Open}
+   type SecuredPaddock = Paddock where it.status in {Enclosure.Secured}
+
+   fn secure(p: OpenPaddock) -> SecuredPaddock
+-    after result.id == p.id
++    after result.id == p.id and result.species == p.species
++
++  # an example: one call and its answer, run on every check
++  fn ration(species: Species) -> Grams
++    example ration(Species.Goat) == 2000
++    example ration(Species.Rex) == 50000
+
+ body
+   fn secure(p) = p with { status enters Enclosure.Secured }
++  fn ration(species) =
++    if species in {Species.Goat} then 2000
++    else if species in {Species.Raptor} then 12000
++    else 50000</pre>
+<p>Two things about this code are worth pointing out before moving on.</p>
+<ul>
+  <li><b>A value gets a <code>where</code> type only when the checker can prove it fits, or an <code>is</code> test succeeds.</b> Once <code>who is DoorOperator</code> passes, Brass treats <code>who</code> as a <code>DoorOperator</code> for the rest of that branch. Brass has no casts.</li>
+  <li><b>Examples and proofs work together.</b> <code>ration</code>’s two <code>example</code> lines run on every check; separately, the checker proves every answer fits in <code>Grams</code>. Examples are only for functions that can’t fail and take no access.</li>
+</ul>
+
+<h3>Authority is a parameter</h3>
+<p>So far, <code>secure</code> only changes a record. To actually close a door, Brass must call the <i>host</i> (Brass’s name for the outside software it talks to). Here that is the park’s existing control-room software, which reads sensors, runs the door motors, and keeps records. A function reaches the host only through an <i>access</i>: a parameter that lists which host operations it may call. Every call through an access is a request to software outside Brass; the host does the work and sends back a reply. Here the access is <code>Doors</code>, with two operations: look up a paddock and close its door.</p>
+<p>When a motion sensor trips, the host calls <code>lockdown_request</code> with the person at the console and the paddock number. A function the host can call is an <i>entry point</i>. Its access comes from a <i>grant</i> in <code>system.brass</code>, which also limits which doors it covers. The function checks the person’s role, asks the host to close the door, and returns the secured paddock or an error. The host records that result (the <code>log.record</code> line below), and the rest of the park reads it.</p>
+<pre class="k"># the control room's side, sketched in Python; the call shape is illustrative
+who    = db.staff(console.badge)
+# doors is not passed: the runtime fills it from the grant in system.brass
+result = brass.call("park.doors.lockdown_request", who=who, paddock=alarm.paddock)
+log.record(result)   # an Ok with the secured paddock, or an Err with a code and a message</pre>
+<pre class="k"># park/doors.brass
+module park.doors
+import park.enclosures as enclosures
+
+interface
+  # what the host provides; each allow is one operation the host implements
+  access Doors { paddocks: Set&lt;enclosures.PaddockId&gt;, deadline_ms: Int }
+    allow enclosure(paddock: enclosures.PaddockId) -> Outcome&lt;enclosures.Paddock&gt;
+      before paddock in paddocks
+      after  result.id == paddock
+    allow close(operator: enclosures.DoorOperator, paddock: enclosures.PaddockId) -> Outcome&lt;Done&gt;
+      before paddock in paddocks
+
+  # the entry point: the host calls it with plain staff and a paddock number; the role is tested inside
+  fn lockdown_request(doors: Doors, who: enclosures.Staff, paddock: enclosures.PaddockId) -> Outcome&lt;enclosures.SecuredPaddock&gt;
+    after result.id == paddock
+
+# only this file can use what private declares
+private
+  fn lockdown_as(doors: Doors, operator: enclosures.DoorOperator, paddock: enclosures.PaddockId) -> Outcome&lt;enclosures.SecuredPaddock&gt;
+    after result.id == paddock
+
+body
+  fn lockdown_request(doors, who, paddock) =
+    if who is enclosures.DoorOperator then lockdown_as(doors, who, paddock)
+    else Err(FailureCode.Unauthorized, "not a door operator")
+
+  fn lockdown_as(doors, operator, paddock) =
+    let p: enclosures.Paddock = doors.enclosure(paddock)?
+    if p is enclosures.OpenPaddock then
+      doors.close(operator, p.id)?
+      Ok(enclosures.secure(p))
+    else Err(FailureCode.Conflict, "paddock is not open")</pre>
+<pre class="k"># system.brass: the one file that creates authority
+system park
+  grants park.doors.lockdown_request: doors = Doors { paddocks: {1, 2, 3}, deadline_ms: 30000 }
+  # and three required limits and an optional review policy, shown in the complete program</pre>
+<ul>
+  <li><b><code>access</code> lists the host operations available to the code.</b> Within it, each <code>allow</code> declares one operation. <code>doors.close(…)</code> looks like a method call, but <code>doors</code> is an access, and <code>close</code> is one of the operations it allows. The runtime checks both sides of every call: the <code>before</code> going in, the <code>after</code> coming back. Here, access covers paddocks 1 to 3, and <code>deadline_ms</code> allows each operation 30 seconds to reply, enough time for a heavy gate to close.</li>
+  <li><b>Access is passed through parameters.</b> The runtime supplies <code>doors</code> from the grant: the line in <code>system.brass</code> that names an entry point and hands it an access with specific bounds. No grant, no access. <code>lockdown_request</code> then passes <code>doors</code> to <code>lockdown_as</code>, which calls its operations. Access cannot be stored or returned. <code>secure</code> receives none.</li>
+  <li><b><code>close</code> requires a <code>DoorOperator</code>.</b> Having <code>doors</code> is not enough: the staff member must also have the required role.</li>
+</ul>
+<p>Below are four possible host calls and their results, written in the host’s notation. The error messages are illustrative.</p>
+<pre class="out">lockdown_request(who: operator, paddock: 2)
+  → Ok({ id: 2, species: Raptor, status: Secured })
+
+lockdown_request(who: guide, paddock: 2)
+  → Err(FailureCode.Unauthorized, "not a door operator")           <span class="f"># the body's own refusal</span>
+
+lockdown_request(who: operator, paddock: 7)
+  → Err(FailureCode.Unauthorized, "paddock in paddocks")           <span class="f"># the authority check on enclosure refused; the grant covers 1 to 3</span>
+
+lockdown_request(who: operator, paddock: 41)
+  → Err(FailureCode.InvalidInput, "paddock: enclosures.PaddockId")  <span class="f"># refused on the way in: 41 is not a PaddockId, and the body never ran</span></pre>
+
+<h3>Failure is a value</h3>
+<p><code>lockdown_as</code> has three places where it can return an error: reading the paddock, closing the door, and finding that the paddock isn't open. All three come back the same way, as an error value in the return type rather than an exception. Every error carries one of Brass’s standard failure codes, the closed list below, plus a message. A body picks the code that fits; it can’t invent new ones.</p>
+<pre class="k"># built in
+type Outcome&lt;T&gt;  = Ok(T) | Err(FailureCode, Text)
+type FailureCode = Unauthorized | InvalidInput | Conflict | Unavailable | ResourceExhausted | Other | Unknown | NotFound</pre>
+<pre class="k grow"># park/doors.brass
+ private
+   fn lockdown_as(…) -> Outcome&lt;enclosures.SecuredPaddock&gt;
+     after result.id == paddock
+ body
+   fn lockdown_as(doors, operator, paddock) =
++    # ? gives the Ok value, or leaves the function now, handing the Err to its caller
+     let p: enclosures.Paddock = doors.enclosure(paddock)?
+     if p is enclosures.OpenPaddock then
+       doors.close(operator, p.id)?
++      # the last line of a branch is its value
+       Ok(enclosures.secure(p))
++    # every failure (Err) carries a code and a message
+     else Err(FailureCode.Conflict, "paddock is not open")</pre>
+<ul>
+  <li><b><code>after</code> describes success only.</b> <code>lockdown_as</code> promises <code>after result.id == paddock</code>. On a function that returns an <code>Outcome&lt;T&gt;</code>, that promise is about the value inside <code>Ok</code>: when the function succeeds, the paddock it returns has the id it was asked for. When it returns an <code>Err</code>, there is no result to promise anything about.</li>
+  <li><b>Brass has no exceptions.</b> <code>?</code> unwraps the value inside <code>Ok</code> so the next line can use it. If the call came back as an <code>Err</code> instead, the function stops right there and hands that <code>Err</code> back to whoever called it. <code>?</code> works only in functions that return an <code>Outcome</code>. To handle the result directly, use <code>is Ok</code> or <code>is Err</code>.</li>
+  <li><b>Errors do not undo earlier actions.</b> If the door closes and a later step fails, the door stays closed. Brass has no notion of a set of actions that succeed or fail together. A few failures aren’t errors at all and stop the whole call; see <a href="#stops"><i>When a call stops</i></a>.</li>
+</ul>
+
+<div class="sign ">Tooling: support for AI models</div>
+<h2 id="tool">How a model uses the tool — AKA less grep to build context faster</h2>
+<p><code>brass</code> lets a model ask questions about unfamiliar code without reading every file. The session below shows the workflow: <b>read</b> the modules’ declarations, <b>ask</b> about one declaration, <b>edit</b> the code, and <b>check</b> the result.</p>
+<p>In other words, <span class="hl"><code>brass</code> stops the model from leaning on grep and gives it the semantic information it needs to build context.</span></p>
+<p>Let’s consider a scenario where the model is asked to let the control room secure a paddock in any state. Every command below is part of <code>brass</code> today, and the models in the trials used each one. Every line that reports a proof, <code>proven</code>, <i>rejected</i> and <i>✓ every contract proven</i>, shows the full checker at work: what <code>brass</code> reports once it proves promises and state moves.</p>
+<div class="control"><div class="bar"><i></i>Park control · brass session</div>
+<div class="flow">
+  <div class="step"><div class="lab"><b>Model reads via <code class="cmd">brass show</code></b><span>It asks <code>brass</code> to show the declarations of the <code>enclosures</code> and <code>doors</code> modules in one call, and gets 46 of their 66 lines, without the bodies. The source comes back exactly as written, so the model can copy a line straight into a patch. Here, each … stands for lines left out to keep it short.</span></div>
+    <pre class="out"><span class="cmd">$ brass show enclosures doors</span>
+file  park/enclosures.brass   declarations, lines 1 to 28 of 36
+module park.enclosures
+
+interface
+  type PaddockId = Int where it in 1 to 40
+…
+  type Paddock        = { id: PaddockId, species: Species, status: Enclosure }
+…
+  fn secure(p: OpenPaddock) -> SecuredPaddock
+    after result.id == p.id and result.species == p.species
+…
+file  park/doors.brass   declarations, lines 1 to 18 of 30
+…
+  fn lockdown_request(doors: Doors, who: enclosures.Staff, paddock: enclosures.PaddockId) -> Outcome&lt;enclosures.SecuredPaddock&gt;
+    after result.id == paddock
+
+private
+  fn lockdown_as(doors: Doors, operator: enclosures.DoorOperator, paddock: enclosures.PaddockId) -> Outcome&lt;enclosures.SecuredPaddock&gt;
+    after result.id == paddock</pre></div>
+
+  <div class="step"><div class="lab"><b>Model asks via <code class="cmd">brass info</code></b><span>It asks <code>brass</code> for everything it knows about <code>secure</code>: its promises, what it holds, and who calls it under what condition. There is one caller, in a branch where the paddock is already known to be open. <code>proven</code> means the checker established the function’s promises for every allowed input. The report’s <code>q:</code> ID lets a later edit cite these facts: <code>brass verify</code> re-runs the report, and the full checker rejects an edit whose cited facts no longer match.</span></div>
+    <pre class="out"><span class="cmd">$ brass info park.enclosures.secure</span>
+info park.enclosures.secure  q:81c0d2e9a7f4
+  fn secure(p: OpenPaddock) -> SecuredPaddock      proven
+    after result.id == p.id and result.species == p.species      proven
+  holds     no access; cannot reach outside
+  used_by   1 declaration, 1 line
+    doors.brass:29   Ok(enclosures.secure(p))
+      in       fn lockdown_as(…) -> Outcome&lt;enclosures.SecuredPaddock&gt; (private)
+      on path  if p is enclosures.OpenPaddock then
+  body      1 line   references: Enclosure.Secured
+end q:81c0d2e9a7f4</pre></div>
+
+  <div class="step"><div class="lab"><b>Model edits via <code class="cmd">brass apply</code></b><span>Here the model applies a patch that changes <code>secure</code> to accept any paddock, the obvious fix. The checker rejects the patch: a paddock could already be <code>Secured</code> or <code>Breached</code>, and neither state has a declared move, an <i>edge</i>, into <code>Secured</code>. The tool checks before writing, so no files change. It holds the patch for correction in the next <code>apply</code>. The <code>@@@</code> lines are part of the patch format, not Brass.</span></div>
+    <pre class="out"><span class="cmd">$ brass apply &lt;&lt;'PATCH'
+@@@ edit park/enclosures.brass
+@@@ find
+  fn secure(p: OpenPaddock) -> SecuredPaddock
+@@@ replace
+  fn secure(p: Paddock) -> SecuredPaddock
+@@@ end
+PATCH</span>
+apply       <span class="no">✗</span> nothing written: the check rejects 1 line
+rejected    in the patched files:
+  <span class="no">fault</span> edge not established: p.status enters Enclosure.Secured
+    source states not covered: Secured, Breached
+    at park/enclosures.brass: fn secure
+    fix: narrow p to a state with that edge, or test p is OpenPaddock first
+held        1 block that matched, kept for your next apply</pre></div>
+
+  <div class="step"><div class="lab"><b>Model checks via <code class="cmd">brass check</code></b><span>It sees that the suggested fix would put the old restriction back, so it would not do what was asked. Securing a breached paddock needs a new move in the machine, which is a change to the interface that a person should decide on. The model drops the held patch, so the files stay as they were, runs the check again, and explains this in its reply.</span></div>
+    <pre class="out"><span class="cmd">$ brass apply --drop</span>
+apply       held patch discarded
+
+<span class="cmd">$ brass check</span>
+check       <span class="ok">✓</span> every contract proven or enforced, every edge established
+grants      <span class="ok">✓</span> Doors { paddocks: {1, 2, 3}, deadline_ms: 30000 } fits park.doors.Doors
+examples    <span class="ok">✓</span> 2 found, 2 hold
+lock        written</pre></div>
+</div>
+</div>
+<p class="cap">All four commands work today.</p>
+<!-- 5. edges -->
+<div class="sign hz"><span>Mistakes: caught and missed</span></div>
+<h2 id="catches">What it catches, and what it misses</h2>
+<p><span class="hl">The checker can enforce what’s declared, but it cannot tell whether you’ve declared everything that matters.</span> No compiler or type checker in any language can; a missing rule looks the same as a rule you chose not to write. Below are three edits a model might confidently make, and how far the checker’s protection goes on each.</p>
+<div class="trio" id="trio"><div class="edit"><h3>Cut the Rex ration</h3><p class="lesson">an example catches it</p><pre><span class="f"># park/enclosures.brass</span>
+<span class="ln "><span class="w">interface</span></span><span class="ln ">  <span class="w">fn</span> ration(species: Species) -&gt; Grams</span><span class="ln ">    <span class="w">example</span> ration(Species.Goat) == 2000</span><span class="ln ">    <span class="w">example</span> ration(Species.Rex) == 50000</span><span class="ln "><span class="w">body</span></span><span class="ln ">  <span class="w">fn</span> ration(species) =</span><span class="ln ">    <span class="w">if</span> species <span class="w">in</span> {Species.Goat} <span class="w">then</span> 2000</span><span class="ln ">    <span class="w">else</span> <span class="w">if</span> species <span class="w">in</span> {Species.Raptor} <span class="w">then</span> 12000</span><span class="ln del">    <span class="w">else</span> 50000</span><span class="ln add">    <span class="w">else</span> 20000</span></pre><p class="lead">The model runs <code>brass check</code>, which also runs every example, and gets this back:</p><div><span class="stamp no">Rejected</span></div><pre class="out"><span class="cmd">$ brass check</span>
+examples    ✗ 2 found, 1 holds, 1 fails
+  FAILS    enclosures.ration   park/enclosures.brass:28
+           ration(Species.Rex) == 50000   got 20000</pre><p>The example says a Rex eats 50,000 grams and the new code says 20,000, so the checker rejects the edit. That does not mean the cut is wrong: it may be a real budget change. If it is, the model should update the example as well, and a person approves that change to the interface.</p></div><div class="edit"><h3>Drop an <code>is</code> test that looks redundant</h3><p class="lesson">a type catches it</p><pre><span class="f"># park/doors.brass</span>
+<span class="ln "><span class="w">body</span></span><span class="ln ">  <span class="w">fn</span> lockdown_as(doors, operator, paddock) =</span><span class="ln ">    <span class="w">let</span> p: enclosures.Paddock = doors.enclosure(paddock)?</span><span class="ln del">    <span class="w">if</span> p <span class="w">is</span> enclosures.OpenPaddock <span class="w">then</span></span><span class="ln del">      doors.close(operator, p.id)?</span><span class="ln del">      Ok(enclosures.secure(p))</span><span class="ln del">    <span class="w">else</span> Err(FailureCode.Conflict, "paddock is not open")</span><span class="ln add">    doors.close(operator, p.id)?</span><span class="ln add">    Ok(enclosures.secure(p))</span></pre><p class="lead">The model runs <code>brass check</code> and gets this back:</p><div><span class="stamp no">Rejected</span></div><pre class="out"><span class="cmd">$ brass check</span>
+fault argument type: expected enclosures.OpenPaddock, found enclosures.Paddock
+  at park/doors.brass: fn lockdown_as, enclosures.secure(p)
+  fix: test p is enclosures.OpenPaddock first, or pass an OpenPaddock</pre><p>The host might return a paddock in any state, but <code>secure</code> only accepts an open one, so the checker rejects the call. No example was needed to catch this, because the rule is part of the declaration of <code>secure</code> and the checker applies it to every caller.</p><p class="lead">This one needs the full checker, which checks conditions like <code>OpenPaddock</code>.</p></div><div class="edit"><h3>Skip the door</h3><p class="lesson">nothing catches it</p><pre><span class="f"># park/doors.brass</span>
+<span class="ln "><span class="w">private</span></span><span class="ln ">  <span class="w">fn</span> lockdown_as(…) -&gt; Outcome&lt;enclosures.SecuredPaddock&gt;</span><span class="ln ">    <span class="w">after</span> result.id == paddock</span><span class="ln "><span class="w">body</span></span><span class="ln ">  <span class="w">fn</span> lockdown_as(doors, operator, paddock) =</span><span class="ln ">    <span class="w">let</span> p: enclosures.Paddock = doors.enclosure(paddock)?</span><span class="ln ">    <span class="w">if</span> p <span class="w">is</span> enclosures.OpenPaddock <span class="w">then</span></span><span class="ln del">      doors.close(operator, p.id)?</span><span class="ln ">      Ok(enclosures.secure(p))</span><span class="ln ">    <span class="w">else</span> Err(FailureCode.Conflict, "paddock is not open")</span></pre><p class="lead">The model runs <code>brass check</code> and gets this back:</p><div><span class="stamp yes">Accepted</span><span class="caution">and wrong</span></div><pre class="out"><span class="cmd">$ brass check</span>
+no rejection: every before and after still holds</pre><p>The code reports the paddock as secured without ever closing the door. The result still has the right id, state and species, so every declared promise holds. No promise says that <code>lockdown_as</code> must call <code>close</code>, so the checker accepts it.</p></div></div>
+<p class="pull">The record says Secured. The door is still open.</p>
+<p>The third edit shows the limit of what contracts say: a <code>before</code> covers the inputs and an <code>after</code> covers a successful result, and neither says what the body does in between. Which operations a body calls, how many times and in what order, is left to a reader or a test.</p>
+<p class="caution-line"><span class="caution">Caution</span> Past this point, the checker only knows what the host tells it.</p>
+<p>There is a second limit, and it has nothing to do with what the code says. Even when the code does ask the host to close the door, the host could report the door as closed when it isn't. Brass has no way to see that, which is why the report on <code>lockdown_request</code> lists it as assumed:</p>
+<pre class="out"><span class="cmd">$ brass info park.doors.lockdown_request</span>
+info park.doors.lockdown_request  q:3f2a9c81e0d4
+  fn lockdown_request(doors: Doors, who: enclosures.Staff, paddock: enclosures.PaddockId) -> Outcome&lt;enclosures.SecuredPaddock&gt;   <b>enforced</b>
+    after result.id == paddock              enforced      <span class="f"># rests on enclosure's after, which the runtime checks</span>
+  holds     doors: Doors { paddocks: {1, 2, 3}, deadline_ms: 30000 }
+  boundary  who: enclosures.Staff, paddock: enclosures.PaddockId   checked on entry   enforced
+            who's identity, and that the paddock is really open                assumed
+            that a door is shut when close returns Ok                          assumed
+  used_by   none; granted entry point
+end q:3f2a9c81e0d4</pre>
+<p>The word at the end of each row is the label <code>brass</code> puts on every promise. It says what supports the promise:</p>
+<ul>
+  <li><code>proven</code>: the checker proved it before the program runs.</li>
+  <li><code>enforced</code>: the runtime checks it on every call, as it does with the paddock number coming in and the host’s reply.</li>
+  <li><code>assumed</code>: nothing checks it. The program goes forward as if it held, and the label shows the reviewer exactly what they are taking on faith.</li>
+</ul>
+<p>Put another way, Brass is good at expressing rules in code; the quality of those rules is up to whoever writes them.</p>
+
+<div class="sign ">Results: what the trials measured</div>
+<h2 id="impact">The impact of this work</h2>
+<p>A model needs context to change code successfully. Normally, gathering this context means a lot of back-and-forth: read a file, follow a reference, run a check. Brass’s grammar and tooling bring more of that information into each response, reducing the back-and-forth.</p>
+<p>To measure this, Claude Sonnet added a feature to the same expense-report program in Brass and in Python, across 40 sessions and three scenarios. Here, <b>Brass</b> means the language plus its tooling: the <code>brass</code> command, a project map and a host contract, a short list of the operations the outside software provides. Python had ordinary file tools only. Brass with file tools alone, and the full numbers, are in <a href="ai-token-efficiency-of-brass.html"><i>The AI Token Efficiency of Brass</i></a>.</p>
+<p class="pull">With Brass, the model made fewer than half as many requests and used less than half the context it did with Python.</p>
+<div class="tablewrap"><table aria-label="Requests, total context and reasoning tokens per session, Brass against Python">
+  <thead><tr><th>session range</th><th>Brass</th><th>Python</th></tr></thead>
+  <tbody>
+    <tr><td>requests to the model</td><td>13 to 23</td><td>37 to 63</td></tr>
+    <tr><td>total context sent to the model</td><td>0.98M to 2.66M tokens</td><td>2.72M to 5.97M tokens</td></tr>
+    <tr><td>model reasoning tokens spent on code changes</td><td>38k to 79k tokens</td><td>21k to 46k tokens</td></tr>
+  </tbody>
+</table></div>
+<p class="cap">Total context adds up everything sent to the model on every request, so text sent again on a later request is counted again. Each end of a range is one scenario’s average over five sessions. <i>The AI Token Efficiency of Brass</i> covers what the runs cost.</p>
+<p>When getting to know the code base, the model gathered context in fewer requests with Brass, <span class="hl">but with Python the model spent fewer tokens reasoning out the solution</span>: in every scenario the Brass sessions thought 1.4 to 1.8 times as much. That makes sense, since the model has seen a vast amount of Python and none of Brass, though that cause hasn’t been measured. And two of the fifteen Brass sessions missed at least one test case, where every Python session passed. A few other findings matter:</p>
+<ul>
+  <li><b>Brass’s context grew faster on a codebase 2.5 times larger.</b> It rose 75% against Python’s 46%, but stayed under half of Python’s.</li>
+  <li><b>The tooling helps Python too.</b> Brass sessions start with a map of the project’s modules. In an earlier test, giving Python a comparable tool and map removed about three quarters of the difference in total context on the larger codebase. Brass still used the least. That’s worth exploring further, since the same idea could cut token use in languages people already use.</li>
+  <li><b>Settling a design question cut reasoning.</b> In an earlier trial, the model spent extra effort on a field that had to hold the state of one of two different state machines; in park terms, a field that could hold either a paddock’s state or a feeding schedule’s state. The language hadn’t said how to type such a field, so the confusion was in Brass, not in the task. The rule was settled (one shared list of step names, with a converter from each machine) and the trial rerun. Reasoning fell by nearly a third, and every session passed every test.</li>
+</ul>
+<p>These runs cover one model, one program and two tasks. Brass is new, with no body of code for models to learn from. Further savings in both context and reasoning are expected, but not yet measured, as the language matures.</p>
+
+<!-- reference -->
+<section class="ref">
+<div class="sign">Reference: full code and details</div>
+<h2>For readers who want the details</h2>
+<p>The tour showed the park's code in pieces. This section has every reserved word, the complete program as its three files, a note on the lock file that <code>brass</code> writes, and a few more forms a body can use.</p>
+
+<h3>The whole vocabulary</h3>
+<p>Brass works to avoid giving you several ways to write the same thing. When a keyword does more than one job, the meanings stay related: <code>in</code>, for example, checks whether a value is in a set or range, and also steps through an array or range in a <code>for</code> loop. The goal is to make code easier for people to read. Whether that helps models too is still untested.</p>
+<p>Below are all the reserved words, grouped by what they do. There are 37 reserved in every file and four more reserved only in the system file.</p>
+<div class="tablewrap"><table class="kw">
+  <tbody>
+    <tr><td>module structure</td><td class="c"><span>module</span><span>import</span><span>as</span><span>interface</span><span>private</span><span>body</span></td></tr>
+    <tr><td>types and values</td><td class="c"><span>type</span><span>const</span><span>projects</span><span>with</span></td></tr>
+    <tr><td>conditions</td><td class="c"><span>where</span><span>it</span><span>in</span><span>is</span><span>to</span><span>when</span></td></tr>
+    <tr><td>functions and promises</td><td class="c"><span>fn</span><span>before</span><span>after</span><span>example</span></td></tr>
+    <tr><td>state</td><td class="c"><span>machine</span><span>states</span><span>initial</span><span>enters</span></td></tr>
+    <tr><td>authority</td><td class="c"><span>access</span><span>allow</span></td></tr>
+    <tr><td>logic</td><td class="c"><span>and</span><span>or</span><span>not</span></td></tr>
+    <tr><td>inside function bodies</td><td class="c"><span>let</span><span>if</span><span>then</span><span>else</span><span>for</span><span>break</span><span>any</span><span>all</span></td></tr>
+    <tr><td>system file only</td><td class="c"><span>system</span><span>requires</span><span>grants</span><span>limit</span></td></tr>
+    <tr><td>built in, not keywords</td><td class="c"><span>Ok</span><span>Err</span><span>Done</span><span>None</span><span>result</span><span>length</span></td></tr>
+    <tr><td>tokens</td><td class="c"><span>?</span><span>@@</span><span>-&gt;</span><span>=</span><span>#</span></td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="program">The complete program</h3>
+<pre class="k"># park/enclosures.brass
+module park.enclosures
+
+interface
+  type PaddockId = Int where it in 1 to 40
+  type BadgeId   = Int where it in 1 to 9999
+  type Grams     = Int where it in 0 to 50000
+  type Species   = Goat | Raptor | Rex
+  type Role      = Keeper | Operator | Guide
+
+  type Staff        = { badge: BadgeId, role: Role }
+  type DoorOperator = Staff where it.role in {Role.Operator}
+
+  machine Enclosure
+    states  Secured, Open, Breached
+    initial Secured
+    Secured enters Open
+    Open    enters Secured | Breached
+
+  type Paddock        = { id: PaddockId, species: Species, status: Enclosure }
+  type OpenPaddock    = Paddock where it.status in {Enclosure.Open}
+  type SecuredPaddock = Paddock where it.status in {Enclosure.Secured}
+
+  fn secure(p: OpenPaddock) -> SecuredPaddock
+    after result.id == p.id and result.species == p.species
+  fn ration(species: Species) -> Grams
+    example ration(Species.Goat) == 2000
+    example ration(Species.Rex) == 50000
+
+body
+  fn secure(p) = p with { status enters Enclosure.Secured }
+
+  fn ration(species) =
+    if species in {Species.Goat} then 2000
+    else if species in {Species.Raptor} then 12000
+    else 50000</pre>
+<pre class="k"># park/doors.brass
+module park.doors
+import park.enclosures as enclosures
+
+interface
+  access Doors { paddocks: Set&lt;enclosures.PaddockId&gt;, deadline_ms: Int }
+    allow enclosure(paddock: enclosures.PaddockId) -> Outcome&lt;enclosures.Paddock&gt;
+      before paddock in paddocks
+      after  result.id == paddock
+    allow close(operator: enclosures.DoorOperator, paddock: enclosures.PaddockId) -> Outcome&lt;Done&gt;
+      before paddock in paddocks
+
+  fn lockdown_request(doors: Doors, who: enclosures.Staff, paddock: enclosures.PaddockId) -> Outcome&lt;enclosures.SecuredPaddock&gt;
+    after result.id == paddock
+
+private
+  fn lockdown_as(doors: Doors, operator: enclosures.DoorOperator, paddock: enclosures.PaddockId) -> Outcome&lt;enclosures.SecuredPaddock&gt;
+    after result.id == paddock
+
+body
+  fn lockdown_request(doors, who, paddock) =
+    if who is enclosures.DoorOperator then lockdown_as(doors, who, paddock)
+    else Err(FailureCode.Unauthorized, "not a door operator")
+
+  fn lockdown_as(doors, operator, paddock) =
+    let p: enclosures.Paddock = doors.enclosure(paddock)?
+    if p is enclosures.OpenPaddock then
+      doors.close(operator, p.id)?
+      Ok(enclosures.secure(p))
+    else Err(FailureCode.Conflict, "paddock is not open")</pre>
+<pre class="k"># system.brass
+system park
+  grants park.doors.lockdown_request: doors = Doors { paddocks: {1, 2, 3}, deadline_ms: 30000 }
+  limit  cpu_ms 5000
+  limit  memory_bytes 268435456
+  limit  transcript_bytes 67108864, drop oldest
+  limit  impact_modules 4</pre>
+<p><code>brass</code> generates a lock file to ensure the program runs with the same code, dependencies and tools that were checked. If the lock is incomplete, or anything differs from what it records (a module, the system file, a dependency, the checker or the runtime), the program won’t run. The file isn’t edited by hand.</p>
+
+<h3>More body forms</h3>
+<p>The same park code shows how Brass handles bounded retries, collections, optional values and unfinished code.</p>
+
+<h4 class="form">Retry a fixed number of times</h4>
+<p>If the door doesn’t close on the first try, this version tries up to three times and stops at the first success. Every Brass loop has a fixed limit, so the checker knows it ends.</p>
+<pre class="k"># park/doors.brass: lockdown_as with a bounded retry
+fn lockdown_as(doors, operator, paddock) =
+  let p: enclosures.Paddock = doors.enclosure(paddock)?
+  if p is enclosures.OpenPaddock then
+    # every let is typed
+    let last: Outcome&lt;Done&gt; = Err(FailureCode.Unavailable, "not tried")
+    # bounded by its range: 1, 2, 3
+    for attempt in 1 to 3
+      # a rebinding of the same type, not a mutation
+      last = doors.close(operator, p.id)
+      if last is Ok then break
+    if last is Ok then Ok(enclosures.secure(p))
+    else Err(FailureCode.Unavailable, "door did not close in three attempts")
+  else Err(FailureCode.Conflict, "paddock is not open")</pre>
+<p>If all three attempts fail, the function gives up and returns an <code>Unavailable</code> error. A <code>while</code> loop could keep retrying forever; this one can’t.</p>
+
+<h4 class="form">Filter a list</h4>
+<p>Filtering can’t make a list longer, so the result keeps the input’s size limit.</p>
+<pre class="k"># park/enclosures.brass
+fn open_ones(ps: Array&lt;Paddock&gt; where it.length in 0 to 40) -> Array&lt;OpenPaddock&gt; where it.length in 0 to 40
+fn open_ones(ps) =
+  let found: Array&lt;OpenPaddock&gt; = []
+  for p in ps
+    if p is OpenPaddock then found = found ++ [p]
+  found</pre>
+<p>Because the limit is part of the return type, the checker must prove the result holds at most 40 paddocks, and every caller of <code>open_ones</code> can rely on that without checking.</p>
+<p><b>A condition may follow a type wherever one is written.</b> That covers a <code>type</code> line, a field (except one marked <code>when</code>, which takes a named type), a parameter, a return type and a <code>let</code>. Give it a name with <code>type</code> when you reuse it or want to make its purpose clear. For example, <code>PaddockId</code> tells you what the number identifies; <code>Int where it in 1 to 40</code> only tells you its allowed range.</p>
+
+<h4 class="form">Check whether any paddock has a loose predator</h4>
+<p><code>any</code> expresses the check without writing a loop or keeping a separate flag.</p>
+<pre class="k"># park/enclosures.brass
+fn predator_loose(ps: Array&lt;Paddock&gt; where it.length in 0 to 40) -> Bool
+fn predator_loose(ps) = any p in ps where p is OpenPaddock and p.species in {Species.Raptor, Species.Rex}</pre>
+<p><code>all</code> works the same way and asks whether every item matches. On an empty list, <code>any</code> is false and <code>all</code> is true.</p>
+<p><b>Membership is tested with <code>in</code>, and types with <code>is</code>.</b> Checking <code>p.status in {Enclosure.Open}</code> narrows the status field to open, but doesn’t make <code>p</code> an <code>OpenPaddock</code>. For that, use <code>p is OpenPaddock</code>.</p>
+
+<h4 class="form">Handle a missing value</h4>
+<p>The second signer is optional, so the code checks whether one was supplied.</p>
+<pre class="k"># park/enclosures.brass
+fn signers(first: BadgeId, second: Maybe&lt;BadgeId&gt;) -> Int
+fn signers(first, second) =
+  # on the right of and, second counts as a plain BadgeId
+  if second != None and second != first then 2 else 1</pre>
+<p>Without <code>Maybe</code>, a missing signer would need a stand-in value like 0, and nothing would force the code to check for it. Here the type makes that check part of using the value.</p>
+
+<h4 class="form">Leave a gap on purpose</h4>
+<p>A hole, written <code>@@name</code>, marks something a model hasn’t worked out yet. The program is rejected until it’s filled, and <code>brass</code> says what type would fit.</p>
+<pre class="k"># park/doors.brass, inside lockdown_as
+doors.close(@@operator, p.id)?</pre>
+<p>Holes let a model outline a change first and fill in the details later; <code>brass check</code> lists each hole and the type it needs.</p>
+
+<h4 class="form" id="stops">When a call stops</h4>
+<p>A few failures aren’t <code>Err</code> values. They stop the whole call, and Brass code can’t catch them:</p>
+<ul>
+  <li>arithmetic on an integer without a <code>where</code> range produces a value too large or too small for its type</li>
+  <li>the call runs out of memory or CPU time</li>
+  <li>the host’s reply breaks its <code>after</code> promise</li>
+  <li>a <code>before</code> or <code>after</code> the checker proved fails when the runtime checks it again; the runtime re-checks every proven one as the code runs</li>
+</ul>
+<p>The runtime records the cause in its call log, called the <i>transcript</i>. Effects already made through an access stand, as they do after an <code>Err</code>.</p>
+
+<h4 class="form">Two more details</h4>
+<ul>
+  <li><b>The base types are built in.</b> They are <code>Int8 Int16 Int32 Int64 Int Float Bool Text Bytes Array&lt;T&gt; Set&lt;T&gt; Outcome&lt;T&gt; Maybe&lt;T&gt; Done</code>, and integers are signed.</li>
+  <li><b>A declaration may continue onto the next line.</b> It can do so while a <code>(</code>, <code>&lt;</code> or <code>{</code> is still open, like Python’s rule for brackets, with <code>&lt;</code> added for types such as <code>Array&lt;T&gt;</code>.</li>
+</ul>
+
+<h2 id="faq">FAQ</h2>
+<p><b>What do the proofs settle, and what do they leave to people?</b><br>A proved promise means the body does what its declaration says, nothing more. It does not mean the declaration asked for the right thing: in the park, a record marked “secured” does not prove the door closed. People still check that the requirements are all there, that outside actions happen in the right order, and that they had the intended effect. When the checker can’t prove a promise, it rejects the program, names the clause and suggests a fix, and the model tries again. A correct program can be rejected that way. The promise is never weakened to make the check pass.</p>
+<p><b>Why leave out familiar features such as inheritance and recursion?</b><br>Brass favors code whose structure and limits are explicit. Records list their own fields, and loops have declared bounds. This gives up some flexibility so a model or reviewer has fewer relationships to reconstruct and can see why repeated work must finish.</p>
+<p><b>What does <code>?</code> do, and why can’t a body look inside a failure?</b><br><code>?</code> takes the value out of a successful result and, on failure, hands the failure straight to the caller. It only works inside a function that itself returns <code>Outcome</code>, so a failure can never be dropped quietly. A body can test for <code>Err</code> and pass it on, but it can’t read the failure code, which keeps decisions about failure in the declarations rather than scattered through bodies.</p>
+<p><b>How does a model know to use the <code>brass</code> tooling, and what does the workflow look like?</b><br>The same way a person would: it’s told. In the trials, each session’s prompt opened with a short brief naming the commands and asking for every edit to go through <code>brass apply</code>. The loop is then: 1) <code>show</code> for the module index, 2) <code>show</code> with names for the declarations that matter, 3) <code>info</code> for who uses one, 4) a patch, 5) <code>apply</code>, which checks before it writes and names what to fix if it refuses, 6) <code>check</code>. Along the way the model gets a dense, structured picture of the program, so it rarely has to grep for anything.</p>
+<p><b>What is Brass’s memory model? How are values laid out in memory?</b><br>That part isn’t decided, but the direction is. The spec fixes what the language promises: values never change in place, arrays declare how long they can get, and every program declares a CPU and a memory limit, so the checker always knows an upper bound. The runtime is headed for WebAssembly, and that settles a lot of questions: a WebAssembly module has one flat block of memory the host can cap, and no way to reach a file or a network except through functions the host hands it, which is exactly the shape of a Brass access. How memory is laid out, shared and freed, and whether a program ever sees a heap, will be strongly informed by the WebAssembly architecture and its best practices.</p>
+
+<div class="plaque" style="margin-top:3rem"><span class="b">End of tour</span><span>Brass finds a way</span></div>
+<div class="foot">
+  <p>This page describes Brass v0.3. It’s a design, shared for feedback. Until 2026-10-10 the language was called Keel and its tool <code>keelc</code>; the earlier trials ran under those names.</p>
+</div>
+</section>
+</article>
+
+<script>
+(function(){
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const KW=new Set("module import as interface private body type where it in is to and or not when with projects fn before after example access allow machine states initial enters const let if then else for break any all system requires grants limit".split(" "));
+const hl=line=>{let code=line,com="";const i=line.indexOf("#");if(i>=0){code=line.slice(0,i);com=line.slice(i)}
+  return code.replace(/("[^"]*")|([A-Za-z_]\w*)|([^A-Za-z_"]+)/g,(m,str,w,o)=>str?esc(str):w?(KW.has(w)?`<span class="w">${w}</span>`:w):esc(o))+(com?`<span class="c">${esc(com)}</span>`:"")};
+document.querySelectorAll("pre.k").forEach(p=>{const diff=p.classList.contains("diff"),grow=p.classList.contains("grow");const lines=p.textContent.split("\n");
+  p.innerHTML=lines.map((l,i)=>{
+    if(i==0&&/^# .*\.brass/.test(l))return `<span class="f">${esc(l)}</span>`;
+    if(diff&&(l[0]=="+"||l[0]=="-"))return `<span class="${l[0]=="+"?"add":"del"}">${hl(" "+l.slice(1))}</span>`;
+    if(grow){const m=l[0],t=l.slice(1);return m=="+"?`<span class="add">${hl(" "+t)}</span>`:m=="-"?`<span class="del">${hl(" "+t)}</span>`:`<span class="ctx">${hl(" "+t)}</span>`}
+    return hl(l)}).join("\n")});
+
+
+
+})();
+</script>
+</body>
+</html>

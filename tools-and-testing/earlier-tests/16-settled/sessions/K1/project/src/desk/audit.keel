@@ -1,0 +1,34 @@
+# desk/audit.keel
+module desk.audit
+import desk.ids as ids
+import desk.reports as reports
+import desk.advances as advances
+
+interface
+  type Step = Draft | Submitted | Approved | Rejected | ChangesRequested | Paid | Requested | Settled
+
+  type Entry = { who: ids.Badge, report: ids.ReportId, was: Step, now: Step, reason: ids.Reason }
+
+  fn of_report(s: reports.ReportStatus) -> Step
+    example of_report(reports.ReportStatus.Paid) == Step.Paid
+  fn of_advance(s: advances.AdvanceStatus) -> Step
+    example of_advance(advances.AdvanceStatus.Settled) == Step.Settled
+
+  fn entry(who: ids.Badge, report: ids.ReportId, was: Step, now: Step, reason: ids.Reason) -> Entry
+    after result.who == who and result.report == report
+body
+  fn of_report(s) =
+    if s in {reports.ReportStatus.Draft} then Step.Draft
+    else if s in {reports.ReportStatus.Submitted} then Step.Submitted
+    else if s in {reports.ReportStatus.Approved} then Step.Approved
+    else if s in {reports.ReportStatus.Rejected} then Step.Rejected
+    else if s in {reports.ReportStatus.ChangesRequested} then Step.ChangesRequested
+    else Step.Paid
+
+  fn of_advance(s) =
+    if s in {advances.AdvanceStatus.Requested} then Step.Requested
+    else if s in {advances.AdvanceStatus.Approved} then Step.Approved
+    else if s in {advances.AdvanceStatus.Paid} then Step.Paid
+    else Step.Settled
+
+  fn entry(who, report, was, now, reason) = { who: who, report: report, was: was, now: now, reason: reason }

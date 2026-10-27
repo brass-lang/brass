@@ -1,0 +1,82 @@
+# desk/trips.brass
+module desk.trips
+import desk.ids as ids
+import desk.reports as reports
+import desk.lines as lines
+import desk.records as records
+
+interface
+  machine TripStatus
+    states  Requested, Approved, Reconciled, Closed
+    initial Requested
+    Requested  enters Approved | Closed
+    Approved   enters Requested | Reconciled | Closed
+    Reconciled enters Reconciled
+
+  type Days = Int where it in 0 to 30
+  type Km   = Int where it in 0 to 2000
+
+  type TripPlan = { region: records.Region, days: Days, vehicle: records.Vehicle, km: Km }
+  type TxnIds   = Array<records.TxnId> where it.length in 0 to 1000
+  type Reconciliation = { committed: ids.Money, actual: ids.Money, report: ids.ReportId, transactions: TxnIds }
+
+  type Trip = { id: ids.ReportId, badge: ids.Badge, department: ids.DepartmentId, period: ids.Period, plan: TripPlan, committed: ids.Money, approvals: reports.Approvals, status: TripStatus,
+      reconciliation: Reconciliation when it.status in {TripStatus.Reconciled} }
+  type Trips = Array<Trip> where it.length in 0 to 1000
+
+  type Requested    = Trip where it.status in {TripStatus.Requested}
+  type Approved     = Trip where it.status in {TripStatus.Approved}
+  type Reconciled   = Trip where it.status in {TripStatus.Reconciled}
+  type Open         = Trip where it.status in {TripStatus.Requested, TripStatus.Approved}
+  type Reconcilable = Trip where it.status in {TripStatus.Approved, TripStatus.Reconciled}
+
+  fn commit(plan: TripPlan) -> ids.Money
+    example commit({ region: records.Region.Island, days: 0, vehicle: records.Vehicle.Car, km: 0 }) == 0
+    example commit({ region: records.Region.Offsite, days: 2, vehicle: records.Vehicle.Car, km: 0 }) == 24000
+
+  fn remaining_for(committed: ids.Money, badge: ids.Badge, rs: reports.Reports) -> Int
+    after result >= 0
+  fn remaining_with_pending(committed: ids.Money, badge: ids.Badge, rs: reports.Reports, pending_badge: ids.Badge, pending_amount: Int) -> Int
+    after result >= 0
+
+  fn add_approval(t: Requested, who: ids.Badge) -> Trip
+    before t.approvals.length < 2
+    after  result.status in {TripStatus.Requested} and result.approvals.length == t.approvals.length + 1
+  fn approve(t: Requested) -> Trip
+    after result.status in {TripStatus.Approved}
+  fn amend(t: Open, plan: TripPlan, committed: ids.Money) -> Trip
+    after result.status in {TripStatus.Requested} and result.approvals.length == 0 and result.plan == plan and result.committed == committed
+  fn close(t: Open) -> Trip
+    after result.status in {TripStatus.Closed}
+  fn reconcile(t: Reconcilable, r: Reconciliation) -> Trip
+    after result.status in {TripStatus.Reconciled}
+private
+  fn spent_by_badge(rs: reports.Reports, badge: ids.Badge) -> Int
+    after result >= 0
+body
+  fn commit(plan) =
+    let per_diem: Int = if plan.days >= 1 then records.per_diem_rate(plan.region) * plan.days else 0
+    let mileage: Int = if plan.km >= 1 then records.mileage_rate(plan.vehicle) * plan.km else 0
+    per_diem + mileage
+
+  fn spent_by_badge(rs, badge) =
+    let sum: Int = 0
+    for r in rs
+      if r.badge == badge and r is reports.Counted then sum = sum + lines.budgeted_total(r.lines)
+    sum
+
+  fn remaining_for(committed, badge, rs) =
+    let spent: Int = spent_by_badge(rs, badge)
+    if committed > spent then committed - spent else 0
+
+  fn remaining_with_pending(committed, badge, rs, pending_badge, pending_amount) =
+    let spent: Int = spent_by_badge(rs, badge) + (if badge == pending_badge then pending_amount else 0)
+    if committed > spent then committed - spent else 0
+
+  fn add_approval(t, who) = t with { approvals: t.approvals ++ [who] }
+  fn approve(t) = t with { status enters TripStatus.Approved }
+  fn amend(t, plan, committed) =
+    if t.status in {TripStatus.Requested} then t with { plan: plan, committed: committed, approvals: [] }
+    else t with { status enters TripStatus.Requested, plan: plan, committed: committed, approvals: [] }
+  fn close(t) = t with { status enters TripStatus.Closed }
+  fn reconcile(t, r) = t with { status enters TripStatus.Reconciled, reconciliation: r }

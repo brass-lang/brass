@@ -1,0 +1,154 @@
+# desk/review.keel
+module desk.review
+import desk.ids as ids
+import desk.lines as lines
+import desk.staff as staff
+import desk.reports as reports
+import desk.audit as audit
+import desk.host as host
+import desk.routing as routing
+import desk.budget as budget
+import desk.advance as adv
+
+interface
+  partial fn open_draft(store: host.Store, badge: ids.Badge, period: ids.Period, first_line: lines.Line) -> Outcome<ids.ReportId>
+  partial fn add_line(store: host.Store, report_id: ids.ReportId, badge: ids.Badge, line: lines.Line) -> Outcome<Done>
+  partial fn submit(store: host.Store, report_id: ids.ReportId, badge: ids.Badge) -> Outcome<Done>
+  partial fn approve(store: host.Store, report_id: ids.ReportId, approver: ids.Badge) -> Outcome<reports.ReportStatus>
+  partial fn reject(store: host.Store, report_id: ids.ReportId, approver: ids.Badge, reason: ids.Reason) -> Outcome<Done>
+  partial fn request_changes(store: host.Store, report_id: ids.ReportId, approver: ids.Badge, reason: ids.Reason) -> Outcome<Done>
+  partial fn resubmit(store: host.Store, report_id: ids.ReportId, badge: ids.Badge) -> Outcome<Done>
+
+  partial fn may_act(store: host.Store, r: reports.Submitted, who: staff.Active) -> Outcome<Bool>
+  partial fn may_act_at(store: host.Store, requester: ids.Badge, department: ids.DepartmentId, approved: reports.Approvals, who: staff.Active) -> Outcome<Bool>
+private interface
+  type Gate = { r: reports.Submitted, who: staff.Active }
+  type Own  = { r: reports.Report, who: staff.Active }
+
+  partial fn gate(store: host.Store, report_id: ids.ReportId, approver: ids.Badge) -> Outcome<Gate>
+  partial fn own(store: host.Store, report_id: ids.ReportId, badge: ids.Badge) -> Outcome<Own>
+  partial fn open_and_valid(store: host.Store, r: reports.Report) -> Outcome<Done>
+  partial fn required_for(store: host.Store, requester: ids.Badge, department: ids.DepartmentId, approved: reports.Approvals) -> Outcome<Maybe<ids.Badge>>
+  partial fn stand_in(store: host.Store, required: ids.Badge) -> Outcome<Maybe<ids.Badge>>
+  partial fn final_approval(store: host.Store, r: reports.Submitted, who: staff.Active) -> Outcome<reports.ReportStatus>
+body
+  fn open_draft(store, badge, period, first_line) =
+    let who: staff.Staff = store.staff(badge)?
+    if who is staff.Active then
+      let closed: Bool = store.period_closed(period)?
+      if not closed then
+        let id: ids.ReportId = store.next_id()?
+        store.save_report({ id: id, badge: badge, department: who.department, period: period, lines: [first_line], status: reports.ReportStatus.Draft, approvals: [] })?
+        Ok(id)
+      else Err(FailureCode.Conflict, "the period is closed")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn add_line(store, report_id, badge, line) =
+    let o: Own = own(store, report_id, badge)?
+    if o.r is reports.Editable then
+      if o.r.lines.length < 50 then store.save_report(reports.add_line(o.r, line))
+      else Err(FailureCode.InvalidInput, "a report holds at most 50 lines")
+    else Err(FailureCode.Conflict, "the report is not editable")
+
+  fn submit(store, report_id, badge) =
+    let o: Own = own(store, report_id, badge)?
+    if o.r is reports.Draft then
+      open_and_valid(store, o.r)?
+      store.save_report(reports.submit(o.r))?
+      store.append_audit(audit.entry(badge, o.r.id, audit.of_report(reports.ReportStatus.Draft), audit.of_report(reports.ReportStatus.Submitted), "submitted"))
+    else Err(FailureCode.Conflict, "the report is not a draft")
+
+  fn resubmit(store, report_id, badge) =
+    let o: Own = own(store, report_id, badge)?
+    if o.r is reports.AwaitingChanges then
+      open_and_valid(store, o.r)?
+      store.save_report(reports.resubmit(o.r))?
+      store.append_audit(audit.entry(badge, o.r.id, audit.of_report(reports.ReportStatus.ChangesRequested), audit.of_report(reports.ReportStatus.Submitted), "resubmitted"))
+    else Err(FailureCode.Conflict, "the report is not awaiting changes")
+
+  fn approve(store, report_id, approver) =
+    let g: Gate = gate(store, report_id, approver)?
+    if g.r.approvals.length + 1 >= routing.steps_for(lines.total(g.r.lines)) then final_approval(store, g.r, g.who)
+    else
+      store.save_report(reports.add_approval(g.r, g.who.badge))?
+      store.append_audit(audit.entry(g.who.badge, g.r.id, audit.of_report(reports.ReportStatus.Submitted), audit.of_report(reports.ReportStatus.Submitted), "approved; awaiting the next approver"))?
+      Ok(reports.ReportStatus.Submitted)
+
+  fn reject(store, report_id, approver, reason) =
+    let g: Gate = gate(store, report_id, approver)?
+    store.save_report(reports.reject(g.r))?
+    store.append_audit(audit.entry(g.who.badge, g.r.id, audit.of_report(reports.ReportStatus.Submitted), audit.of_report(reports.ReportStatus.Rejected), reason))
+
+  fn request_changes(store, report_id, approver, reason) =
+    let g: Gate = gate(store, report_id, approver)?
+    store.save_report(reports.request_changes(g.r))?
+    store.append_audit(audit.entry(g.who.badge, g.r.id, audit.of_report(reports.ReportStatus.Submitted), audit.of_report(reports.ReportStatus.ChangesRequested), reason))
+
+  fn own(store, report_id, badge) =
+    let who: staff.Staff = store.staff(badge)?
+    if who is staff.Active then
+      let r: reports.Report = store.report(report_id)?
+      if r.badge == badge then Ok({ r: r, who: who })
+      else Err(FailureCode.Unauthorized, "only the submitter may act on this report")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn open_and_valid(store, r) =
+    let closed: Bool = store.period_closed(r.period)?
+    if closed then Err(FailureCode.Conflict, "the period is closed")
+    else if lines.all_valid(r.lines) then Ok(Done)
+    else Err(FailureCode.InvalidInput, "a line is over its limit or lacks a required receipt")
+
+  fn gate(store, report_id, approver) =
+    let who: staff.Staff = store.staff(approver)?
+    if who is staff.Active then
+      let r: reports.Report = store.report(report_id)?
+      if r is reports.Submitted then
+        let closed: Bool = store.period_closed(r.period)?
+        if not closed then
+          if who.badge != r.badge then
+            let allowed: Bool = may_act(store, r, who)?
+            if allowed then Ok({ r: r, who: who })
+            else Err(FailureCode.Unauthorized, "not this report's next approver")
+          else Err(FailureCode.Unauthorized, "a report cannot be approved by its submitter")
+        else Err(FailureCode.Conflict, "the period is closed")
+      else Err(FailureCode.Conflict, "the report is not awaiting approval")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn may_act(store, r, who) = may_act_at(store, r.badge, r.department, r.approvals, who)
+
+  fn may_act_at(store, requester, department, approved, who) =
+    let required: Maybe<ids.Badge> = required_for(store, requester, department, approved)?
+    if required == None then Ok(who.role in {ids.Role.Finance})
+    else Ok(who.badge == required)
+
+  fn required_for(store, requester, department, approved) =
+    let role: ids.Role = routing.role_for(approved.length + 1)
+    if role in {ids.Role.Finance} then Ok(None)
+    else if role in {ids.Role.Supervisor} then
+      let submitter: staff.Staff = store.staff(requester)?
+      if submitter.supervisor != None then stand_in(store, submitter.supervisor)
+      else Err(FailureCode.Conflict, "the submitter has no supervisor")
+    else
+      let dept: staff.Department = store.department(department)?
+      stand_in(store, dept.director)
+
+  fn stand_in(store, required) =
+    let person: staff.Staff = store.staff(required)?
+    if person.active then Ok(required)
+    else if person.supervisor != None then
+      let up: staff.Staff = store.staff(person.supervisor)?
+      if up.active then Ok(person.supervisor)
+      else Err(FailureCode.Conflict, "no active approver stands in for " ++ required)
+    else Err(FailureCode.Conflict, "no active approver stands in for " ++ required)
+
+  fn final_approval(store, r, who) =
+    let dept: staff.Department = store.department(r.department)?
+    let others: reports.Reports = store.reports_for(r.department, r.period)?
+    let advs: adv.Advances = store.advances_for(r.department, r.period)?
+    let within: Bool = budget.spend_of(others) + budget.advance_spend_of(advs) + lines.budgeted_total(r.lines) <= dept.budget
+    if within or who.role in {ids.Role.Finance} then
+      let reason: ids.Reason = if within then "approved" else "approved; budget override"
+      store.save_report(reports.approve(r))?
+      store.append_audit(audit.entry(who.badge, r.id, audit.of_report(reports.ReportStatus.Submitted), audit.of_report(reports.ReportStatus.Approved), reason))?
+      Ok(reports.ReportStatus.Approved)
+    else Err(FailureCode.Conflict, "the department budget for this period would be exceeded")

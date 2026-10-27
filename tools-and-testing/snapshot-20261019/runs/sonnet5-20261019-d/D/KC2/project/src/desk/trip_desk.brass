@@ -1,0 +1,182 @@
+# desk/trip_desk.brass
+module desk.trip_desk
+import desk.ids as ids
+import desk.staff as staff
+import desk.records as records
+import desk.reports as reports
+import desk.routing as routing
+import desk.trips as trips
+import desk.audit as audit
+import desk.host as host
+import desk.registry as registry
+import desk.delegation as delegation
+import desk.budget as budget
+import desk.review as review
+import desk.lines as lines
+import std.text as text
+
+interface
+  fn file_trip(store: host.Store, badge: ids.Badge, period: ids.Period, region: records.Region, days: trips.Days, vehicle: records.Vehicle, km: trips.Km) -> Outcome<ids.ReportId>
+    before days >= 1 or km >= 1
+  fn amend_trip(store: host.Store, trip_id: ids.ReportId, badge: ids.Badge, region: records.Region, days: trips.Days, vehicle: records.Vehicle, km: trips.Km) -> Outcome<trips.TripStatus>
+    before days >= 1 or km >= 1
+  fn approve_trip(store: host.Store, reg: registry.Registry, trip_id: ids.ReportId, approver: ids.Badge, today: ids.Period) -> Outcome<trips.TripStatus>
+  fn reconcile_trip(store: host.Store, reg: registry.Registry, trip_id: ids.ReportId, report_id: ids.ReportId, finance_badge: ids.Badge) -> Outcome<Int>
+  fn close_trip(store: host.Store, trip_id: ids.ReportId, finance_badge: ids.Badge, reason: ids.Reason) -> Outcome<Done>
+private
+  type Decision = { allowed: Bool, acting_for: Maybe<ids.Badge> }
+  type Gate = { t: trips.Requested, who: staff.Active, acting_for: Maybe<ids.Badge> }
+  type Reconciliation = { actual: Int, counted_txns: trips.CountedTxns }
+
+  fn gate(store: host.Store, reg: registry.Registry, trip_id: ids.ReportId, approver: ids.Badge, today: ids.Period) -> Outcome<Gate>
+  fn may_act_trip(store: host.Store, reg: registry.Registry, t: trips.Trip, who: staff.Active, today: ids.Period) -> Outcome<Decision>
+  fn final_approve(store: host.Store, t: trips.Requested, who: staff.Active, acting_for: Maybe<ids.Badge>, today: ids.Period) -> Outcome<trips.TripStatus>
+  fn step_reason(acting_for: Maybe<ids.Badge>, today: ids.Period, base: Text) -> Text
+  fn compute_reconciliation(reg: registry.Registry, badge: ids.Badge, period: ids.Period, report_total: Int) -> Outcome<Reconciliation>
+  fn reconcile_first(store: host.Store, reg: registry.Registry, t: trips.Approved, report_id: ids.ReportId, who_badge: ids.Badge) -> Outcome<Int>
+  fn reconcile_repeat(store: host.Store, reg: registry.Registry, t: trips.Reconciled, report_id: ids.ReportId, who_badge: ids.Badge) -> Outcome<Int>
+  fn reconcile_reason(committed: Int, actual: Int, repeat: Bool) -> Text
+body
+  fn file_trip(store, badge, period, region, days, vehicle, km) =
+    let who: staff.Staff = store.staff(badge)?
+    if who is staff.Active then
+      let closed: Bool = store.period_closed(period)?
+      if not closed then
+        let existing: trips.Trips = store.trips_for(who.department, period)?
+        if any t in existing where t.badge == badge and t.status in {trips.TripStatus.Requested, trips.TripStatus.Approved, trips.TripStatus.Reconciled} then
+          Err(FailureCode.Conflict, "this staff member already has an open trip for this period")
+        else
+          let committed: Int = trips.commit_amount(region, days, vehicle, km)
+          let id: ids.ReportId = store.next_id()?
+          store.save_trip({ id: id, badge: badge, department: who.department, period: period, plan: { region: region, days: days, vehicle: vehicle, km: km }, committed: committed, approvals: [], status: trips.TripStatus.Requested })?
+          Ok(id)
+      else Err(FailureCode.Conflict, "the period is closed")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn amend_trip(store, trip_id, badge, region, days, vehicle, km) =
+    let t: trips.Trip = store.trip(trip_id)?
+    if t.badge != badge then Err(FailureCode.Unauthorized, "only the staff member who filed this trip may amend it")
+    else
+      let plan: trips.Plan = { region: region, days: days, vehicle: vehicle, km: km }
+      let committed: Int = trips.commit_amount(region, days, vehicle, km)
+      if t is trips.Requested then
+        store.save_trip(trips.amend_requested(t, plan, committed))?
+        Ok(trips.TripStatus.Requested)
+      else if t is trips.Approved then
+        store.save_trip(trips.amend_approved(t, plan, committed))?
+        store.append_audit(audit.trip_entry(badge, t.id, trips.TripStatus.Approved, trips.TripStatus.Requested, "amended"))?
+        Ok(trips.TripStatus.Requested)
+      else Err(FailureCode.Conflict, "the trip is reconciled or closed")
+
+  fn approve_trip(store, reg, trip_id, approver, today) =
+    let g: Gate = gate(store, reg, trip_id, approver, today)?
+    if g.t.approvals.length + 1 >= routing.steps_for(g.t.committed) then
+      final_approve(store, g.t, g.who, g.acting_for, today)
+    else
+      store.save_trip(trips.add_approval(g.t, g.who.badge))?
+      store.append_audit(audit.trip_entry(g.who.badge, g.t.id, trips.TripStatus.Requested, trips.TripStatus.Requested, step_reason(g.acting_for, today, "approved; awaiting the next approver")))?
+      Ok(trips.TripStatus.Requested)
+
+  fn reconcile_trip(store, reg, trip_id, report_id, finance_badge) =
+    let who: staff.Staff = store.staff(finance_badge)?
+    if who is staff.Finance then
+      let t: trips.Trip = store.trip(trip_id)?
+      if t is trips.Approved then reconcile_first(store, reg, t, report_id, who.badge)
+      else if t is trips.Reconciled then reconcile_repeat(store, reg, t, report_id, who.badge)
+      else Err(FailureCode.Conflict, "the trip is not approved or already reconciled")
+    else Err(FailureCode.Unauthorized, "only active finance staff may reconcile a trip")
+
+  fn close_trip(store, trip_id, finance_badge, reason) =
+    let who: staff.Staff = store.staff(finance_badge)?
+    if who is staff.Finance then
+      let t: trips.Trip = store.trip(trip_id)?
+      if t is trips.Open then
+        store.save_trip(trips.close(t))?
+        store.append_audit(audit.trip_entry(who.badge, t.id, t.status, trips.TripStatus.Closed, reason))
+      else Err(FailureCode.Conflict, "the trip is not requested or approved")
+    else Err(FailureCode.Unauthorized, "only active finance staff may close a trip")
+
+  fn gate(store, reg, trip_id, approver, today) =
+    let who: staff.Staff = store.staff(approver)?
+    if who is staff.Active then
+      let t: trips.Trip = store.trip(trip_id)?
+      if t is trips.Requested then
+        let closed: Bool = store.period_closed(t.period)?
+        if not closed then
+          if who.badge != t.badge then
+            let decision: Decision = may_act_trip(store, reg, t, who, today)?
+            if decision.allowed then Ok({ t: t, who: who, acting_for: decision.acting_for })
+            else Err(FailureCode.Unauthorized, "not this trip's next approver")
+          else Err(FailureCode.Unauthorized, "a trip cannot be approved by its filer")
+        else Err(FailureCode.Conflict, "the period is closed")
+      else Err(FailureCode.Conflict, "the trip is not awaiting approval")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn may_act_trip(store, reg, t, who, today) =
+    let step: Int = t.approvals.length + 1
+    let required: Maybe<ids.Badge> = review.required_for(store, t.badge, t.department, step)?
+    if required != None then
+      if who.badge == required then Ok({ allowed: true, acting_for: None })
+      else
+        let deputy: Maybe<ids.Badge> = delegation.delegate_in_force(reg, required, today)?
+        if deputy != None and who.badge == deputy then Ok({ allowed: true, acting_for: required })
+        else Ok({ allowed: false, acting_for: None })
+    else Ok({ allowed: who.role in {ids.Role.Finance}, acting_for: None })
+
+  fn final_approve(store, t, who, acting_for, today) =
+    let dept: staff.Department = store.department(t.department)?
+    let rs: reports.Reports = store.reports_for(t.department, t.period)?
+    let reports_total: Int = budget.reports_total_for_badge(rs, t.badge)
+    let pretend: trips.Trip = t with { status enters trips.TripStatus.Approved }
+    let trip_amt: Int = budget.trip_commitment(pretend, reports_total)
+    let spent: Int = budget.department_spend(store, t.department, t.period)?
+    let within: Bool = spent + trip_amt <= dept.budget
+    if within or who.role in {ids.Role.Finance} then
+      let base: Text = if within then "approved" else "approved; budget override"
+      store.save_trip(trips.approve(t))?
+      store.append_audit(audit.trip_entry(who.badge, t.id, trips.TripStatus.Requested, trips.TripStatus.Approved, step_reason(acting_for, today, base)))?
+      Ok(trips.TripStatus.Approved)
+    else Err(FailureCode.Conflict, "the department budget for this period would be exceeded")
+
+  fn step_reason(acting_for, today, base) =
+    if acting_for != None then base ++ " on behalf of " ++ acting_for ++ " for period " ++ text.of(today)
+    else base
+
+  fn compute_reconciliation(reg, badge, period, report_total) =
+    let txns: records.Txns = reg.txns_for(period)?
+    let actual: Int = report_total
+    let counted: trips.CountedTxns = []
+    for tx in txns
+      if tx.badge == badge and tx.status in {records.CardStatus.Open, records.CardStatus.Disputed} then
+        actual = actual + tx.amount
+        counted = counted ++ [tx.id]
+    Ok({ actual: actual, counted_txns: counted })
+
+  fn reconcile_first(store, reg, t, report_id, who_badge) =
+    let r: reports.Report = store.report(report_id)?
+    if r.badge == t.badge and r.period == t.period then
+      if r is reports.Counted then
+        let result: Reconciliation = compute_reconciliation(reg, t.badge, t.period, lines.total(r.lines))?
+        store.save_trip(trips.reconcile_approved(t, result.actual, report_id, result.counted_txns))?
+        store.append_audit(audit.trip_entry(who_badge, t.id, trips.TripStatus.Approved, trips.TripStatus.Reconciled, reconcile_reason(t.committed, result.actual, false)))?
+        Ok(result.actual)
+      else Err(FailureCode.Conflict, "the report is not approved or paid")
+    else Err(FailureCode.Conflict, "the report belongs to another staff member or period")
+
+  fn reconcile_repeat(store, reg, t, report_id, who_badge) =
+    let r: reports.Report = store.report(report_id)?
+    if r.badge == t.badge and r.period == t.period then
+      if r is reports.Counted then
+        let result: Reconciliation = compute_reconciliation(reg, t.badge, t.period, lines.total(r.lines))?
+        let changed: Bool = t.actual != result.actual or t.report_id != report_id
+        store.save_trip(trips.reconcile_again(t, result.actual, report_id, result.counted_txns))?
+        if changed then
+          store.append_audit(audit.trip_entry(who_badge, t.id, trips.TripStatus.Reconciled, trips.TripStatus.Reconciled, reconcile_reason(t.committed, result.actual, true)))?
+          Ok(result.actual)
+        else Ok(result.actual)
+      else Err(FailureCode.Conflict, "the report is not approved or paid")
+    else Err(FailureCode.Conflict, "the report belongs to another staff member or period")
+
+  fn reconcile_reason(committed, actual, repeat) =
+    let base: Text = if repeat then "reconciled again" else "reconciled"
+    if actual > committed then base ++ "; the actual amount exceeds the committed amount" else base

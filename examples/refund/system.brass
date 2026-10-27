@@ -1,0 +1,7 @@
+# system.brass — the one file that hands out authority. Type names resolve in the granted function's module.
+system support
+  grants support.refund.issue: pay = StripePay { processor: payments.Processor.Stripe, per_txn_max: 50000 }
+  limit  cpu_ms 5000
+  limit  memory_bytes 268435456                       # 256 MiB
+  limit  transcript_bytes 67108864, drop oldest       # 64 MiB
+  limit  impact_modules 4

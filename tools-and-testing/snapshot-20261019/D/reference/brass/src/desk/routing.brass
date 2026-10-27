@@ -1,0 +1,22 @@
+# desk/routing.brass
+module desk.routing
+import desk.ids as ids
+
+interface
+  type Step = Int where it in 1 to 3
+
+  fn steps_for(total: Int) -> Step
+    after not (total <= 50000) or result == 1
+    after not (total > 50000 and total <= 500000) or result == 2
+    after not (total > 500000) or result == 3
+    example steps_for(50000) == 1
+    example steps_for(50001) == 2
+    example steps_for(500001) == 3
+
+  fn role_for(step: Step) -> ids.Role
+    example role_for(1) == ids.Role.Supervisor
+    example role_for(3) == ids.Role.Finance
+body
+  fn steps_for(total) = if total <= 50000 then 1 else if total <= 500000 then 2 else 3
+
+  fn role_for(step) = if step == 1 then ids.Role.Supervisor else if step == 2 then ids.Role.Director else ids.Role.Finance

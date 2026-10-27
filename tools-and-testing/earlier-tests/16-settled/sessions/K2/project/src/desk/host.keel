@@ -1,0 +1,32 @@
+# desk/host.keel
+module desk.host
+import desk.ids as ids
+import desk.staff as staff
+import desk.reports as reports
+import desk.advances as advances
+import desk.audit as audit
+
+interface
+  access Store
+    allow staff(badge: ids.Badge) -> Outcome<staff.Staff>
+      after result.badge == badge
+    allow report(id: ids.ReportId) -> Outcome<reports.Report>
+      after result.id == id
+    allow advance(id: ids.AdvanceId) -> Outcome<advances.Advance>
+      after result.id == id
+    allow department(id: ids.DepartmentId) -> Outcome<staff.Department>
+      after result.id == id
+    allow reports_for(department: ids.DepartmentId, period: ids.Period) -> Outcome<reports.Reports>
+    allow advances_for(department: ids.DepartmentId, period: ids.Period) -> Outcome<advances.Advances>
+    allow paid_advances() -> Outcome<advances.Advances>
+    allow submitted_reports() -> Outcome<reports.Reports>
+    allow period_closed(period: ids.Period) -> Outcome<Bool>
+    allow next_id() -> Outcome<ids.ReportId>
+    allow save_report(r: reports.Report) -> Outcome<Done>
+    allow save_advance(a: advances.Advance) -> Outcome<Done>
+    allow append_audit(e: audit.Entry) -> Outcome<Done>
+    allow close_period(period: ids.Period) -> Outcome<Done>
+
+  access Ledger
+    allow pay(badge: ids.Badge, amount: Int, key: Text) -> Outcome<Text>
+body

@@ -1,0 +1,61 @@
+# desk/queries.brass
+module desk.queries
+import desk.ids as ids
+import desk.lines as lines
+import desk.staff as staff
+import desk.reports as reports
+import desk.advances as advances
+import desk.audit as audit
+import desk.host as host
+import desk.budget as budget
+import desk.review as review
+
+interface
+  type Ids       = Array<ids.ReportId> where it.length in 0 to 1000
+  type Row       = { id: ids.ReportId, badge: ids.Badge, status: audit.Step, total: Int, budgeted: Int }
+  type Rows      = Array<Row> where it.length in 0 to 1000
+  type Statement = { department: ids.DepartmentId, period: ids.Period, budget: ids.Money, spend: Int, remaining: Int, rows: Rows }
+
+  fn statement(store: host.Store, department: ids.DepartmentId, period: ids.Period) -> Outcome<Statement>
+
+  fn spend(store: host.Store, department: ids.DepartmentId, period: ids.Period) -> Outcome<Int>
+  fn pending_for(store: host.Store, approver: ids.Badge) -> Outcome<Ids>
+  fn outstanding_advances(store: host.Store, today: ids.Period) -> Outcome<Ids>
+body
+  fn spend(store, department, period) =
+    let dept: staff.Department = store.department(department)?
+    let rs: reports.Reports = store.reports_for(dept.id, period)?
+    let advs: advances.Advances = store.advances_for(dept.id, period)?
+    Ok(budget.spend_of(rs) + budget.advance_spend_of(advs))
+
+  fn statement(store, department, period) =
+    let dept: staff.Department = store.department(department)?
+    let rs: reports.Reports = store.reports_for(dept.id, period)?
+    let advs: advances.Advances = store.advances_for(dept.id, period)?
+    let rows: Rows = []
+    for r in rs
+      if r is reports.Counted then rows = rows ++ [{ id: r.id, badge: r.badge, status: audit.of_report(r.status), total: lines.total(r.lines), budgeted: lines.budgeted_total(r.lines) }]
+    for a in advs
+      if a is advances.Counted then rows = rows ++ [{ id: a.id, badge: a.badge, status: audit.of_advance(a.status), total: a.amount, budgeted: a.amount }]
+    let spent: Int = budget.spend_of(rs) + budget.advance_spend_of(advs)
+    Ok({ department: dept.id, period: period, budget: dept.budget, spend: spent, remaining: dept.budget - spent, rows: rows })
+
+  fn outstanding_advances(store, today) =
+    let paid: advances.Advances = store.paid_advances()?
+    let out: Ids = []
+    for a in paid
+      if a.period + 2 < today then out = out ++ [a.id]
+    Ok(out)
+
+  fn pending_for(store, approver) =
+    let who: staff.Staff = store.staff(approver)?
+    let rs: reports.Reports = store.submitted_reports()?
+    let out: Ids = []
+    if who is staff.Active then
+      for r in rs
+        if r is reports.Submitted and r.badge != who.badge then
+          let verdict: Outcome<Bool> = review.may_act(store, r, who)
+          if verdict is Ok then
+            let allowed: Bool = verdict?
+            if allowed then out = out ++ [r.id]
+    Ok(out)

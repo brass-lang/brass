@@ -1,0 +1,39 @@
+# park/desk.brass
+module park.desk
+import park.ids as ids
+import park.staff as staff
+interface
+  access Store
+    allow load(id: ids.BadgeId) -> Outcome<staff.Staff>
+    allow save(s: staff.Staff) -> Outcome<Done>
+
+  fn open(store: Store, id: ids.BadgeId) -> Outcome<Done>
+
+  # a comment naming clock_in and OnShift must not count
+  fn note(n: Int) -> Int
+  fn helper() -> Int
+  fn probe(n: Int) -> Int
+  fn scopes(store: Store, id: ids.BadgeId) -> Int
+  fn quiet(n: Int) -> Bool
+body
+  fn open(store, id) =
+    let s: staff.Staff = store.load(id)?
+    if s is staff.OnShift then Err(FailureCode.Conflict, "already on shift; see clock_in")
+    else store.save(staff.clock_in(s))
+  fn note(n) =
+    let load: Int = n + 1
+    load
+  fn helper() = 1
+  fn probe(n) =
+    let helper: Int = helper()                  # the binding is not a use; the initializer is a call
+    helper
+  fn scopes(store, id) =
+    let a: Int = helper()                       # a use before the binding below
+    if a > 0 then
+      let helper: Int = 2                       # hides helper only in this branch
+      helper
+    else helper()                               # not hidden here
+    for helper in 1 to 3                        # hides helper only in the loop
+      a = a + helper
+    helper()                                    # not hidden after the loop
+  fn quiet(n) = not (n > 0) and not helper() == n

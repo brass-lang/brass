@@ -1,0 +1,51 @@
+# desk/lines.keel
+module desk.lines
+import desk.ids as ids
+
+interface
+  type Line   = { category: ids.Category, amount: ids.Money, description: ids.Description, receipt: Bool }
+  type Lines  = Array<Line> where length in 1 to 50
+  type Policy = { limit: ids.Money, receipt_over: ids.Money, budgeted: Bool }
+
+  fn policy_for(c: ids.Category) -> Policy
+    example policy_for(ids.Category.Other) == { limit: 50000, receipt_over: 2500, budgeted: true }
+
+  fn line_valid(l: Line) -> Bool
+    example line_valid({ category: ids.Category.Feed, amount: 2500, description: "hay", receipt: false }) == true
+    example line_valid({ category: ids.Category.Feed, amount: 2501, description: "hay", receipt: false }) == false
+    example line_valid({ category: ids.Category.Other, amount: 50001, description: "misc", receipt: true }) == false
+
+  fn all_valid(ls: Lines) -> Bool
+
+  fn total(ls: Lines) -> Int
+    after result >= 0
+    example total([{ category: ids.Category.Feed, amount: 1000, description: "a", receipt: false }, { category: ids.Category.Travel, amount: 2000, description: "b", receipt: false }]) == 3000
+
+  fn budgeted_total(ls: Lines) -> Int
+    after result >= 0
+body
+  fn policy_for(c) =
+    if c in {ids.Category.Feed} then { limit: 200000, receipt_over: 2500, budgeted: true }
+    else if c in {ids.Category.Veterinary} then { limit: 500000, receipt_over: 2500, budgeted: true }
+    else if c in {ids.Category.Containment} then { limit: 1000000, receipt_over: 5000, budgeted: true }
+    else if c in {ids.Category.Equipment} then { limit: 300000, receipt_over: 2500, budgeted: true }
+    else if c in {ids.Category.Travel} then { limit: 150000, receipt_over: 2500, budgeted: true }
+    else { limit: 50000, receipt_over: 2500, budgeted: true }
+
+  fn line_valid(l) =
+    let p: Policy = policy_for(l.category)
+    l.amount <= p.limit and (l.amount <= p.receipt_over or l.receipt)
+
+  fn all_valid(ls) = all l in ls where line_valid(l)
+
+  fn total(ls) =
+    let sum: Int = 0
+    for l in ls
+      sum = sum + l.amount
+    sum
+
+  fn budgeted_total(ls) =
+    let sum: Int = 0
+    for l in ls
+      if policy_for(l.category).budgeted then sum = sum + l.amount
+    sum

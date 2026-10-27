@@ -1,0 +1,46 @@
+# desk/exceptions.brass
+module desk.exceptions
+import desk.ids as ids
+import desk.staff as staff
+import desk.reports as reports
+import desk.records as records
+import desk.host as host
+import desk.registry as registry
+
+interface
+  fn request_exception(store: host.Store, reg: registry.Registry, report_id: ids.ReportId, badge: ids.Badge, position: Int, reason: Text) -> Outcome<records.ExceptionId>
+  fn decide_exception(store: host.Store, reg: registry.Registry, exception_id: records.ExceptionId, director_badge: ids.Badge, grant: Bool) -> Outcome<records.ExceptionStatus>
+body
+  fn request_exception(store, reg, report_id, badge, position, reason) =
+    let who: staff.Staff = store.staff(badge)?
+    if who is staff.Active then
+      let r: reports.Report = store.report(report_id)?
+      if r.badge == badge then
+        if r is reports.Editable then
+          if position >= 1 and position <= r.lines.length and reason.length >= 1 and reason.length <= 200 then
+            let existing: records.Exceptions = reg.exceptions_for(r.id)?
+            if any e in existing where e.position == position and e.status in {records.ExceptionStatus.Pending} then
+              Err(FailureCode.Conflict, "an exception for this line is already pending")
+            else
+              let id: records.ExceptionId = store.next_id()?
+              reg.save_exception({ id: id, report: r.id, position: position, badge: badge, reason: reason, status: records.ExceptionStatus.Pending, decided_by: None })?
+              Ok(id)
+          else Err(FailureCode.InvalidInput, "the position must name a line, and the reason be 1 to 200 characters")
+        else Err(FailureCode.Conflict, "the report is not editable")
+      else Err(FailureCode.Unauthorized, "only the submitter may ask for an exception")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn decide_exception(store, reg, exception_id, director_badge, grant) =
+    let who: staff.Staff = store.staff(director_badge)?
+    if who is staff.Active then
+      let e: records.PolicyException = reg.exception(exception_id)?
+      if e is records.PendingException then
+        let r: reports.Report = store.report(e.report)?
+        let dept: staff.Department = store.department(r.department)?
+        if dept.director == director_badge then
+          let decided: records.PolicyException = records.decide(e, grant, director_badge)
+          reg.save_exception(decided)?
+          Ok(decided.status)
+        else Err(FailureCode.Unauthorized, "only the department's director may decide an exception")
+      else Err(FailureCode.Conflict, "the exception is already decided")
+    else Err(FailureCode.Unauthorized, "staff member is not active")

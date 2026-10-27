@@ -1,0 +1,182 @@
+{
+ "small-P1": {
+  "size": "small",
+  "arm": "P",
+  "prompt_sha256": "e837c2166e273e1c",
+  "prompt_chars": 4219
+ },
+ "grown-K1": {
+  "size": "grown",
+  "arm": "K",
+  "prompt_sha256": "cf28726633c1673b",
+  "prompt_chars": 23682
+ },
+ "small-KC1": {
+  "size": "small",
+  "arm": "KC",
+  "prompt_sha256": "59089e43443528ef",
+  "prompt_chars": 28471
+ },
+ "grown-P1": {
+  "size": "grown",
+  "arm": "P",
+  "prompt_sha256": "ad7bd486044c9ba6",
+  "prompt_chars": 4219
+ },
+ "small-K1": {
+  "size": "small",
+  "arm": "K",
+  "prompt_sha256": "ce39304aa03c7a5e",
+  "prompt_chars": 23682
+ },
+ "grown-KC1": {
+  "size": "grown",
+  "arm": "KC",
+  "prompt_sha256": "8acca723d3517692",
+  "prompt_chars": 30518
+ },
+ "small-P2": {
+  "size": "small",
+  "arm": "P",
+  "prompt_sha256": "8875f744b026816d",
+  "prompt_chars": 4219
+ },
+ "grown-K2": {
+  "size": "grown",
+  "arm": "K",
+  "prompt_sha256": "a7cdd90e3c0de8c7",
+  "prompt_chars": 23682
+ },
+ "small-KC2": {
+  "size": "small",
+  "arm": "KC",
+  "prompt_sha256": "de65eace84dbd9f4",
+  "prompt_chars": 28471
+ },
+ "grown-P2": {
+  "size": "grown",
+  "arm": "P",
+  "prompt_sha256": "c1d426d9fa446afc",
+  "prompt_chars": 4219
+ },
+ "small-K2": {
+  "size": "small",
+  "arm": "K",
+  "prompt_sha256": "2b83005ae4f6c40b",
+  "prompt_chars": 23682
+ },
+ "grown-KC2": {
+  "size": "grown",
+  "arm": "KC",
+  "prompt_sha256": "8545aaa440543894",
+  "prompt_chars": 30518
+ },
+ "small-P3": {
+  "size": "small",
+  "arm": "P",
+  "prompt_sha256": "8bc284b2ced5efbd",
+  "prompt_chars": 4219
+ },
+ "grown-K3": {
+  "size": "grown",
+  "arm": "K",
+  "prompt_sha256": "8f14ccf657cf69dc",
+  "prompt_chars": 23682
+ },
+ "small-KC3": {
+  "size": "small",
+  "arm": "KC",
+  "prompt_sha256": "0a12de6c9dbaa837",
+  "prompt_chars": 28471
+ },
+ "grown-P3": {
+  "size": "grown",
+  "arm": "P",
+  "prompt_sha256": "9459e235f0d2072f",
+  "prompt_chars": 4219
+ },
+ "small-K3": {
+  "size": "small",
+  "arm": "K",
+  "prompt_sha256": "67db63dfbca82655",
+  "prompt_chars": 23682
+ },
+ "grown-KC3": {
+  "size": "grown",
+  "arm": "KC",
+  "prompt_sha256": "c024941c63f72dcb",
+  "prompt_chars": 30518
+ },
+ "small-P4": {
+  "size": "small",
+  "arm": "P",
+  "prompt_sha256": "a2ded904db84b966",
+  "prompt_chars": 4219
+ },
+ "grown-K4": {
+  "size": "grown",
+  "arm": "K",
+  "prompt_sha256": "b64ae9c8a27bfb0c",
+  "prompt_chars": 23682
+ },
+ "small-KC4": {
+  "size": "small",
+  "arm": "KC",
+  "prompt_sha256": "0cccc1d72450afd0",
+  "prompt_chars": 28471
+ },
+ "grown-P4": {
+  "size": "grown",
+  "arm": "P",
+  "prompt_sha256": "34bef00b2ced6e0d",
+  "prompt_chars": 4219
+ },
+ "small-K4": {
+  "size": "small",
+  "arm": "K",
+  "prompt_sha256": "1575b8a4a8733acd",
+  "prompt_chars": 23682
+ },
+ "grown-KC4": {
+  "size": "grown",
+  "arm": "KC",
+  "prompt_sha256": "eef29e27ccf602b1",
+  "prompt_chars": 30518
+ },
+ "small-P5": {
+  "size": "small",
+  "arm": "P",
+  "prompt_sha256": "56aac3defa8cbd2a",
+  "prompt_chars": 4219
+ },
+ "grown-K5": {
+  "size": "grown",
+  "arm": "K",
+  "prompt_sha256": "a7d511ad21285b0a",
+  "prompt_chars": 23682
+ },
+ "small-KC5": {
+  "size": "small",
+  "arm": "KC",
+  "prompt_sha256": "e2c4a0e03ddfe741",
+  "prompt_chars": 28471
+ },
+ "grown-P5": {
+  "size": "grown",
+  "arm": "P",
+  "prompt_sha256": "79ce85dd5284c218",
+  "prompt_chars": 4219
+ },
+ "small-K5": {
+  "size": "small",
+  "arm": "K",
+  "prompt_sha256": "9eb694309631cbbc",
+  "prompt_chars": 23682
+ },
+ "grown-KC5": {
+  "size": "grown",
+  "arm": "KC",
+  "prompt_sha256": "35682ad17931fa3d",
+  "prompt_chars": 30518
+ }
+}

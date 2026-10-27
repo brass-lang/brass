@@ -1,0 +1,25 @@
+# desk/budget.brass
+module desk.budget
+import desk.ids as ids
+import desk.lines as lines
+import desk.reports as reports
+import desk.advances as advances
+import desk.host as host
+
+interface
+  fn spend_of(rs: reports.Reports, advs: advances.Advances) -> Int
+    after result >= 0
+  fn department_spend(store: host.Store, department: ids.DepartmentId, period: ids.Period) -> Outcome<Int>
+body
+  fn spend_of(rs, advs) =
+    let sum: Int = 0
+    for r in rs
+      if r is reports.Counted then sum = sum + lines.budgeted_total(r.lines)
+    for a in advs
+      if a is advances.Counted then sum = sum + a.amount
+    sum
+
+  fn department_spend(store, department, period) =
+    let rs: reports.Reports = store.reports_for(department, period)?
+    let advs: advances.Advances = store.advances_for(department, period)?
+    Ok(spend_of(rs, advs))

@@ -1,0 +1,67 @@
+{
+ "label": "small-KC2",
+ "size": "small",
+ "arm": "KC",
+ "collected": "2026-10-17T07:05:41+00:00",
+ "started": "2026-10-17T07:00:29+00:00",
+ "session_id": "cd57c46f-b481-5b37-9466-887a6d309201",
+ "is_error": false,
+ "subtype": "success",
+ "terminal_reason": "completed",
+ "api_error_status": null,
+ "num_turns": 9,
+ "duration_ms": 302258,
+ "cost_usd": 1.4219089999999999,
+ "models": [
+  "claude-opus-5-5"
+ ],
+ "model_ok": true,
+ "thinking_tokens": 16657,
+ "output_tokens": 36486,
+ "cache_read": 567825,
+ "cache_write": 72319,
+ "input_uncached": 18,
+ "transcript_saved": true,
+ "leaks": [],
+ "scores": {
+  "C.json": {
+   "held": 122,
+   "total": 122,
+   "could_not_run": 0,
+   "by_kind": {
+    "edge": [
+     9,
+     9
+    ],
+    "integration": [
+     5,
+     5
+    ],
+    "invariant": [
+     1,
+     1
+    ],
+    "new": [
+     25,
+     25
+    ],
+    "preserved": [
+     82,
+     82
+    ]
+   }
+  },
+  "baseline.json": {
+   "held": 82,
+   "total": 82,
+   "could_not_run": 0,
+   "by_kind": {
+    "preserved": [
+     82,
+     82
+    ]
+   }
+  }
+ },
+ "final_check": "done        nothing else to run"
+}

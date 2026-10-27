@@ -1,0 +1,719 @@
+[
+ {
+  "number": "100",
+  "size": "small",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/payment.brass:60: a.reference (Advance.reference, when Paid|Settled) under `a is advances.Paid` at payment.brass:55: pass",
+    "desk/advances.brass:34: result.owed (when Settled) in an `after`, right of `result.status in {AdvanceStatus.Settled} and`; left operand of `and` holds on the right (spec \u00a711): pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:9: Entry.was and Entry.now, reports.ReportStatus -> audit.Step (also entry() params at audit.brass:11); shared Step vocabulary with of_report/of_advance converters",
+    "desk/queries.brass:15: Row.status, reports.ReportStatus -> audit.Step",
+    "desk/queries.brass:16: Rows bound, length 0 to 1000 -> 0 to 2000 (room for advance rows)"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 2: the only new literal naming a machine field is review.brass:169 (save_advance), status Requested, initial, no conditional field: legal, not a finding. Item 8: the four new Store operations are in the C-small contract; no Text for a state. Audit calls write audit.Step.X directly (e.g. payment.brass:24, review.brass:67) rather than through of_report/of_advance; the step names still match each machine's states. New declaration, not a widening against the start: Advance.owed is plain Int (advances.brass:16) with `before owed >= 0` on settle, where ids.Money was available.",
+  "batch": "rows-C6"
+ },
+ {
+  "number": "114",
+  "size": "grown",
+  "language": "python",
+  "legality": {
+   "when_reads": null,
+   "when_literals": null,
+   "converters_listed": null,
+   "loosened": null
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 8 pass: Store gains only advance, advances_for, paid_advances, save_advance (host.py); calls next_id and Ledger.pay; no Registry use. AdvanceStatus is its own enum (advances.py:14). Outside the rubric (typing only): audit.Entry.from_status/to_status (audit.py:11-12) and queries.Row.status (queries.py:25) stay annotated ReportStatus but receive AdvanceStatus values. No behavioral defect against TASK-C seen.",
+  "batch": "rows-C3"
+ },
+ {
+  "number": "205",
+  "size": "grown",
+  "language": "python",
+  "legality": {
+   "when_reads": null,
+   "when_literals": null,
+   "converters_listed": null,
+   "loosened": null
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 8 pass: host calls made by new code (advances.py, queries.py, review.py, routing.py) are staff, report, department, reports_for, period_closed, next_id, save_report, append_audit, advance, advances_for, paid_advances, save_advance, Ledger.pay; all in the C-grown contract and declared in host.py:22-25. AdvanceStatus is its own enum (records.py:55-59) with its own transition table (records.py:85-90); no Text stands in for a state. Outside the rubric (Python, so not item 4): audit.py:11-12 Entry.from_status/to_status and queries.py:25 Row.status widened from ReportStatus to bare Enum, so they hold either machine's status. Outside the rubric: review.py _required_for/_stand_in moved into routing.py:25-44 (a refactor mixed into the change; routing now imports host). The behavior reads as equivalent. No behavioral defect found against TASK-C.",
+  "batch": "rows-C1"
+ },
+ {
+  "number": "284",
+  "size": "grown",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/payment.brass:39: a.reference read under `if a is records.AdvancePaid` (line 34); reference exists in {Paid, Settled}; pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:17: Entry.was/now: reports.ReportStatus -> audit.Step (new plain union of both machines' state names)",
+    "desk/audit.brass:19: entry(was, now) parameters: reports.ReportStatus -> audit.Step",
+    "desk/queries.brass:15: Row.status: reports.ReportStatus -> audit.Step"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 2: the only new record literal with a machine field is desk/advances.brass:30 (new Advance in the initial state Requested, no conditional field). Out of scope and legal. The Advance machine and record were added to the existing records.brass (lines 60-77) rather than to a new module. Step plus the converters (audit.brass:8-13) follow the shared-Step pattern and borrow no machine state. Item 8 pass: every Store/Ledger call is in the C-grown contract; no Registry call is added. Outside the rubric, a possible bound defect: queries.brass:16 Rows stays `length 0 to 1000`, but statement (queries.brass:36-39) appends up to 1,000 advance rows after up to 1,000 report rows, so the refinement can be exceeded. Outside the rubric: settle_advance's contract (records.brass:105-106) does not state result.owed == owed. No other behavioral defect found.",
+  "batch": "rows-C1"
+ },
+ {
+  "number": "321",
+  "size": "grown",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/advances.brass:72: a.reference (Advance.reference, when Paid|Settled) under `if a is records.AdvancePaid` at :68: pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:7: Entry.was and Entry.now: reports.ReportStatus (machine, 6 states) -> status.Step (plain enum, 8 names covering both machines)",
+    "desk/audit.brass:9: entry() parameters was, now: reports.ReportStatus -> status.Step",
+    "desk/queries.brass:15: Row.status: reports.ReportStatus -> status.Step",
+    "desk/queries.brass:16: Rows: Array<Row> where it.length in 0 to 1000 -> 0 to 2000"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 8: host calls all in host-contract.C-grown; AdvanceStatus is its own machine (records.brass); no Text as a state. Step and its converters live in a new module desk/status.brass (of_report, of_advance, examples for every state). Rows bound doubled to hold report rows plus advance rows (each source capped at 1,000). New entry point request_advance takes `amount: Int` (advances.brass:15), not a typed amount; the body tests `amount >= 1 and amount <= 1000000000` (:32) before the literal at :36 places it in records.Amount; new declaration, so not scored under item 4. records.brass advance helpers carry no `after` contracts. Item 2: only new machine-record literal is advances.brass:36, status Requested (initial), no conditional field; inherited review.brass open_draft literal unchanged. Outside the rubric: none found.",
+  "batch": "rows-C4"
+ },
+ {
+  "number": "341",
+  "size": "small",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/payment.brass:61: a.reference (Advance.reference, when Paid|Settled) under `if a is advances.Paid` at :56: pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:10: Entry.was and Entry.now: reports.ReportStatus (machine, 6 states) -> audit.Step (plain enum, 8 names covering both machines)",
+    "desk/audit.brass:20: entry() parameters was, now: reports.ReportStatus -> audit.Step",
+    "desk/queries.brass:15: Row.status: reports.ReportStatus -> audit.Step",
+    "desk/review.brass:35: private required_for: parameter `r: reports.Submitted` -> `badge: ids.Badge, department: ids.DepartmentId, approvals_length: Int where it in 0 to 2`; the Submitted state requirement is dropped so advances can share it"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 8: host calls all in host-contract.C-small; AdvanceStatus is its own machine (advances.brass:6); no Text as a state. Converters audit.of_report / audit.of_advance. request_advance amount is ids.Money with `before amount >= 1` (review.brass:22-23). Item 2: only new machine-record literal is review.brass:100, status Requested (initial), no conditional field; inherited open_draft literal unchanged. OUTSIDE THE RUBRIC, legality: the reserved word `as` (spec \u00a72.3; 'a keyword is never a legal name', \u00a72 line 62) is used as a parameter and local name at budget.brass:11, :20, :22 and queries.brass:28, :29, :34, :38, :40, :57, :59. A conforming checker rejects these lines. No behavioral defect against TASK-C found.",
+  "batch": "rows-C4"
+ },
+ {
+  "number": "361",
+  "size": "small",
+  "language": "Brass",
+  "legality": {
+   "when_reads": [
+    "desk/payment.brass:52: a.reference (Advance.reference, when Paid|Settled) under `if a is advances.Paid` at payment.brass:47 \u2014 pass",
+    "desk/advances.brass:34: result.owed (when Settled) in settle's `after`, guarded by the preceding conjunct `result.status in {AdvanceStatus.Settled}` on the same line \u2014 pass (assumes the left conjunct of `and` establishes the state, as \u00a79.4 allows an enclosing `in` test in a contract)"
+   ],
+   "when_literals": [
+    "desk/review.brass:168: request_advance literal names status advances.AdvanceStatus.Requested (the initial state) and no conditional field \u2014 pass"
+   ],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:8: Entry.was and Entry.now changed from reports.ReportStatus to ids.Step (a new plain sum type, ids.brass:15, superset of both machines' state names, filled through converters audit.of_report / audit.of_advance); same for entry() parameters at audit.brass:10",
+    "desk/queries.brass:16: Row.status changed from reports.ReportStatus to ids.Step"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 8 pass: host allows added in host.brass match the contract's four new Store operations; AdvanceStatus is its own machine (advances.brass:6); ids.Step is a plain sum type, not a machine and not Text. The loosened entries are the shared Step-vocabulary pattern with one converter per machine, not a widening to Text or Int; recorded per item 4 as old/new type. Outside rubric: queries.brass:17 Rows stays at most 1000 while statement can append up to 1000 report rows plus 1000 advance rows (queries.brass:38-40); a checker question, not a case failure. Advance.owed declared plain Int (advances.brass:17) with `before owed >= 0` on settle.",
+  "batch": "rows-C2"
+ },
+ {
+  "number": "372",
+  "size": "small",
+  "language": "Python",
+  "legality": {
+   "when_reads": null,
+   "when_literals": null,
+   "converters_listed": null,
+   "loosened": null
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 8 pass: all host calls in new code are in the C-small contract; own AdvanceStatus enum (advances.py:12); audit.py:8 Status = Union[ReportStatus, AdvanceStatus]; no state reused, no str standing in for a state. Outside rubric: host.py:21 next_id and host.py:29 Ledger.pay key retyped from ReportId to str (ReportId is an alias of str, so no behavioral effect); request_advance checks only amount >= 1, no upper bound (review.py:164); not a task-C requirement.",
+  "batch": "rows-C2"
+ },
+ {
+  "number": "376",
+  "size": "grown",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/payment.brass:63: a.reference read under `if a is advances.Paid` (line 58); reference exists in {Paid, Settled}; pass",
+    "desk/advances.brass:32: result.owed read in contract after conjunct `result.status in {AdvanceStatus.Settled}`; owed exists in {Settled}; pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:10: Entry.was/now: reports.ReportStatus -> audit.Step (new plain union of both machines' state names)",
+    "desk/audit.brass:12: entry(was, now) parameters: reports.ReportStatus -> audit.Step",
+    "desk/queries.brass:15: Row.status: reports.ReportStatus -> audit.Step",
+    "desk/queries.brass:16: Rows: Array<Row> where length 0 to 1000 -> 0 to 2000"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 2: the only new record literal with a machine field is desk/review.brass:169 (new Advance in the initial state Requested, no conditional field). Out of scope and legal. Step plus the converters (audit.brass:8, 15-23) follow the shared-Step pattern and borrow no machine state. Item 8 pass: every Store/Ledger call is in the C-grown contract. Outside item 4's strict scope (new declarations, not widened ones): the new owed field is plain Int (advances.brass:16), as are settle's parameter (advances.brass:31) and payment.brass:62 `let owed: Int`, where ids.Money would bound it at 0 or more. Advance ids are typed ids.ReportId. No behavioral defect found.",
+  "batch": "rows-C1"
+ },
+ {
+  "number": "377",
+  "size": "small",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/payment.brass:52: a.reference read under `if a is advances.Paid` (line 47); reference exists in {Paid, Settled}; pass",
+    "desk/advances.brass:34: result.owed read in contract after conjunct `result.status in {AdvanceStatus.Settled}`; owed exists in {Settled}; pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:9: Entry.was/now: reports.ReportStatus -> audit.Step (new plain union of both machines' state names)",
+    "desk/audit.brass:11: entry(was, now) parameters: reports.ReportStatus -> audit.Step",
+    "desk/queries.brass:15: Row.status: reports.ReportStatus -> audit.Step",
+    "desk/queries.brass:16: Rows: Array<Row> where length 0 to 1000 -> 0 to 2000"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 2: the only new record literal with a machine field is desk/advancing.brass:30 (save_advance of a new Advance with status Requested, the initial state, and no conditional field). It is out of item 2's scope and legal. Item 4 context: Step plus the of_report/of_advance converters (audit.brass:8, 14-26) follow the shared-Step-vocabulary pattern. Step is a plain type, not a machine, and borrows no machine's state. The Rows widening makes room for the advance rows. Item 8 pass: every Store/Ledger call is in the C-small contract; AdvanceStatus is its own machine (advances.brass:6-11). Outside the rubric: Advance.amount uses a new Amount = ids.Money where it >= 1 (advances.brass:13). No behavioral defect found.",
+  "batch": "rows-C1"
+ },
+ {
+  "number": "447",
+  "size": "grown",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/payment.brass:50: a.reference (Advance.reference, when Paid|Settled) under `if a is advances.Paid` at payment.brass:45: pass",
+    "desk/advances.brass:33: result.owed (when Settled) in `after`, conjoined after `result.status in {AdvanceStatus.Settled}` on the same line: pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:10: Entry.was/now: reports.ReportStatus -> audit.Status (new closed 8-state vocabulary, report and advance states; not Text)",
+    "desk/audit.brass:12: entry() params was/now: reports.ReportStatus -> audit.Status",
+    "desk/queries.brass:15: Row.status: reports.ReportStatus -> audit.Status",
+    "desk/queries.brass:16: Rows bound: length 0 to 1000 -> 0 to 2000 (reports plus advances)"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 2: the one new literal naming a machine state, desk/advancing.brass:32 (save_advance in request_advance), uses the initial state AdvanceStatus.Requested and names no conditional field: legal, not a finding. Item 8 pass: host calls are Store.staff, period_closed, next_id, advance, advances_for, paid_advances, save_advance, report, reports_for, department, save_report, append_audit, Ledger.pay, all listed; AdvanceStatus is its own machine (advances.brass:6); audit.Status is a separate enum reached by converters of_report/of_advance, not a borrowed machine state. Outside the rubric: refactor moved required_for/stand_in/may_act from review.brass into routing.brass (routing now imports host and staff), not a defect. Approvals type duplicated in advances.brass:13 rather than reused. No behavioral defect found.",
+  "batch": "rows-C5"
+ },
+ {
+  "number": "466",
+  "size": "grown",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/advances.brass:74: a.reference (Advance.reference, when Paid|Settled) under `a is reports.PaidAdvance` at advances.brass:68: pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:7: Entry.was and Entry.now, reports.ReportStatus -> reports.Step (also entry() params at audit.brass:9); shared Step vocabulary with of_report/of_advance converters",
+    "desk/queries.brass:13: Row.status, reports.ReportStatus -> reports.Step",
+    "desk/queries.brass:14: Rows bound, length 0 to 1000 -> 0 to 2000 (room for advance rows)"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 2: the only new literal naming a machine field is advances.brass:36 (save_advance), status Requested, initial, no conditional field: legal, not a finding. Item 8: Store.advance, advances_for, paid_advances, save_advance are all in the C-grown contract; no Registry call added; AdvanceStatus is its own machine (declared in reports.brass), no Text for a state. Outside the rubric, likely behavioral defect: review.brass:140-143 final_approval for a report still checks budget.spend_of(reports) only; approved and paid advances are not counted against the budget when a report is approved, against 'An approved advance counts against the department's budget for its period, like an approved report.' (Advance approval at advances.brass:142 does count both.) Also outside: of_report/of_advance carry one example each, not one per state.",
+  "batch": "rows-C6"
+ },
+ {
+  "number": "470",
+  "size": "grown",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/advances.brass:76: a.reference (Advance.reference, when Paid|Settled) under `if a is records.AdvancePaid` at advances.brass:69: pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:7: Entry.was/now: reports.ReportStatus -> records.Step (new closed 8-state vocabulary; not Text)",
+    "desk/audit.brass:9: entry() params was/now: reports.ReportStatus -> records.Step",
+    "desk/queries.brass:14: Row.status: reports.ReportStatus -> records.Step"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 2: the one new literal naming a machine state, desk/advances.brass:37 (save_advance in request_advance), uses initial AdvanceStatus.Requested and no conditional field: legal. Its amount is a plain Int parameter checked by `amount >= 1 and amount <= 1000000000` at :35 before the literal fills records.Amount. Item 4 note (new declarations, not widenings of starting ones): request_advance amount is plain Int (advances.brass:16) where records.Amount exists; outstanding_advances today is plain Int (advances.brass:20) where ids.Period exists; AdvanceId = Text (records.brass:60), same as ids.ReportId = Text. Item 8 pass: all host calls are listed in host-contract.C-grown, no Registry calls added; AdvanceStatus is its own machine in records.brass; Step is a separate enum with converters step_of_report/step_of_advance. No behavioral defect found.",
+  "batch": "rows-C5"
+ },
+ {
+  "number": "531",
+  "size": "small",
+  "language": "Python",
+  "legality": {
+   "when_reads": null,
+   "when_literals": null,
+   "converters_listed": null,
+   "loosened": null
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 8 pass: host calls in new code (staff, advance, report, department, reports_for, advances_for, paid_advances, period_closed, next_id, save_report, save_advance, append_audit, Ledger.pay) are all in the C-small contract. Advances have their own AdvanceStatus enum (advances.py:11); audit.py:13-14 and queries.py:25 widen status to Union[ReportStatus, AdvanceStatus], no state reused, no str standing in for a state. Legality items 1, 2, 4 do not apply to Python. Outside rubric: no behavioral defect seen against TASK-C.",
+  "batch": "rows-C2"
+ },
+ {
+  "number": "544",
+  "size": "small",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/advances.brass:30: result.reference read in pay's after, under the left conjunct result.status in {AdvanceStatus.Paid} (spec: what the left operand of and establishes holds for the right); pass",
+    "desk/advances.brass:32: result.owed read in settle's after, under the left conjunct result.status in {AdvanceStatus.Settled}; pass",
+    "desk/payment.brass:61: a.reference read under if a is advances.Paid (payment.brass:56); Paid is in the field's set {Paid, Settled}; pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:10: Entry.was and Entry.now: reports.ReportStatus -> audit.Step (new plain union, a superset of the report machine's states plus Requested and Settled; follows the shared Step vocabulary of C22 option A)",
+    "desk/queries.brass:16: Row.status: reports.ReportStatus -> audit.Step (same widening, so a statement row can carry an advance's state)",
+    "desk/queries.brass:16: Row.id: ids.ReportId -> Text (nominal only: ids.ReportId is declared as Text)",
+    "desk/queries.brass:17: Rows bound: length 0 to 1000 -> 0 to 2000"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 1 pass (3 reads, all under a fixing test; advances.brass:36-37 set reference/owed inside with, writes not reads). Item 2 pass: the only new literal touching a machine is review.brass:169, the new advance in its initial state Requested with no conditional field; queries.brass:38/40 row literals carry audit.Step, not a machine. Inherited, not findings: review.brass:50 report literal in Draft. Item 4: four widenings listed; the Step change is the C22 pattern and is recorded, not judged. Item 8 pass: host.brass:24-28 adds only advance, advances_for, paid_advances, save_advance (all in the C-small contract); advances have their own machine AdvanceStatus (advances.brass:6); audit uses a separate Step union with converters of_report/of_advance, no state borrowed; no Text stands in for a state. Advance ids flow through ids.ReportId-typed slots (Entry.report, Ledger.pay key); both are Text aliases. Outside the rubric: none seen; pay_against checks, settlement arithmetic, budget counting (Approved and Paid only) and outstanding (paid_advances, period + 2 < today) match TASK-C.",
+  "batch": "rows-C3"
+ },
+ {
+  "number": "556",
+  "size": "small",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/payment.brass:52: a.reference (Advance.reference, when Paid|Settled) under `if a is advances.Paid` at :47: pass",
+    "desk/advances.brass:34: result.owed (Advance.owed, when Settled) in an `after`, right of `result.status in {AdvanceStatus.Settled} and`: pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:10: Entry.was and Entry.now: reports.ReportStatus (machine, 6 states) -> audit.Step (plain enum, 8 names covering both machines)",
+    "desk/audit.brass:12: entry() parameters was, now: reports.ReportStatus -> audit.Step",
+    "desk/queries.brass:15: Row.status: reports.ReportStatus -> audit.Step"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 8: host calls all in host-contract.C-small (staff, period_closed, next_id, advance, advances_for, paid_advances, save_advance, report, save_report, reports_for, department, append_audit, ledger.pay); AdvanceStatus is its own machine (advances.brass:6); no Text as a state. Loosened entries are a shared audit vocabulary with converters audit.of_report / audit.of_advance; recorded because the declared type is wider than the start's. Amount refined as advances.Amount = ids.Money where it >= 1 (advances.brass:14). Item 2: only new machine-record literal is advancing.brass:30, status Requested (initial), no conditional field; inherited review.brass open_draft literal unchanged. Outside the rubric: none found.",
+  "batch": "rows-C4"
+ },
+ {
+  "number": "558",
+  "size": "small",
+  "language": "python",
+  "legality": {
+   "when_reads": null,
+   "when_literals": null,
+   "converters_listed": null,
+   "loosened": null
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Legality items 1, 2, 4 do not apply (Python). Item 8 pass: new host calls are store.advance, advances_for, paid_advances, save_advance, next_id, ledger.pay (all in host-contract.C-small and the declared protocol, host.py:22-25); AdvanceStatus is its own enum (advances.py:11); audit Status = Union[ReportStatus, AdvanceStatus] (audit.py:8) and Row.status union (queries.py:25) use each machine's own enum, no Text state. Outside the rubric: no behavioral defect found against TASK-C.",
+  "batch": "rows-C5"
+ },
+ {
+  "number": "584",
+  "size": "small",
+  "language": "python",
+  "legality": {
+   "when_reads": null,
+   "when_literals": null,
+   "converters_listed": null,
+   "loosened": null
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 8 pass: Store gains only advance, advances_for, paid_advances, save_advance (host.py); calls next_id and Ledger.pay; AdvanceStatus is its own enum (advances.py:11). audit.Entry statuses widened to Union[ReportStatus, AdvanceStatus] (audit.py), a union of two separate enums, not a borrowed state. Ledger.pay key annotation widened ReportId -> str (host.py); both are str. Outside the rubric: pay_against (payment.py:34) saves the advance before the report; no defect against TASK-C seen.",
+  "batch": "rows-C3"
+ },
+ {
+  "number": "585",
+  "size": "grown",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/advances.brass:72: a.reference (Advance.reference, when Paid|Settled) under `if a is records.AdvancePaid` at :65: pass",
+    "desk/records.brass:106: result.owed (Advance.owed, when Settled) in an `after`, right of `result.status in {AdvanceStatus.Settled} and`: pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:10: Entry.was and Entry.now: reports.ReportStatus (machine, 6 states) -> audit.Step (plain enum, 8 names covering both machines)",
+    "desk/audit.brass:12: entry() parameters was, now: reports.ReportStatus -> audit.Step",
+    "desk/queries.brass:15: Row.status: reports.ReportStatus -> audit.Step"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 8: host calls are store.staff, period_closed, next_id, advance, advances_for, paid_advances, save_advance, report, save_report, reports_for, department, append_audit and ledger.pay, all in host-contract.C-grown; AdvanceStatus is its own machine (records.brass); no Text used as a state. The loosened entries are a shared audit vocabulary with one converter per machine (audit.of_report, audit.of_advance, examples for every state), not an ad hoc widening; recorded because the declared type is wider than the start's. Item 2: the only new machine-record literal is advances.brass:36, status Requested (initial), no conditional field; inherited literal review.brass open_draft (status Draft) unchanged. Outside the rubric: none found; pay_against saves and audits the advance before the report (advances.brass:70-73, 77-80), which the task does not order.",
+  "batch": "rows-C4"
+ },
+ {
+  "number": "619",
+  "size": "grown",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/advances.brass:69: a.reference (Advance.reference, when Paid|Settled) under `a is reports.AdvancePaid` at advances.brass:64: pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:7: Entry.was and Entry.now, reports.ReportStatus -> reports.State (also entry() params at audit.brass:9); shared step vocabulary with state_of_report/state_of_advance converters",
+    "desk/queries.brass:13: Row.status, reports.ReportStatus -> reports.State",
+    "desk/queries.brass:14: Rows bound, length 0 to 1000 -> 0 to 2000 (room for advance rows)"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 2: the only new literal naming a machine field is advances.brass:34 (save_advance), status Requested, initial, no conditional field: legal, not a finding. Item 8: the four new Store operations are in the C-grown contract; no Registry call added; AdvanceStatus is its own machine, no Text for a state. review.brass gains may_act_on/required_approver taking (department, badge, approvals_length) so reports and advances share the routing rule; report final_approval counts advances (review.brass:161-162).",
+  "batch": "rows-C6"
+ },
+ {
+  "number": "646",
+  "size": "small",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/payment.brass:60: a.reference (Advance.reference, when Paid|Settled) under `if a is advances.Paid` at :55: pass",
+    "desk/advances.brass:32: result.owed (Advance.owed, when Settled) in an `after`, right of `result.status in {AdvanceStatus.Settled} and`: pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:7: Entry.was and Entry.now: reports.ReportStatus (machine, 6 states) -> audit.Step (plain enum, 8 names covering both machines)",
+    "desk/audit.brass:9: entry() parameters was, now: reports.ReportStatus -> audit.Step",
+    "desk/queries.brass:16: Rows: Array<Row> where it.length in 0 to 1000 -> 0 to 2000"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 8: host calls all in host-contract.C-small; AdvanceStatus is its own machine (advances.brass:6); no Text as a state. Audit steps are written directly as audit.Step.X at each call site, with no converter from either machine. queries.brass:15 Row.status changed from reports.ReportStatus to a new plain enum RowStatus = Approved | Paid (:14), filled by an `in` test on each machine (:38, :42); not wider in values, so not listed as loosened, but the machine type is gone. request_advance amount is ids.Money with `before amount >= 1` (review.brass:24-25). Item 2: only new machine-record literal is review.brass:169, status Requested (initial), no conditional field; inherited open_draft literal unchanged. Outside the rubric: none found.",
+  "batch": "rows-C4"
+ },
+ {
+  "number": "658",
+  "size": "small",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/payment.brass:50: a.reference read under `if r is reports.Approved and a is advances.Paid and ...` (line 46); reference exists in {Paid, Settled}; pass",
+    "desk/advances.brass:33: result.owed read in contract after conjunct `result.status in {AdvanceStatus.Settled}`; owed exists in {Settled}; pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:10: Entry.was/now: reports.ReportStatus -> audit.Step (new plain union of both machines' state names)",
+    "desk/audit.brass:26: entry(was, now) parameters: reports.ReportStatus -> audit.Step",
+    "desk/queries.brass:15: Row.status: reports.ReportStatus -> audit.Step",
+    "desk/queries.brass:16: Rows: Array<Row> where length 0 to 1000 -> 0 to 2000"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 2: the only new record literal with a machine field is desk/review.brass:168 (new Advance in the initial state Requested, no conditional field). Out of scope and legal. Step plus the converters (audit.brass:8, 12-24) follow the shared-Step pattern and borrow no machine state. budget.spend_of gained a parameter (budget.brass:8), which is not a widening. Item 8 pass: every Store/Ledger call is in the C-small contract. Outside the rubric: advance ids are typed ids.ReportId; Advance.amount is ids.Money, with `before amount in 1 to 1000000000` on request_advance (review.brass:24-25). No behavioral defect found.",
+  "batch": "rows-C1"
+ },
+ {
+  "number": "661",
+  "size": "small",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/payment.brass:60: a.reference (Advance.reference, when Paid|Settled) under `if a is advances.Paid` at payment.brass:56: pass",
+    "desk/advances.brass:35: result.owed (when Settled) in `after`, conjoined after `result.status in {AdvanceStatus.Settled}` on the same line: pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:10: Entry.was/now: reports.ReportStatus -> audit.Step (new closed 8-state vocabulary; not Text)",
+    "desk/audit.brass:12: entry() params was/now: reports.ReportStatus -> audit.Step",
+    "desk/queries.brass:15: Row.status: reports.ReportStatus -> audit.Step"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 2: the one new literal naming a machine state, desk/review.brass:168 (save_advance in request_advance), uses initial AdvanceStatus.Requested and no conditional field: legal. Item 8 pass: host calls are all in host-contract.C-small; AdvanceStatus is its own machine (advances.brass:7); audit.Step is a separate enum with converters of_report/of_advance. Reuses reports.Approvals as a type (advances.brass:16), not a state. No behavioral defect found.",
+  "batch": "rows-C5"
+ },
+ {
+  "number": "704",
+  "size": "grown",
+  "language": "Brass",
+  "legality": {
+   "when_reads": [
+    "desk/advancing.brass:76: a.reference (Advance.reference, when Paid|Settled) under `if a is advances.Paid` at advancing.brass:69 \u2014 pass",
+    "desk/advances.brass:35: result.owed (when Settled) in settle's `after`, guarded by the preceding conjunct `result.status in {AdvanceStatus.Settled}` \u2014 pass (assumes the left conjunct of `and` establishes the state)"
+   ],
+   "when_literals": [
+    "desk/advancing.brass:37: request_advance literal names status advances.AdvanceStatus.Requested (initial) and no conditional field \u2014 pass",
+    "desk/queries.brass:39: FAIL \u2014 statement row literal places `status: st` where st (queries.brass:38) is reports.ReportStatus.Approved or reports.ReportStatus.Paid written as constants: a non-initial machine state not obtained by enters, an allow result, or an entry parameter (\u00a79.2), and taken from the report machine for an advance"
+   ],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:10: Entry.was and Entry.now changed from reports.ReportStatus to audit.Step (new plain sum type at audit.brass:8, filled through audit.of_report / audit.of_advance); same for entry() parameters at audit.brass:25"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": [
+    "desk/queries.brass:38: state borrowed from another machine \u2014 an advance's statement row status is set to reports.ReportStatus.Approved / reports.ReportStatus.Paid (mapped from advances.AdvanceStatus), because Row.status (queries.brass:14) stayed reports.ReportStatus"
+   ]
+  },
+  "notes": "Host calls in advancing.brass are all in the C-grown contract; no Registry use. The audit path uses the Step converters correctly; only the statement row borrows ReportStatus. On item 2: the starting tree also passed reports.ReportStatus constants into audit entries; this session replaced those with Step, so the only remaining instance is the new row at queries.brass:38-39. Outside rubric: request_advance takes amount: Int (advancing.brass:16) and range-checks it in the body (advancing.brass:35) rather than using its own Amount type; new declaration, not a widening. pay_against saves and audits the advance before the report (advancing.brass:74-77, 82-85), the reverse of the other sessions; TASK-C does not fix this order. queries.brass:15 Rows stays at most 1000 while rows can reach 2000.",
+  "batch": "rows-C2"
+ },
+ {
+  "number": "796",
+  "size": "grown",
+  "language": "python",
+  "legality": {
+   "when_reads": null,
+   "when_literals": null,
+   "converters_listed": null,
+   "loosened": null
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 8 pass: Store gains only advance, advances_for, paid_advances, save_advance (host.py); calls next_id and Ledger.pay; no Registry use. AdvanceStatus is its own enum with its own ADVANCE_TRANSITIONS in records.py, reusing the generic _move helper, not another machine's states. Approval reuses review.may_act on an Advance by duck typing (advances.py:84). Outside the rubric (typing only): audit.Entry.from_status/to_status (audit.py:11-12) and queries.Row.status (queries.py:24) stay annotated ReportStatus but receive AdvanceStatus values. No behavioral defect against TASK-C seen.",
+  "batch": "rows-C3"
+ },
+ {
+  "number": "801",
+  "size": "small",
+  "language": "python",
+  "legality": {
+   "when_reads": null,
+   "when_literals": null,
+   "converters_listed": null,
+   "loosened": null
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Items 1, 2 and 4 do not apply (Python). Item 8: host.py adds advance, advances_for, paid_advances, save_advance to Store, exactly the operations the task names; AdvanceStatus is its own Enum with its own TRANSITIONS (advances.py:11-23); audit Entry and statement Row take Union[ReportStatus, AdvanceStatus] (audit.py:8, queries.py:24), no str for a state. Outside the rubric, representation only: Advance.owed defaults to 0 and reference to None in every state (advances.py:35-36), so a saved Requested/Approved/Paid advance carries owed=0; whether the hidden cases treat that as absent is undecidable from the tree.",
+  "batch": "rows-C6"
+ },
+ {
+  "number": "815",
+  "size": "grown",
+  "language": "python",
+  "legality": {
+   "when_reads": null,
+   "when_literals": null,
+   "converters_listed": null,
+   "loosened": null
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Legality items 1, 2, 4 do not apply (Python). Item 8 pass: new host calls are store.advance, advances_for, paid_advances, save_advance, next_id, ledger.pay (all in host-contract.C-grown and the declared Store/Ledger protocol, host.py:22-25); no Registry calls added; AdvanceStatus is its own enum (advances.py:12); audit Entry and queries Row widen to Union[ReportStatus, AdvanceStatus] (audit.py:13-14, queries.py:25), each machine's own enum, no Text state. Outside the rubric: no behavioral defect found against TASK-C.",
+  "batch": "rows-C5"
+ },
+ {
+  "number": "869",
+  "size": "grown",
+  "language": "Brass",
+  "legality": {
+   "when_reads": [
+    "desk/payment.brass:59: a.reference (Advance.reference, when Paid|Settled) under `if a is advances.PaidAdvance` at payment.brass:48 \u2014 pass",
+    "desk/advances.brass:32: result.owed (when Settled) in settle's `after`, guarded by the preceding conjunct `result.status in {AdvanceStatus.Settled}` \u2014 pass (assumes the left conjunct of `and` establishes the state)"
+   ],
+   "when_literals": [
+    "desk/review.brass:170: request_advance literal names status advances.AdvanceStatus.Requested (initial) and no conditional field \u2014 pass"
+   ],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:10: Entry.was and Entry.now changed from reports.ReportStatus to audit.Step (new plain sum type at audit.brass:8, filled through audit.of_report / audit.of_advance); same for entry() parameters at audit.brass:12",
+    "desk/queries.brass:16: Row.status changed from reports.ReportStatus to audit.Step",
+    "desk/queries.brass:17: Rows bound widened from `it.length in 0 to 1000` to `0 to 2000` (room for 1000 reports plus 1000 advances)"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 8 pass: all host calls are in the C-grown contract; AdvanceStatus is its own machine; Step is a plain sum type. Outside rubric: the advance's settlement audit reason is \"settled against report \" ++ r.id (payment.brass:56, 62); ids.Reason is Text of length 1 to 200 and ReportId is unbounded Text, so the refinement is not established by the code (a checker question). Advance.amount is ids.Money (0 allowed, advances.brass:14), with the at-least-1 check in request_advance's body (review.brass:166). pay_against saves both records before either audit entry (payment.brass:53-56, 59-62).",
+  "batch": "rows-C2"
+ },
+ {
+  "number": "939",
+  "size": "small",
+  "language": "brass",
+  "legality": {
+   "when_reads": [
+    "desk/payment.brass:63: a.reference (Advance.reference, when Paid|Settled) under `a is advances.Paid` at payment.brass:58: pass",
+    "desk/advances.brass:32: result.owed (when Settled) in an `after`, right of `result.status in {AdvanceStatus.Settled} and`; left operand of `and` holds on the right (spec \u00a711, \u00a73 predicate rule): pass"
+   ],
+   "when_literals": [],
+   "converters_listed": null,
+   "loosened": [
+    "desk/audit.brass:10: Entry.was and Entry.now, reports.ReportStatus -> audit.Step (also entry() params at audit.brass:26); the shared Step vocabulary with of_report/of_advance converters, the shape the task D starting tree uses",
+    "desk/queries.brass:15: Row.status, reports.ReportStatus -> audit.Step (same vocabulary)"
+   ]
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 2: the only new literal naming a machine field is review.brass:169 (save_advance), status Requested, the initial state, no conditional field: legal, not a finding. Item 8: the four new Store operations (advance, advances_for, paid_advances, save_advance) are all in the C-small contract; Step is a separate vocabulary reached by converters, no Text for a state. Outside the rubric: queries.brass:16 keeps Rows at 0 to 1000 while statement() now appends up to 1000 report rows plus up to 1000 advance rows; the bound can be exceeded.",
+  "batch": "rows-C6"
+ },
+ {
+  "number": "970",
+  "size": "grown",
+  "language": "python",
+  "legality": {
+   "when_reads": null,
+   "when_literals": null,
+   "converters_listed": null,
+   "loosened": null
+  },
+  "requirements": {
+   "overage_reason": null,
+   "closed_reason": null,
+   "write_order": null,
+   "invented": []
+  },
+  "notes": "Item 8 pass: Store gains only advance, advances_for, paid_advances, save_advance (host.py:22-25); calls next_id and Ledger.pay; no Registry use. AdvanceStatus is its own enum with its own transition table (advances.py:12-24). Moved report routing into routing.required_approver (routing.py:25) shared by reports and advances; behavior equivalent by reading. Outside the rubric (typing only): audit.Entry.from_status/to_status stay annotated ReportStatus (audit.py:11-12) but receive AdvanceStatus values from payment.py and review.py; Row.status was widened to a Union (queries.py:25). No behavioral defect against TASK-C seen.",
+  "batch": "rows-C3"
+ }
+]

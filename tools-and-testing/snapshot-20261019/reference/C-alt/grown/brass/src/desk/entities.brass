@@ -1,0 +1,24 @@
+# desk/entities.brass
+module desk.entities
+import desk.ids as ids
+import desk.lines as lines
+import desk.reports as reports
+import desk.records as records
+import desk.host as host
+import desk.registry as registry
+
+interface
+  type CostCenterSummary = { cost_center: records.CostCenterId, entity: records.EntityId, entity_name: Text, departments: records.DeptIds, approved_total: Int }
+
+  fn cost_center_summary(store: host.Store, reg: registry.Registry, cost_center_id: records.CostCenterId, period: ids.Period) -> Outcome<CostCenterSummary>
+body
+  fn cost_center_summary(store, reg, cost_center_id, period) =
+    let cc: records.CostCenter = reg.cost_center(cost_center_id)?
+    let e: records.Entity = reg.entity(cc.entity)?
+    let depts: records.DeptIds = reg.departments_of(cc.id)?
+    let total: Int = 0
+    for d in depts
+      let rs: reports.Reports = store.reports_for(d, period)?
+      for r in rs
+        if r.status in {reports.ReportStatus.Approved, reports.ReportStatus.Paid} then total = total + lines.total(r.lines)
+    Ok({ cost_center: cc.id, entity: e.id, entity_name: e.name, departments: depts, approved_total: total })

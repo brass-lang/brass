@@ -1,0 +1,68 @@
+# desk/cards.brass
+module desk.cards
+import desk.ids as ids
+import desk.staff as staff
+import desk.reports as reports
+import desk.records as records
+import desk.host as host
+import desk.registry as registry
+
+interface
+  type TxnIds = Array<records.TxnId> where it.length in 0 to 1000
+
+  fn import_txn(store: host.Store, reg: registry.Registry, finance_badge: ids.Badge, badge: ids.Badge, period: ids.Period, amount: Int, category: ids.Category, merchant: Text) -> Outcome<records.TxnId>
+  fn match_txn(store: host.Store, reg: registry.Registry, txn_id: records.TxnId, report_id: ids.ReportId, badge: ids.Badge) -> Outcome<Done>
+  fn dispute_txn(store: host.Store, reg: registry.Registry, txn_id: records.TxnId, badge: ids.Badge) -> Outcome<Done>
+  fn unmatched(reg: registry.Registry, period: ids.Period) -> Outcome<TxnIds>
+private
+  type Matchable = reports.Report where it.status in {reports.ReportStatus.Submitted, reports.ReportStatus.Approved, reports.ReportStatus.Paid}
+body
+  fn import_txn(store, reg, finance_badge, badge, period, amount, category, merchant) =
+    let who: staff.Staff = store.staff(finance_badge)?
+    if who is staff.Finance then
+      let holder: staff.Staff = store.staff(badge)?
+      if amount >= 1 and amount <= 1000000000 and merchant.length >= 1 and merchant.length <= 200 then
+        let closed: Bool = store.period_closed(period)?
+        if not closed then
+          let id: records.TxnId = store.next_id()?
+          reg.save_txn({ id: id, badge: holder.badge, period: period, amount: amount, category: category, merchant: merchant, status: records.CardStatus.Open, matched: None })?
+          Ok(id)
+        else Err(FailureCode.Conflict, "the period is closed")
+      else Err(FailureCode.InvalidInput, "an amount of at least 1 cent and a merchant of 1 to 200 characters")
+    else Err(FailureCode.Unauthorized, "only active finance staff may import card transactions")
+
+  fn match_txn(store, reg, txn_id, report_id, badge) =
+    let who: staff.Staff = store.staff(badge)?
+    if who is staff.Active then
+      let t: records.CardTxn = reg.txn(txn_id)?
+      if t.badge == badge then
+        if t is records.OpenTxn then
+          let r: reports.Report = store.report(report_id)?
+          if r.badge == badge then
+            if r.period == t.period then
+              if r is Matchable then
+                if any l in r.lines where l.category == t.category and l.amount == t.amount then reg.save_txn(records.match_txn(t, report_id))
+                else Err(FailureCode.InvalidInput, "the report has no line of this category and amount")
+              else Err(FailureCode.Conflict, "the report is not submitted, approved, or paid")
+            else Err(FailureCode.Conflict, "the report is for another period")
+          else Err(FailureCode.Unauthorized, "the report belongs to someone else")
+        else Err(FailureCode.Conflict, "the transaction is not open")
+      else Err(FailureCode.Unauthorized, "only the card holder may match a transaction")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn dispute_txn(store, reg, txn_id, badge) =
+    let who: staff.Staff = store.staff(badge)?
+    if who is staff.Active then
+      let t: records.CardTxn = reg.txn(txn_id)?
+      if t.badge == badge then
+        if t is records.OpenTxn then reg.save_txn(records.dispute_txn(t))
+        else Err(FailureCode.Conflict, "the transaction is not open")
+      else Err(FailureCode.Unauthorized, "only the card holder may dispute a transaction")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn unmatched(reg, period) =
+    let ts: records.Txns = reg.txns_for(period)?
+    let out: TxnIds = []
+    for t in ts
+      if t.status in {records.CardStatus.Open} then out = out ++ [t.id]
+    Ok(out)

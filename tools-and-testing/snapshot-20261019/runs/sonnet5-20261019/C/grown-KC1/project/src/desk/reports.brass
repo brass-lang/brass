@@ -1,0 +1,114 @@
+# desk/reports.brass
+module desk.reports
+import desk.ids as ids
+import desk.lines as lines
+
+interface
+  machine ReportStatus
+    states  Draft, Submitted, Approved, Rejected, ChangesRequested, Paid
+    initial Draft
+    Draft            enters Submitted
+    Submitted        enters Approved | Rejected | ChangesRequested
+    ChangesRequested enters Submitted
+    Approved         enters Paid
+
+  machine AdvanceStatus
+    states  Requested, Approved, Paid, Settled
+    initial Requested
+    Requested enters Approved
+    Approved  enters Paid
+    Paid      enters Settled
+
+  type State = Draft | Submitted | Approved | Rejected | ChangesRequested | Paid | Requested | Settled
+
+  type Approvals = Array<ids.Badge> where it.length in 0 to 2
+  type Report = { id: ids.ReportId, badge: ids.Badge, department: ids.DepartmentId, period: ids.Period, lines: lines.Lines, status: ReportStatus, approvals: Approvals,
+      reference: Text when it.status in {ReportStatus.Paid} }
+  type Reports = Array<Report> where it.length in 0 to 1000
+
+  type Draft           = Report where it.status in {ReportStatus.Draft}
+  type Submitted       = Report where it.status in {ReportStatus.Submitted}
+  type Approved        = Report where it.status in {ReportStatus.Approved}
+  type AwaitingChanges = Report where it.status in {ReportStatus.ChangesRequested}
+  type Counted         = Report where it.status in {ReportStatus.Approved, ReportStatus.Paid}
+  type Editable        = Report where it.status in {ReportStatus.Draft, ReportStatus.ChangesRequested}
+
+  type Advance = { id: ids.ReportId, badge: ids.Badge, department: ids.DepartmentId, period: ids.Period, amount: ids.Money, status: AdvanceStatus, approvals: Approvals,
+      reference: Text when it.status in {AdvanceStatus.Paid, AdvanceStatus.Settled},
+      owed: ids.Money when it.status in {AdvanceStatus.Settled} }
+  type Advances = Array<Advance> where it.length in 0 to 1000
+
+  type AdvanceRequested = Advance where it.status in {AdvanceStatus.Requested}
+  type AdvanceApproved  = Advance where it.status in {AdvanceStatus.Approved}
+  type AdvancePaid      = Advance where it.status in {AdvanceStatus.Paid}
+  type CountedAdvance   = Advance where it.status in {AdvanceStatus.Approved, AdvanceStatus.Paid}
+
+  fn add_line(r: Editable, l: lines.Line) -> Report
+    before r.lines.length < 50
+    after  result.status == r.status and result.lines.length == r.lines.length + 1
+  fn submit(r: Draft) -> Report
+    after result.status in {ReportStatus.Submitted} and result.approvals.length == 0
+  fn add_approval(r: Submitted, who: ids.Badge) -> Report
+    before r.approvals.length < 2
+    after  result.status in {ReportStatus.Submitted} and result.approvals.length == r.approvals.length + 1
+  fn approve(r: Submitted) -> Report
+    after result.status in {ReportStatus.Approved}
+  fn reject(r: Submitted) -> Report
+    after result.status in {ReportStatus.Rejected}
+  fn request_changes(r: Submitted) -> Report
+    after result.status in {ReportStatus.ChangesRequested} and result.approvals.length == 0
+  fn resubmit(r: AwaitingChanges) -> Report
+    after result.status in {ReportStatus.Submitted} and result.approvals.length == 0
+  fn pay(r: Approved, reference: Text) -> Report
+    after result.status in {ReportStatus.Paid}
+
+  fn add_advance_approval(a: AdvanceRequested, who: ids.Badge) -> Advance
+    before a.approvals.length < 2
+    after  result.status in {AdvanceStatus.Requested} and result.approvals.length == a.approvals.length + 1
+  fn approve_advance(a: AdvanceRequested) -> Advance
+    after result.status in {AdvanceStatus.Approved}
+  fn pay_advance(a: AdvanceApproved, reference: Text) -> Advance
+    after result.status in {AdvanceStatus.Paid}
+  fn settle_advance(a: AdvancePaid, owed: ids.Money) -> Advance
+    after result.status in {AdvanceStatus.Settled}
+
+  fn state_of_report(s: ReportStatus) -> State
+    example state_of_report(ReportStatus.Draft) == State.Draft
+    example state_of_report(ReportStatus.Submitted) == State.Submitted
+    example state_of_report(ReportStatus.Approved) == State.Approved
+    example state_of_report(ReportStatus.Rejected) == State.Rejected
+    example state_of_report(ReportStatus.ChangesRequested) == State.ChangesRequested
+    example state_of_report(ReportStatus.Paid) == State.Paid
+  fn state_of_advance(s: AdvanceStatus) -> State
+    example state_of_advance(AdvanceStatus.Requested) == State.Requested
+    example state_of_advance(AdvanceStatus.Approved) == State.Approved
+    example state_of_advance(AdvanceStatus.Paid) == State.Paid
+    example state_of_advance(AdvanceStatus.Settled) == State.Settled
+body
+  fn add_line(r, l)        = r with { lines: r.lines ++ [l] }
+  fn submit(r)             = r with { status enters ReportStatus.Submitted, approvals: [] }
+  fn add_approval(r, who)  = r with { approvals: r.approvals ++ [who] }
+  fn approve(r)            = r with { status enters ReportStatus.Approved }
+  fn reject(r)             = r with { status enters ReportStatus.Rejected }
+  fn request_changes(r)    = r with { status enters ReportStatus.ChangesRequested, approvals: [] }
+  fn resubmit(r)           = r with { status enters ReportStatus.Submitted, approvals: [] }
+  fn pay(r, reference)     = r with { status enters ReportStatus.Paid, reference: reference }
+
+  fn add_advance_approval(a, who) = a with { approvals: a.approvals ++ [who] }
+  fn approve_advance(a)           = a with { status enters AdvanceStatus.Approved }
+  fn pay_advance(a, reference)    = a with { status enters AdvanceStatus.Paid, reference: reference }
+  fn settle_advance(a, owed)      = a with { status enters AdvanceStatus.Settled, owed: owed }
+
+  fn state_of_report(s) =
+    if s in {ReportStatus.Draft} then State.Draft
+    else if s in {ReportStatus.Submitted} then State.Submitted
+    else if s in {ReportStatus.Approved} then State.Approved
+    else if s in {ReportStatus.Rejected} then State.Rejected
+    else if s in {ReportStatus.ChangesRequested} then State.ChangesRequested
+    else State.Paid
+
+  fn state_of_advance(s) =
+    if s in {AdvanceStatus.Requested} then State.Requested
+    else if s in {AdvanceStatus.Approved} then State.Approved
+    else if s in {AdvanceStatus.Paid} then State.Paid
+    else State.Settled

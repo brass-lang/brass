@@ -1,0 +1,12 @@
+# park/ids.brass — the identifiers and units the park's modules share.
+module park.ids
+
+interface
+  type PaddockId = Int where it in 1 to 40
+  type BadgeId   = Int where it in 1 to 9999
+  type Day       = Int where it in 1 to 366
+  type Count     = Int where it in 0 to 500
+  type Grams     = Int where it in 0 to 50000
+  type Species   = Goat | Raptor | Rex
+
+body

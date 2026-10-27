@@ -1,0 +1,30 @@
+# desk/readiness.brass
+module desk.readiness
+import desk.ids as ids
+import desk.reports as reports
+import desk.records as records
+import desk.host as host
+import desk.registry as registry
+
+interface
+  type Readiness = { period: ids.Period, closed: Bool, open_card_txns: Int, requested_pos: Int, submitted_reports: Int, ready: Bool }
+
+  fn period_readiness(store: host.Store, reg: registry.Registry, period: ids.Period) -> Outcome<Readiness>
+body
+  fn period_readiness(store, reg, period) =
+    let closed: Bool = store.period_closed(period)?
+    let ts: records.Txns = reg.txns_for(period)?
+    let open: Int = 0
+    for t in ts
+      if t.status in {records.CardStatus.Open} then open = open + 1
+    let depts: records.DeptIds = reg.departments()?
+    let requested: Int = 0
+    for d in depts
+      let pos: records.POs = reg.pos_for(d, period)?
+      for p in pos
+        if p.status in {records.PoStatus.Requested} then requested = requested + 1
+    let rs: reports.Reports = store.submitted_reports()?
+    let waiting: Int = 0
+    for r in rs
+      if r.period == period then waiting = waiting + 1
+    Ok({ period: period, closed: closed, open_card_txns: open, requested_pos: requested, submitted_reports: waiting, ready: not closed and open == 0 and requested == 0 and waiting == 0 })

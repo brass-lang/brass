@@ -1,0 +1,17 @@
+# desk/advance_types.brass
+module desk.advance_types
+import desk.ids as ids
+import desk.reports as reports
+
+interface
+  machine AdvanceStatus
+    states  Requested, Approved, Paid, Settled
+    initial Requested
+    Requested enters Approved
+    Approved  enters Paid
+    Paid      enters Settled
+
+  type Advance  = { id: ids.ReportId, badge: ids.Badge, department: ids.DepartmentId, period: ids.Period, amount: Int where it in 1 to 1000000000, status: AdvanceStatus, approvals: reports.Approvals, owed: Int,
+      reference: Text when it.status in {AdvanceStatus.Paid, AdvanceStatus.Settled} }
+  type Advances = Array<Advance> where it.length in 0 to 1000
+body

@@ -1,0 +1,45 @@
+# park/feeding.brass — a feeding is planned, then delivered or skipped; only a delivered one has a signer.
+module park.feeding
+import park.ids as ids
+import park.staff as staff
+
+interface
+  machine FeedingStatus
+    states  Planned, Delivered, Skipped
+    initial Planned
+    Planned enters Delivered | Skipped
+
+  type Feeding = { paddock: ids.PaddockId,
+                   species: ids.Species,
+                   heads:   ids.Count,
+                   grams:   ids.Grams,
+                   day:     ids.Day,
+                   status:  FeedingStatus,
+                   delivered_by: ids.BadgeId when it.status in {FeedingStatus.Delivered} }
+
+  type PendingFeeding   = Feeding where it.status in {FeedingStatus.Planned}
+  type DeliveredFeeding = Feeding where it.status in {FeedingStatus.Delivered}
+  type Deliverer        = staff.Staff where it.role in {staff.Role.Keeper}
+
+  fn plan(paddock: ids.PaddockId, species: ids.Species, heads: ids.Count, grams: ids.Grams, day: ids.Day) -> PendingFeeding
+    after result.paddock == paddock and result.grams == grams and result.day == day
+
+  fn deliver(f: PendingFeeding, by: Deliverer) -> DeliveredFeeding
+    after result.paddock == f.paddock and result.grams == f.grams and result.delivered_by == by.badge
+
+  fn skip(f: PendingFeeding) -> Feeding
+    after result.paddock == f.paddock and result.status in {FeedingStatus.Skipped}
+
+  fn signer(f: Feeding) -> Outcome<ids.BadgeId>
+
+body
+  fn plan(paddock, species, heads, grams, day) =
+    { paddock: paddock, species: species, heads: heads, grams: grams, day: day, status: FeedingStatus.Planned }
+
+  fn deliver(f, by) = f with { status enters FeedingStatus.Delivered, delivered_by: by.badge }
+
+  fn skip(f) = f with { status enters FeedingStatus.Skipped }
+
+  fn signer(f) =
+    if f is DeliveredFeeding then Ok(f.delivered_by)
+    else Err(FailureCode.Conflict, "not delivered yet")

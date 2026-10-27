@@ -1,0 +1,35 @@
+# desk/audit.brass
+module desk.audit
+import desk.ids as ids
+import desk.reports as reports
+import desk.advances as advances
+
+interface
+  type Status = Draft | Submitted | Approved | Rejected | ChangesRequested | Paid | Requested | Settled
+  type Entry  = { who: ids.Badge, report: ids.ReportId, was: Status, now: Status, reason: ids.Reason }
+
+  fn entry(who: ids.Badge, report: ids.ReportId, was: reports.ReportStatus, now: reports.ReportStatus, reason: ids.Reason) -> Entry
+    after result.who == who and result.report == report
+  fn advance_entry(who: ids.Badge, advance: ids.ReportId, was: advances.AdvanceStatus, now: advances.AdvanceStatus, reason: ids.Reason) -> Entry
+    after result.who == who and result.report == advance
+private
+  fn of_report(s: reports.ReportStatus) -> Status
+  fn of_advance(s: advances.AdvanceStatus) -> Status
+body
+  fn entry(who, report, was, now, reason) = { who: who, report: report, was: of_report(was), now: of_report(now), reason: reason }
+
+  fn advance_entry(who, advance, was, now, reason) = { who: who, report: advance, was: of_advance(was), now: of_advance(now), reason: reason }
+
+  fn of_report(s) =
+    if s in {reports.ReportStatus.Draft} then Status.Draft
+    else if s in {reports.ReportStatus.Submitted} then Status.Submitted
+    else if s in {reports.ReportStatus.Approved} then Status.Approved
+    else if s in {reports.ReportStatus.Rejected} then Status.Rejected
+    else if s in {reports.ReportStatus.ChangesRequested} then Status.ChangesRequested
+    else Status.Paid
+
+  fn of_advance(s) =
+    if s in {advances.AdvanceStatus.Requested} then Status.Requested
+    else if s in {advances.AdvanceStatus.Approved} then Status.Approved
+    else if s in {advances.AdvanceStatus.Paid} then Status.Paid
+    else Status.Settled

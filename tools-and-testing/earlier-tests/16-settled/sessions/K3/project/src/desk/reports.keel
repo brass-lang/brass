@@ -1,0 +1,53 @@
+# desk/reports.keel
+module desk.reports
+import desk.ids as ids
+import desk.lines as lines
+
+interface
+  machine ReportStatus
+    states  Draft, Submitted, Approved, Rejected, ChangesRequested, Paid
+    initial Draft
+    Draft            enters Submitted
+    Submitted        enters Approved | Rejected | ChangesRequested
+    ChangesRequested enters Submitted
+    Approved         enters Paid
+
+  type Approvals = Array<ids.Badge> where length in 0 to 2
+  type Report = { id: ids.ReportId, badge: ids.Badge, department: ids.DepartmentId, period: ids.Period, lines: lines.Lines, status: ReportStatus, approvals: Approvals }
+    where status in {ReportStatus.Paid} has reference: Text
+  type Reports = Array<Report> where length in 0 to 1000
+
+  type Draft           = Report where status in {ReportStatus.Draft}
+  type Submitted       = Report where status in {ReportStatus.Submitted}
+  type Approved        = Report where status in {ReportStatus.Approved}
+  type AwaitingChanges = Report where status in {ReportStatus.ChangesRequested}
+  type Counted         = Report where status in {ReportStatus.Approved, ReportStatus.Paid}
+  type Editable        = Report where status in {ReportStatus.Draft, ReportStatus.ChangesRequested}
+
+  fn add_line(r: Editable, l: lines.Line) -> Report
+    before r.lines.length < 50
+    after  result.status == r.status and result.lines.length == r.lines.length + 1
+  fn submit(r: Draft) -> Report
+    after result.status in {ReportStatus.Submitted} and result.approvals.length == 0
+  fn add_approval(r: Submitted, who: ids.Badge) -> Report
+    before r.approvals.length < 2
+    after  result.status in {ReportStatus.Submitted} and result.approvals.length == r.approvals.length + 1
+  fn approve(r: Submitted) -> Report
+    after result.status in {ReportStatus.Approved}
+  fn reject(r: Submitted) -> Report
+    after result.status in {ReportStatus.Rejected}
+  fn request_changes(r: Submitted) -> Report
+    after result.status in {ReportStatus.ChangesRequested} and result.approvals.length == 0
+  fn resubmit(r: AwaitingChanges) -> Report
+    after result.status in {ReportStatus.Submitted} and result.approvals.length == 0
+  fn pay(r: Approved, reference: Text) -> Report
+    after result.status in {ReportStatus.Paid}
+body
+  fn add_line(r, l)        = r with { lines: r.lines ++ [l] }
+  fn submit(r)             = r with { status enters ReportStatus.Submitted, approvals: [] }
+  fn add_approval(r, who)  = r with { approvals: r.approvals ++ [who] }
+  fn approve(r)            = r with { status enters ReportStatus.Approved }
+  fn reject(r)             = r with { status enters ReportStatus.Rejected }
+  fn request_changes(r)    = r with { status enters ReportStatus.ChangesRequested, approvals: [] }
+  fn resubmit(r)           = r with { status enters ReportStatus.Submitted, approvals: [] }
+  fn pay(r, reference)     = r with { status enters ReportStatus.Paid, reference: reference }

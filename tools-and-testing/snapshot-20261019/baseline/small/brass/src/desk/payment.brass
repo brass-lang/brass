@@ -1,0 +1,32 @@
+# desk/payment.brass
+module desk.payment
+import desk.ids as ids
+import desk.lines as lines
+import desk.staff as staff
+import desk.reports as reports
+import desk.audit as audit
+import desk.host as host
+
+interface
+  fn pay(store: host.Store, ledger: host.Ledger, report_id: ids.ReportId, finance_badge: ids.Badge) -> Outcome<Text>
+  fn close_period(store: host.Store, period: ids.Period, finance_badge: ids.Badge) -> Outcome<Done>
+body
+  fn pay(store, ledger, report_id, finance_badge) =
+    let who: staff.Staff = store.staff(finance_badge)?
+    if who is staff.Finance then
+      let r: reports.Report = store.report(report_id)?
+      if r is reports.Approved then
+        let reference: Text = ledger.pay(r.badge, lines.total(r.lines), r.id)?
+        store.save_report(reports.pay(r, reference))?
+        store.append_audit(audit.entry(who.badge, r.id, reports.ReportStatus.Approved, reports.ReportStatus.Paid, "paid"))?
+        Ok(reference)
+      else Err(FailureCode.Conflict, "the report is not approved")
+    else Err(FailureCode.Unauthorized, "only active finance staff may pay")
+
+  fn close_period(store, period, finance_badge) =
+    let who: staff.Staff = store.staff(finance_badge)?
+    if who is staff.Finance then
+      let closed: Bool = store.period_closed(period)?
+      if closed then Err(FailureCode.Conflict, "the period is already closed")
+      else store.close_period(period)
+    else Err(FailureCode.Unauthorized, "only active finance staff may close a period")

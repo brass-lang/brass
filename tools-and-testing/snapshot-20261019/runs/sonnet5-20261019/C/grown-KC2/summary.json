@@ -1,0 +1,184 @@
+{
+ "run_id": "sonnet5-20261019",
+ "task": "C",
+ "label": "grown-KC2",
+ "size": "grown",
+ "arm": "KC",
+ "lang": "brass",
+ "started": "2026-10-19T05:16:59+00:00",
+ "collected": "2026-10-19T05:36:55+00:00",
+ "provenance": {
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "cap": 150,
+  "claude_version": "2.1.302 (Claude Code)",
+  "git_head": "c4793c030ab686fd720ab2abd93e94ee3ab965cf",
+  "tool_hash": "1e611b1327ba33d3",
+  "prompt_sha256": "f5464aea089df4e9",
+  "prompt_chars": 30514,
+  "freeze": [
+   "| baselines | `rerun/baseline` | `37e9e7815c64d173` |",
+   "| case evaluator | `rerun/tools/evaluate.py` | `753e74281565ae52` |",
+   "| cases | `rerun/cases` | `eed967342bfa8c3b` |",
+   "| frozen tool lean 8 | `rerun/tools/brass-lean8` | `3a2d086df0fcc20b` |",
+   "| launcher | `rerun/tools/launch.sh` | `72d3b2edcc748c25` |",
+   "| live evaluator | `validation/proxy/bin/brasseval.py` | `c6936b3bfc179282` |",
+   "| live stand-in | `validation/proxy/bin/brass` | `1e611b1327ba33d3` |",
+   "| material port | `rerun/tools/port_materials.py` | `df257bb6eeff9b60` |",
+   "| materials | `rerun/materials` | `234607275a4e57bc` |",
+   "| references | `rerun/reference` | `e96c7d75cebcc572` |",
+   "| respeller | `rerun/tools/respell.py` | `9af47db8a46e5511` |",
+   "| runner | `rerun/tools/run.py` | `854a93192a38d849` |",
+   "| session builder | `rerun/tools/build.py` | `215a37b0764cb9d0` |",
+   "| task d builder | `rerun/tools/build_d.py` | `9401f9a2b2624d68` |",
+   "| task d evaluator | `rerun/tools/evaluate_d.py` | `1c0627a9b48a60c1` |",
+   "| task d inputs | `rerun/D` | `90d0403c71563f04` |",
+   "| task d variants | `rerun/tools/variants_d.py` | `b3e201eab181c8a1` |",
+   "| variants | `rerun/tools/variants.py` | `15295894f63c7312` |"
+  ]
+ },
+ "session_id": "f0e1c798-93b9-4f37-bee1-c303bff97bbc",
+ "own_instance": true,
+ "shares_id_with": null,
+ "is_error": false,
+ "subtype": "success",
+ "terminal_reason": "completed",
+ "api_error_status": null,
+ "num_turns": 16,
+ "duration_ms": 777869,
+ "cost_usd": 1.0446556,
+ "models": [
+  "claude-sonnet-5"
+ ],
+ "model_ok": true,
+ "thinking_tokens": 32659,
+ "output_tokens": 43800,
+ "cache_read": 1203898,
+ "cache_write": 91452,
+ "input_uncached": 34,
+ "transcript_saved": true,
+ "leaks": [
+  "Bash: /tmp/fullpatch.txt",
+  "Bash: /tmp/patch1.txt",
+  "Bash: /tmp/patch2.txt",
+  "Bash: /tmp/patch3.txt"
+ ],
+ "harness_paths": [],
+ "telemetry": {
+  "models": {
+   "claude-sonnet-5": 31
+  },
+  "calls": 16,
+  "ctx_first": 42445,
+  "ctx_second": 45648,
+  "ctx_final": 112780,
+  "task_tokens": 67132,
+  "input_total": 1234265,
+  "fresh_input": 89641,
+  "output_written_chars": 24168,
+  "output_tokens_logged_unreliable": 43797,
+  "tools": {
+   "Bash": 14,
+   "Grep": 1
+  },
+  "shell": {
+   "brass show": 5,
+   "find": 2,
+   "echo": 3,
+   "cat": 6,
+   "ls": 1,
+   "head": 2,
+   "brass info": 1,
+   "sed": 1,
+   "Submitted": 1,
+   "Approved": 1,
+   "Rejected": 1,
+   "ChangesRequested": 1,
+   "Paid": 1,
+   "Requested": 1,
+   "Settled": 1,
+   "awaiting": 3,
+   "budget": 1,
+   "wc": 1,
+   "brass apply": 1,
+   "brass check": 1
+  },
+  "files_read": [],
+  "edits": 0,
+  "tool_errors": 0,
+  "seconds": 778,
+  "answer_chars": 2546
+ },
+ "brass_log_verbs": {
+  "show": 5,
+  "info": 1,
+  "apply": 1,
+  "check": 1
+ },
+ "scores": {
+  "C.json": {
+   "held": 120,
+   "total": 122,
+   "could_not_run": 0,
+   "failed": [
+    "V17",
+    "V40"
+   ],
+   "by_kind": {
+    "edge": [
+     9,
+     9
+    ],
+    "integration": [
+     3,
+     5
+    ],
+    "invariant": [
+     1,
+     1
+    ],
+    "new": [
+     25,
+     25
+    ],
+    "preserved": [
+     82,
+     82
+    ]
+   }
+  },
+  "baseline.json": {
+   "held": 82,
+   "total": 82,
+   "could_not_run": 0,
+   "failed": [],
+   "by_kind": {
+    "preserved": [
+     82,
+     82
+    ]
+   }
+  },
+  "grown.json": {
+   "held": 112,
+   "total": 112,
+   "could_not_run": 0,
+   "failed": [],
+   "by_kind": {
+    "grown": [
+     112,
+     112
+    ]
+   }
+  }
+ },
+ "apply_calls": 1,
+ "edits_outside_apply": [
+  "Bash: cat > /tmp/patch1.txt << 'PATCHEOF'\n@@@ edit src/desk/reports.brass\n@@@ find\n  type Editable        ",
+  "Bash: cat > /tmp/patch2.txt << 'PATCHEOF'\n@@@ edit src/desk/queries.brass\n@@@ find\n  type Row       = { id",
+  "Bash: cat > /tmp/patch3.txt << 'PATCHEOF'\n@@@ new src/desk/advances.brass\n# desk/advances.brass\nmodule des"
+ ],
+ "thinking_before_first_edit": 86319,
+ "final_check": "done        nothing else to run",
+ "check_warnings": []
+}

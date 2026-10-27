@@ -1,0 +1,46 @@
+# desk/budget.brass
+module desk.budget
+import desk.ids as ids
+import desk.lines as lines
+import desk.reports as reports
+import desk.advances as advances
+import desk.trips as trips
+import desk.host as host
+
+interface
+  fn spend_of(rs: reports.Reports, advs: advances.Advances, trps: trips.Trips, pending_badge: Maybe<ids.Badge>, pending_amount: Int) -> Int
+    after result >= 0
+  fn remaining_for(badge: ids.Badge, committed: Int, rs: reports.Reports, extra: Int) -> Int
+    after result >= 0
+  fn trip_contribution(t: trips.Trip, rs: reports.Reports, extra: Int) -> Int
+    after result >= 0
+  fn department_spend(store: host.Store, department: ids.DepartmentId, period: ids.Period) -> Outcome<Int>
+  fn department_spend_pending(store: host.Store, department: ids.DepartmentId, period: ids.Period, pending_badge: Maybe<ids.Badge>, pending_amount: Int) -> Outcome<Int>
+body
+  fn remaining_for(badge, committed, rs, extra) =
+    let counted: Int = extra
+    for r in rs
+      if r is reports.Counted and r.badge == badge then counted = counted + lines.budgeted_total(r.lines)
+    if committed > counted then committed - counted else 0
+
+  fn trip_contribution(t, rs, extra) =
+    if t is trips.Counted then remaining_for(t.badge, t.committed, rs, extra) else 0
+
+  fn spend_of(rs, advs, trps, pending_badge, pending_amount) =
+    let sum: Int = 0
+    for r in rs
+      if r is reports.Counted then sum = sum + lines.budgeted_total(r.lines)
+    for a in advs
+      if a is advances.Counted then sum = sum + a.amount
+    for t in trps
+      let extra: Int = if pending_badge != None and pending_badge == t.badge then pending_amount else 0
+      sum = sum + trip_contribution(t, rs, extra)
+    sum
+
+  fn department_spend(store, department, period) = department_spend_pending(store, department, period, None, 0)
+
+  fn department_spend_pending(store, department, period, pending_badge, pending_amount) =
+    let rs: reports.Reports = store.reports_for(department, period)?
+    let advs: advances.Advances = store.advances_for(department, period)?
+    let trps: trips.Trips = store.trips_for(department, period)?
+    Ok(spend_of(rs, advs, trps, pending_badge, pending_amount))

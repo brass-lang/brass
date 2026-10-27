@@ -1,0 +1,9 @@
+# park/staff.brass — who works here.
+module park.staff
+import park.ids as ids
+
+interface
+  type Role  = Keeper | DoorOperator | Guide
+  type Staff = { badge: ids.BadgeId, role: Role }
+
+body

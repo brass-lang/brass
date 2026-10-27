@@ -1,0 +1,18 @@
+# park/enclosures.brass — a paddock and the states its enclosure may be in.
+module park.enclosures
+
+interface
+  type PaddockId = Int where it in 1 to 40
+  type Species   = Goat | Raptor | Rex
+
+  machine Enclosure
+    states  Secured, Open, Breached
+    initial Secured
+    Secured enters Open
+    Open    enters Secured | Breached
+
+  type Paddock        = { id: PaddockId, species: Species, status: Enclosure }
+  type OpenPaddock    = Paddock where it.status in {Enclosure.Open}
+  type SecuredPaddock = Paddock where it.status in {Enclosure.Secured}
+
+body

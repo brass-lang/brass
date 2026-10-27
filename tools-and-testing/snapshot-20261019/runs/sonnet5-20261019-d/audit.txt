@@ -1,0 +1,150 @@
+1  reproducible from stage 1
+  ok   respell baseline/small runs clean: /var/folders/qv/s054ys5d1_3fv84xkb6g5vnr0000gn/T/tmpypj55xtj/re/baseline/small: 12 files respelled, 0 old forms left
+  ok   baseline/small/brass regenerates identically: 12 files identical
+  ok   respell baseline/grown runs clean: /var/folders/qv/s054ys5d1_3fv84xkb6g5vnr0000gn/T/tmpypj55xtj/re/baseline/grown: 25 files respelled, 0 old forms left
+  ok   baseline/grown/brass regenerates identically: 25 files identical
+  ok   respell reference/C/small runs clean: /var/folders/qv/s054ys5d1_3fv84xkb6g5vnr0000gn/T/tmpypj55xtj/re/reference/C/small: 14 files respelled, 0 old forms left
+  ok   reference/C/small/brass regenerates identically: 14 files identical
+  ok   respell reference/C-alt/small runs clean: /var/folders/qv/s054ys5d1_3fv84xkb6g5vnr0000gn/T/tmpypj55xtj/re/reference/C-alt/small: 14 files respelled, 0 old forms left
+  ok   reference/C-alt/small/brass regenerates identically: 14 files identical
+  ok   C keel patch applies to the grown tree: 17 hunks
+  ok   reference/C/grown/brass regenerates identically: 27 files identical
+  ok   C python patch applies to the grown tree: 14 hunks
+  ok   reference/C/grown/python regenerates identically: 29 files identical
+  ok   C-alt keel patch applies to the grown tree: 14 hunks
+  ok   reference/C-alt/grown/brass regenerates identically: 27 files identical
+  ok   C-alt python patch applies to the grown tree: 4 hunks
+  ok   reference/C-alt/grown/python regenerates identically: 28 files identical
+  ok   port_materials runs with no misses: /var/folders/qv/s054ys5d1_3fv84xkb6g5vnr0000gn/T/tmpypj55xtj/materials: 17 files, 0 misses
+  ok   materials regenerate identically: 17 files identical
+2  unchanged inputs
+  ok   baseline/small/python identical to stage 1: 13 files identical
+  ok   baseline/grown/python identical to stage 1: 27 files identical
+  ok   reference/C/small/python identical to stage 1: 15 files identical
+  ok   reference/C-alt/small/python identical to stage 1: 14 files identical
+  ok   cases/baseline.json identical to stage 1
+  ok   cases/C.json identical to stage 1
+  ok   cases/grown.json identical to stage 1
+  ok   materials/TASK-C.md identical to stage 1
+  ok   materials/README.P.small.md identical to stage 1
+  ok   materials/README.P.grown.md identical to stage 1
+3  no retired spelling in the rerun's Brass
+  ok   no `partial`, `private interface`, `has`, or `.keel` in the six trees
+  ok   no file of another kind (a stray .keel, for one) in the six trees
+4  current check clean
+  ok   brass check baseline/small: (10 hold) · host contract · effect order · types kept · machine states
+  ok   brass check baseline/grown: (14 hold) · host contract · effect order · types kept · machine states
+  ok   brass check reference/C/small: (12 hold) · host contract · effect order · types kept · machine states
+  ok   brass check reference/C/grown: (16 hold) · host contract · effect order · types kept · machine states
+  ok   brass check reference/C-alt/small: (11 hold) · host contract · effect order · types kept · machine states
+  ok   brass check reference/C-alt/grown: (15 hold) · host contract · effect order · types kept · machine states
+5  control: the old grown tree is rejected
+  ok   each old form is rejected by the current tool: {"partial": 49, "private interface": 4, "has": 1, "bare where field": 31}
+6  cases
+  ok   baseline/small brass baseline.json: brass: 82 of 82 cases hold (stand-in execution)
+  ok   baseline/small python baseline.json: python: 82 of 82 cases hold (executed)
+  ok   baseline/grown brass baseline.json: brass: 82 of 82 cases hold (stand-in execution)
+  ok   baseline/grown python baseline.json: python: 82 of 82 cases hold (executed)
+  ok   baseline/grown brass grown.json: brass: 112 of 112 cases hold (stand-in execution)
+  ok   baseline/grown python grown.json: python: 112 of 112 cases hold (executed)
+  ok   reference/C/small brass C.json: brass: 122 of 122 cases hold (stand-in execution)
+  ok   reference/C/small python C.json: python: 122 of 122 cases hold (executed)
+  ok   reference/C/grown brass C.json: brass: 122 of 122 cases hold (stand-in execution)
+  ok   reference/C/grown python C.json: python: 122 of 122 cases hold (executed)
+  ok   reference/C/grown brass grown.json: brass: 112 of 112 cases hold (stand-in execution)
+  ok   reference/C/grown python grown.json: python: 112 of 112 cases hold (executed)
+  ok   reference/C/grown brass baseline.json: brass: 82 of 82 cases hold (stand-in execution)
+  ok   reference/C/grown python baseline.json: python: 82 of 82 cases hold (executed)
+  ok   reference/C-alt/small brass C.json: brass: 122 of 122 cases hold (stand-in execution)
+  ok   reference/C-alt/small python C.json: python: 122 of 122 cases hold (executed)
+  ok   reference/C-alt/grown brass C.json: brass: 122 of 122 cases hold (stand-in execution)
+  ok   reference/C-alt/grown python C.json: python: 122 of 122 cases hold (executed)
+  ok   reference/C-alt/grown brass grown.json: brass: 112 of 112 cases hold (stand-in execution)
+  ok   reference/C-alt/grown python grown.json: python: 112 of 112 cases hold (executed)
+  ok   reference/C-alt/grown brass baseline.json: brass: 82 of 82 cases hold (stand-in execution)
+  ok   reference/C-alt/grown python baseline.json: python: 82 of 82 cases hold (executed)
+7  planted-wrong variants
+  ok   every variant caught: 22 of 22 variants caught
+8  agreement with stage 2's hand respelling
+  ok   all 22 comparable modules present on both sides
+  ok   each of the 22 matches line for line: 0 differ: []
+9  ported tools: the diff from the source is the approved one
+  ok   tools/evaluate.py diff hash 58da770138ddaef0: approved
+  ok   tools/build.py diff hash b79d452db5e28691: approved
+  ok   tools/launch.sh diff hash 8c4a18814c1aca38: approved
+  ok   tools/evaluate_d.py diff hash 66adb55ae2d52230: approved
+  ok   tools/variants_d.py diff hash 7ae557ddae68d931: approved
+  ok   tools/build_d.py diff hash 269e9fbe546b950e: approved
+10 built sessions
+  ok   build.py builds all six task C sessions
+  ok   build_d.py builds both task D sessions
+  ok   C/small-P1 prompt has no old name or form
+  ok   C/small-P1 prompt opens with its session tag
+  ok   C/small-K1 prompt has no old name or form
+  ok   C/small-K1 prompt opens with its session tag
+  ok   C/small-KC1 prompt has no old name or form
+  ok   C/small-KC1 prompt opens with its session tag
+  ok   C/grown-P1 prompt has no old name or form
+  ok   C/grown-P1 prompt opens with its session tag
+  ok   C/grown-K1 prompt has no old name or form
+  ok   C/grown-K1 prompt opens with its session tag
+  ok   C/grown-KC1 prompt has no old name or form
+  ok   C/grown-KC1 prompt opens with its session tag
+  ok   D/P1 prompt has no old name or form
+  ok   D/P1 prompt opens with its session tag
+  ok   D/KC1 prompt has no old name or form
+  ok   D/KC1 prompt opens with its session tag
+  ok   C/small-KC1 project's own bin/brass check is clean
+  ok   C/grown-KC1 project's own bin/brass check is clean
+  ok   D/KC1 project's own bin/brass check is clean
+11 the frozen tool
+  ok   brass-lean8/brass.py is byte-identical to validation/proxy/bin
+  ok   brass-lean8/brasseval.py is byte-identical to validation/proxy/bin
+12 task D
+  ok   D/start identical to the Stage 2 trial's start trees: 57 files identical
+  ok   D/cases/D.json identical to stage 2's
+  ok   D/cases/baseline.json identical to stage 2's
+  ok   D/cases/C.json identical to stage 2's
+  ok   D/cases/grown.json identical to stage 2's
+  ok   D task text is stage 2's TASK.md (with the D33 rule)
+  ok   D/materials/README.P.md identical to trial 29's
+  ok   D/materials/README.KC.md identical to trial 29's
+  ok   D/materials/BRASS.lean8.md identical to trial 29's
+  ok   D/materials/OPENING.lean8.md identical to trial 29's
+  ok   D/materials/host-contract.txt identical to trial 29's
+  ok   D/materials/MAP.md identical to trial 29's
+  ok   D/materials/BRASS-REFERENCE.KC.md identical to task C's KC edition
+  ok   D/materials/BRASS-REFERENCE-FULL.KC.md identical to task C's KC edition
+  ok   D/reference/python identical to stage 2's: 31 files identical
+  ok   D/reference/brass is stage 2's reference under .brass names, nothing else changed
+  ok   D reference brass D.json: brass: 81 of 81 cases hold (stand-in execution)
+  ok   D reference brass baseline.json: brass: 82 of 82 cases hold (stand-in execution)
+  ok   D reference brass C.json: brass: 122 of 122 cases hold (stand-in execution)
+  ok   D reference brass grown.json: brass: 112 of 112 cases hold (stand-in execution)
+  ok   D reference python D.json: python: 81 of 81 cases hold (executed)
+  ok   D reference python baseline.json: python: 82 of 82 cases hold (executed)
+  ok   D reference python C.json: python: 122 of 122 cases hold (executed)
+  ok   D reference python grown.json: python: 112 of 112 cases hold (executed)
+  ok   task D planted variants: variants caught: 14 of 14
+
+Freeze table
+| live stand-in | `validation/proxy/bin/brass` | `1e611b1327ba33d3` |
+| live evaluator | `validation/proxy/bin/brasseval.py` | `c6936b3bfc179282` |
+| case evaluator | `rerun/tools/evaluate.py` | `753e74281565ae52` |
+| session builder | `rerun/tools/build.py` | `215a37b0764cb9d0` |
+| launcher | `rerun/tools/launch.sh` | `72d3b2edcc748c25` |
+| runner | `rerun/tools/run.py` | `854a93192a38d849` |
+| variants | `rerun/tools/variants.py` | `15295894f63c7312` |
+| respeller | `rerun/tools/respell.py` | `9af47db8a46e5511` |
+| material port | `rerun/tools/port_materials.py` | `df257bb6eeff9b60` |
+| frozen tool lean 8 | `rerun/tools/brass-lean8` | `3a2d086df0fcc20b` |
+| task d builder | `rerun/tools/build_d.py` | `9401f9a2b2624d68` |
+| task d evaluator | `rerun/tools/evaluate_d.py` | `1c0627a9b48a60c1` |
+| task d variants | `rerun/tools/variants_d.py` | `b3e201eab181c8a1` |
+| cases | `rerun/cases` | `eed967342bfa8c3b` |
+| materials | `rerun/materials` | `234607275a4e57bc` |
+| baselines | `rerun/baseline` | `37e9e7815c64d173` |
+| references | `rerun/reference` | `e96c7d75cebcc572` |
+| task d inputs | `rerun/D` | `90d0403c71563f04` |
+
+PASS: 0 failures

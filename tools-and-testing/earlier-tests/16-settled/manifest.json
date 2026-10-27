@@ -1,0 +1,17 @@
+{
+ "K1": {
+  "arm": "K",
+  "prompt_sha256": "2c0c1a1f963adde6",
+  "prompt_chars": 21518
+ },
+ "K2": {
+  "arm": "K",
+  "prompt_sha256": "80625f98be13871e",
+  "prompt_chars": 21518
+ },
+ "K3": {
+  "arm": "K",
+  "prompt_sha256": "d8e64ce0c08a75f2",
+  "prompt_chars": 21518
+ }
+}

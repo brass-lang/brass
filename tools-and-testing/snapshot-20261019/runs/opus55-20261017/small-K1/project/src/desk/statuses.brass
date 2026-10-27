@@ -1,0 +1,26 @@
+# desk/statuses.brass
+module desk.statuses
+import desk.reports as reports
+import desk.advances as advances
+
+interface
+  type Status = Draft | Submitted | Approved | Rejected | ChangesRequested | Paid | Requested | Settled
+
+  fn of_report(s: reports.ReportStatus) -> Status
+    example of_report(reports.ReportStatus.Draft) == Status.Draft
+  fn of_advance(s: advances.AdvanceStatus) -> Status
+    example of_advance(advances.AdvanceStatus.Requested) == Status.Requested
+body
+  fn of_report(s) =
+    if s in {reports.ReportStatus.Draft} then Status.Draft
+    else if s in {reports.ReportStatus.Submitted} then Status.Submitted
+    else if s in {reports.ReportStatus.Approved} then Status.Approved
+    else if s in {reports.ReportStatus.Rejected} then Status.Rejected
+    else if s in {reports.ReportStatus.ChangesRequested} then Status.ChangesRequested
+    else Status.Paid
+
+  fn of_advance(s) =
+    if s in {advances.AdvanceStatus.Requested} then Status.Requested
+    else if s in {advances.AdvanceStatus.Approved} then Status.Approved
+    else if s in {advances.AdvanceStatus.Paid} then Status.Paid
+    else Status.Settled

@@ -1,0 +1,10 @@
+# desk/staff.keel
+module desk.staff
+import desk.ids as ids
+
+interface
+  type Staff      = { badge: ids.Badge, name: Text, department: ids.DepartmentId, supervisor: Maybe<ids.Badge>, role: ids.Role, active: Bool }
+  type Active     = Staff where active
+  type Finance    = Staff where active and role in {ids.Role.Finance}
+  type Department = { id: ids.DepartmentId, director: ids.Badge, budget: ids.Money }
+body

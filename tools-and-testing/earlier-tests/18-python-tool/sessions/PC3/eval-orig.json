@@ -1,0 +1,746 @@
+{
+ "language": "python",
+ "mode": "executed",
+ "held": 82,
+ "total": 82,
+ "cases": [
+  {
+   "id": "B01",
+   "op": "submit",
+   "rule": "S8",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B02",
+   "op": "submit",
+   "rule": "S1",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B03",
+   "op": "submit",
+   "rule": "S2",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B04",
+   "op": "submit",
+   "rule": "S3",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B05",
+   "op": "submit",
+   "rule": "S4",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B06",
+   "op": "submit",
+   "rule": "S5",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B07",
+   "op": "submit",
+   "rule": "S6",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B08",
+   "op": "submit",
+   "rule": "S7",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B09",
+   "op": "submit",
+   "rule": "S7",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B10",
+   "op": "submit",
+   "rule": "S7",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B11",
+   "op": "submit",
+   "rule": "S7",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B12",
+   "op": "submit",
+   "rule": "S7",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B13",
+   "op": "approve",
+   "rule": "A9",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B14",
+   "op": "approve",
+   "rule": "A7",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B15",
+   "op": "approve",
+   "rule": "A6",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B16",
+   "op": "approve",
+   "rule": "A4",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B17",
+   "op": "approve",
+   "rule": "A5",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B18",
+   "op": "approve",
+   "rule": "A1",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B19",
+   "op": "approve",
+   "rule": "A2",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B20",
+   "op": "approve",
+   "rule": "chain",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B21",
+   "op": "approve",
+   "rule": "chain",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B22",
+   "op": "approve",
+   "rule": "A9",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B23",
+   "op": "approve",
+   "rule": "A7",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B24",
+   "op": "approve",
+   "rule": "chain",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B25",
+   "op": "approve",
+   "rule": "A7",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B26",
+   "op": "approve",
+   "rule": "A2",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B27",
+   "op": "approve",
+   "rule": "stand-in",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B28",
+   "op": "approve",
+   "rule": "A2",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B29",
+   "op": "approve",
+   "rule": "stand-in",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B30",
+   "op": "approve",
+   "rule": "chain",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B31",
+   "op": "approve",
+   "rule": "A8",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B32",
+   "op": "approve",
+   "rule": "A8",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B33",
+   "op": "approve",
+   "rule": "spend",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B34",
+   "op": "approve",
+   "rule": "A8",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B35",
+   "op": "approve",
+   "rule": "A8",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B36",
+   "op": "reject",
+   "rule": "R8",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B37",
+   "op": "reject",
+   "rule": "R7",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B38",
+   "op": "reject",
+   "rule": "R4",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B39",
+   "op": "reject",
+   "rule": "R8",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B40",
+   "op": "request_changes",
+   "rule": "Q8",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B41",
+   "op": "request_changes",
+   "rule": "Q8",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B42",
+   "op": "resubmit",
+   "rule": "U8",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B43",
+   "op": "resubmit",
+   "rule": "U4",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B44",
+   "op": "resubmit",
+   "rule": "U5",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B45",
+   "op": "resubmit",
+   "rule": "U6",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B46",
+   "op": "resubmit",
+   "rule": "U7",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B47",
+   "op": "pay",
+   "rule": "P7",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B48",
+   "op": "pay",
+   "rule": "P3",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B49",
+   "op": "pay",
+   "rule": "P2",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B50",
+   "op": "pay",
+   "rule": "P5",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B51",
+   "op": "pay",
+   "rule": "P5",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B52",
+   "op": "pay",
+   "rule": "P6",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B53",
+   "op": "pay",
+   "rule": "P5",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B54",
+   "op": "pay",
+   "rule": "P6",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B55",
+   "op": "close_period",
+   "rule": "C5",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B56",
+   "op": "close_period",
+   "rule": "C4",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B57",
+   "op": "close_period",
+   "rule": "C3",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B58",
+   "op": "spend",
+   "rule": "D2",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B59",
+   "op": "spend",
+   "rule": "D1",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B60",
+   "op": "spend",
+   "rule": "D2",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B61",
+   "op": "pending_for",
+   "rule": "N2",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B62",
+   "op": "pending_for",
+   "rule": "N2",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B63",
+   "op": "pending_for",
+   "rule": "N2",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B64",
+   "op": "pending_for",
+   "rule": "N1",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B65",
+   "op": "approve",
+   "rule": "A6",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B66",
+   "op": "approve",
+   "rule": "A9",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B67",
+   "op": "pending_for",
+   "rule": "N2",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B68",
+   "op": "open_draft",
+   "rule": "O4",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B69",
+   "op": "open_draft",
+   "rule": "O1",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B70",
+   "op": "open_draft",
+   "rule": "O2",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B71",
+   "op": "open_draft",
+   "rule": "O3",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B72",
+   "op": "add_line",
+   "rule": "L7",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B73",
+   "op": "add_line",
+   "rule": "L5",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B74",
+   "op": "add_line",
+   "rule": "L5",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B75",
+   "op": "add_line",
+   "rule": "L4",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B76",
+   "op": "add_line",
+   "rule": "L6",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B77",
+   "op": "add_line",
+   "rule": "L3",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B78",
+   "op": "add_line",
+   "rule": "L6",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B79",
+   "op": "statement",
+   "rule": "T2",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B80",
+   "op": "statement",
+   "rule": "T1",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B81",
+   "op": "statement",
+   "rule": "T2",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "B82",
+   "op": "statement",
+   "rule": "T2",
+   "kind": "preserved",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  }
+ ]
+}

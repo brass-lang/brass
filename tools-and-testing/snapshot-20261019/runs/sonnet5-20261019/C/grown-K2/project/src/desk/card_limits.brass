@@ -1,0 +1,41 @@
+# desk/card_limits.brass
+module desk.card_limits
+import desk.ids as ids
+import desk.staff as staff
+import desk.records as records
+import desk.host as host
+import desk.registry as registry
+
+interface
+  fn set_card_limit(store: host.Store, reg: registry.Registry, finance_badge: ids.Badge, badge: ids.Badge, limit: Int) -> Outcome<Done>
+  fn over_limit(reg: registry.Registry, period: ids.Period) -> Outcome<records.Badges>
+
+  fn spent_by(ts: records.Txns, badge: ids.Badge) -> Int
+    after result >= 0
+body
+  fn set_card_limit(store, reg, finance_badge, badge, limit) =
+    let who: staff.Staff = store.staff(finance_badge)?
+    if who is staff.Finance then
+      let holder: staff.Staff = store.staff(badge)?
+      if limit >= 0 and limit <= 1000000000 then reg.save_card_limit({ badge: holder.badge, limit: limit })
+      else Err(FailureCode.InvalidInput, "a card limit is 0 to 1,000,000,000 cents")
+    else Err(FailureCode.Unauthorized, "only active finance staff may set a card limit")
+
+  fn over_limit(reg, period) =
+    let ts: records.Txns = reg.txns_for(period)?
+    let seen: records.Badges = []
+    let out: records.Badges = []
+    for t in ts
+      if not (t.status in {records.CardStatus.Disputed}) and not (any s in seen where s == t.badge) then
+        seen = seen ++ [t.badge]
+        let lim: Outcome<records.CardLimit> = reg.card_limit(t.badge)
+        if lim is Ok then
+          let l: records.CardLimit = lim?
+          if spent_by(ts, t.badge) > l.limit then out = out ++ [t.badge]
+    Ok(out)
+
+  fn spent_by(ts, badge) =
+    let sum: Int = 0
+    for t in ts
+      if t.badge == badge and not (t.status in {records.CardStatus.Disputed}) then sum = sum + t.amount
+    sum

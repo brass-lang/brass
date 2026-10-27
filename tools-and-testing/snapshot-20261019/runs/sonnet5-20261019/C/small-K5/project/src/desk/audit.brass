@@ -1,0 +1,41 @@
+# desk/audit.brass
+module desk.audit
+import desk.ids as ids
+import desk.reports as reports
+import desk.advances as advances
+
+interface
+  type Entry = { who: ids.Badge, report: ids.ReportId, was: ids.Step, now: ids.Step, reason: ids.Reason }
+
+  fn entry(who: ids.Badge, report: ids.ReportId, was: ids.Step, now: ids.Step, reason: ids.Reason) -> Entry
+    after result.who == who and result.report == report
+
+  fn of_report(s: reports.ReportStatus) -> ids.Step
+    example of_report(reports.ReportStatus.Draft) == ids.Step.Draft
+    example of_report(reports.ReportStatus.Submitted) == ids.Step.Submitted
+    example of_report(reports.ReportStatus.Approved) == ids.Step.Approved
+    example of_report(reports.ReportStatus.Rejected) == ids.Step.Rejected
+    example of_report(reports.ReportStatus.ChangesRequested) == ids.Step.ChangesRequested
+    example of_report(reports.ReportStatus.Paid) == ids.Step.Paid
+
+  fn of_advance(s: advances.AdvanceStatus) -> ids.Step
+    example of_advance(advances.AdvanceStatus.Requested) == ids.Step.Requested
+    example of_advance(advances.AdvanceStatus.Approved) == ids.Step.Approved
+    example of_advance(advances.AdvanceStatus.Paid) == ids.Step.Paid
+    example of_advance(advances.AdvanceStatus.Settled) == ids.Step.Settled
+body
+  fn entry(who, report, was, now, reason) = { who: who, report: report, was: was, now: now, reason: reason }
+
+  fn of_report(s) =
+    if s in {reports.ReportStatus.Draft} then ids.Step.Draft
+    else if s in {reports.ReportStatus.Submitted} then ids.Step.Submitted
+    else if s in {reports.ReportStatus.Approved} then ids.Step.Approved
+    else if s in {reports.ReportStatus.Rejected} then ids.Step.Rejected
+    else if s in {reports.ReportStatus.ChangesRequested} then ids.Step.ChangesRequested
+    else ids.Step.Paid
+
+  fn of_advance(s) =
+    if s in {advances.AdvanceStatus.Requested} then ids.Step.Requested
+    else if s in {advances.AdvanceStatus.Approved} then ids.Step.Approved
+    else if s in {advances.AdvanceStatus.Paid} then ids.Step.Paid
+    else ids.Step.Settled

@@ -1,0 +1,46 @@
+# desk/delegation.brass
+module desk.delegation
+import desk.ids as ids
+import desk.staff as staff
+import desk.records as records
+import desk.host as host
+import desk.registry as registry
+
+interface
+  fn grant_delegation(store: host.Store, reg: registry.Registry, delegator: ids.Badge, delegate: ids.Badge, first: ids.Period, last: ids.Period) -> Outcome<records.DelegationId>
+  fn revoke_delegation(store: host.Store, reg: registry.Registry, delegation_id: records.DelegationId, badge: ids.Badge) -> Outcome<Done>
+  fn delegate_in_force(reg: registry.Registry, badge: ids.Badge, period: ids.Period) -> Outcome<Maybe<ids.Badge>>
+body
+  fn grant_delegation(store, reg, delegator, delegate, first, last) =
+    let giver: staff.Staff = store.staff(delegator)?
+    if giver is staff.Active and giver.role in {ids.Role.Supervisor, ids.Role.Director} then
+      let taker: staff.Staff = store.staff(delegate)?
+      if taker is staff.Active then
+        if delegate != delegator and first <= last and last - first <= 11 then
+          let existing: records.Delegations = reg.delegations_from(delegator)?
+          if any d in existing where not d.revoked and d.first <= last and first <= d.last then
+            Err(FailureCode.Conflict, "an existing delegation overlaps these periods")
+          else
+            let id: records.DelegationId = store.next_id()?
+            reg.save_delegation({ id: id, delegator: delegator, delegate: delegate, first: first, last: last, revoked: false })?
+            Ok(id)
+        else Err(FailureCode.InvalidInput, "a delegation goes to someone else, over 1 to 12 periods in order")
+      else Err(FailureCode.Unauthorized, "the delegate is not active")
+    else Err(FailureCode.Unauthorized, "only an active supervisor or director may delegate")
+
+  fn revoke_delegation(store, reg, delegation_id, badge) =
+    let who: staff.Staff = store.staff(badge)?
+    if who is staff.Active then
+      let d: records.Delegation = reg.delegation(delegation_id)?
+      if d.delegator == badge then
+        if not d.revoked then reg.save_delegation(d with { revoked: true })
+        else Err(FailureCode.Conflict, "the delegation is already revoked")
+      else Err(FailureCode.Unauthorized, "only the delegator may revoke a delegation")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn delegate_in_force(reg, badge, period) =
+    let ds: records.Delegations = reg.delegations_from(badge)?
+    let found: Maybe<ids.Badge> = None
+    for d in ds
+      if records.in_force(d, period) then found = d.delegate
+    Ok(found)

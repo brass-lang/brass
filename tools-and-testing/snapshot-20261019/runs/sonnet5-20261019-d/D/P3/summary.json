@@ -1,0 +1,209 @@
+{
+ "run_id": "sonnet5-20261019-d",
+ "task": "D",
+ "label": "P3",
+ "size": "stage2",
+ "arm": "P",
+ "lang": "python",
+ "started": "2026-10-19T17:24:21+00:00",
+ "collected": "2026-10-19T17:38:54+00:00",
+ "provenance": {
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "cap": 150,
+  "claude_version": "2.1.302 (Claude Code)",
+  "git_head": "62456f50acb8c7057d00114d304b86505882b58b",
+  "tool_hash": "1e611b1327ba33d3",
+  "prompt_sha256": "b8877a0e32c498a5",
+  "prompt_chars": 9222,
+  "freeze": [
+   "| baselines | `rerun/baseline` | `37e9e7815c64d173` |",
+   "| case evaluator | `rerun/tools/evaluate.py` | `753e74281565ae52` |",
+   "| cases | `rerun/cases` | `eed967342bfa8c3b` |",
+   "| frozen tool lean 8 | `rerun/tools/brass-lean8` | `3a2d086df0fcc20b` |",
+   "| launcher | `rerun/tools/launch.sh` | `72d3b2edcc748c25` |",
+   "| live evaluator | `validation/proxy/bin/brasseval.py` | `c6936b3bfc179282` |",
+   "| live stand-in | `validation/proxy/bin/brass` | `1e611b1327ba33d3` |",
+   "| material port | `rerun/tools/port_materials.py` | `df257bb6eeff9b60` |",
+   "| materials | `rerun/materials` | `234607275a4e57bc` |",
+   "| references | `rerun/reference` | `e96c7d75cebcc572` |",
+   "| respeller | `rerun/tools/respell.py` | `9af47db8a46e5511` |",
+   "| runner | `rerun/tools/run.py` | `854a93192a38d849` |",
+   "| session builder | `rerun/tools/build.py` | `215a37b0764cb9d0` |",
+   "| task d builder | `rerun/tools/build_d.py` | `9401f9a2b2624d68` |",
+   "| task d evaluator | `rerun/tools/evaluate_d.py` | `1c0627a9b48a60c1` |",
+   "| task d inputs | `rerun/D` | `90d0403c71563f04` |",
+   "| task d variants | `rerun/tools/variants_d.py` | `b3e201eab181c8a1` |",
+   "| variants | `rerun/tools/variants.py` | `15295894f63c7312` |"
+  ]
+ },
+ "session_id": "1de6fc0f-2567-4bc7-827f-547d9a8f52a7",
+ "own_instance": true,
+ "shares_id_with": null,
+ "is_error": false,
+ "subtype": "success",
+ "terminal_reason": "completed",
+ "api_error_status": null,
+ "num_turns": 66,
+ "duration_ms": 777866,
+ "cost_usd": 2.4539422000000006,
+ "models": [
+  "claude-sonnet-5"
+ ],
+ "model_ok": true,
+ "thinking_tokens": 45022,
+ "output_tokens": 75519,
+ "cache_read": 5991561,
+ "cache_write": 125044,
+ "input_uncached": 132,
+ "transcript_saved": true,
+ "leaks": [],
+ "harness_paths": [],
+ "telemetry": {
+  "models": {
+   "claude-sonnet-5": 115
+  },
+  "calls": 66,
+  "ctx_first": 34290,
+  "ctx_second": 36573,
+  "ctx_final": 146372,
+  "task_tokens": 109799,
+  "input_total": 6116737,
+  "fresh_input": 125176,
+  "output_written_chars": 64205,
+  "output_tokens_logged_unreliable": 75519,
+  "tools": {
+   "Read": 29,
+   "Bash": 14,
+   "Grep": 2,
+   "Edit": 14,
+   "Write": 6
+  },
+  "shell": {
+   "find": 3,
+   "sort": 2,
+   "python3": 7,
+   "ls": 1,
+   "grep": 4,
+   "echo": 1
+  },
+  "files_read": [
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/README.md",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/records.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/reports.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/review.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/delegation.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/purchasing.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/routing.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/lines.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/allowances.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/budget.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/queries.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/advances.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/advance_desk.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/audit.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/host.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/payment.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/errors.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/ids.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/staff.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/checks.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/cards.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/registry.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/forecasting.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/__init__.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/reporting.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/allowances.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/scratch/test_trips.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/review.py",
+   "/private/tmp/rerun-sonnet5-20261019-d/D/P3/project/src/desk/trip_desk.py"
+  ],
+  "edits": 20,
+  "tool_errors": 2,
+  "seconds": 778,
+  "answer_chars": 2973
+ },
+ "brass_log_verbs": null,
+ "scores": {
+  "D.json": {
+   "held": 81,
+   "total": 81,
+   "could_not_run": 0,
+   "failed": [],
+   "by_kind": {
+    "edge": [
+     6,
+     6
+    ],
+    "failure": [
+     5,
+     5
+    ],
+    "integration": [
+     5,
+     5
+    ],
+    "new": [
+     64,
+     64
+    ],
+    "preserved": [
+     1,
+     1
+    ]
+   }
+  },
+  "baseline.json": {
+   "held": 82,
+   "total": 82,
+   "could_not_run": 0,
+   "failed": [],
+   "by_kind": {
+    "preserved": [
+     82,
+     82
+    ]
+   }
+  },
+  "C.json": {
+   "held": 122,
+   "total": 122,
+   "could_not_run": 0,
+   "failed": [],
+   "by_kind": {
+    "edge": [
+     9,
+     9
+    ],
+    "integration": [
+     5,
+     5
+    ],
+    "invariant": [
+     1,
+     1
+    ],
+    "new": [
+     25,
+     25
+    ],
+    "preserved": [
+     82,
+     82
+    ]
+   }
+  },
+  "grown.json": {
+   "held": 112,
+   "total": 112,
+   "could_not_run": 0,
+   "failed": [],
+   "by_kind": {
+    "grown": [
+     112,
+     112
+    ]
+   }
+  }
+ }
+}

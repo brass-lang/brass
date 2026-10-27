@@ -1,0 +1,66 @@
+# desk/budget.brass
+module desk.budget
+import desk.ids as ids
+import desk.lines as lines
+import desk.reports as reports
+import desk.advances as advances
+import desk.records as records
+import desk.host as host
+
+interface
+  fn spend_of(rs: reports.Reports, advs: advances.Advances) -> Int
+    after result >= 0
+  fn trip_commitment(committed: Int, counted: Int) -> Int
+    after result >= 0
+  fn counted_for(rs: reports.Reports, badge: ids.Badge) -> Int
+    after result >= 0
+  fn department_spend(store: host.Store, department: ids.DepartmentId, period: ids.Period) -> Outcome<Int>
+  fn department_spend_approving(store: host.Store, department: ids.DepartmentId, period: ids.Period, badge: ids.Badge, pending: Int) -> Outcome<Int>
+  fn department_spend_with_trip(store: host.Store, department: ids.DepartmentId, period: ids.Period, committed: Int, badge: ids.Badge) -> Outcome<Int>
+private
+  fn spend_with(rs: reports.Reports, advs: advances.Advances, trips: records.Trips, pending_badge: Maybe<ids.Badge>, pending: Int) -> Int
+body
+  fn spend_of(rs, advs) =
+    let sum: Int = 0
+    for r in rs
+      if r is reports.Counted then sum = sum + lines.budgeted_total(r.lines)
+    for a in advs
+      if a is advances.Counted then sum = sum + a.amount
+    sum
+
+  fn trip_commitment(committed, counted) = if committed > counted then committed - counted else 0
+
+  fn counted_for(rs, badge) =
+    let sum: Int = 0
+    for r in rs
+      if r.badge == badge and r is reports.Counted then sum = sum + lines.budgeted_total(r.lines)
+    sum
+
+  fn spend_with(rs, advs, trips, pending_badge, pending) =
+    let base: Int = spend_of(rs, advs) + pending
+    let trip_total: Int = 0
+    for t in trips
+      if t.status in {records.TripStatus.Approved} then
+        let base_counted: Int = counted_for(rs, t.badge)
+        let c: Int = if pending_badge != None and pending_badge == t.badge then base_counted + pending else base_counted
+        trip_total = trip_total + trip_commitment(t.committed, c)
+    base + trip_total
+
+  fn department_spend(store, department, period) =
+    let rs: reports.Reports = store.reports_for(department, period)?
+    let advs: advances.Advances = store.advances_for(department, period)?
+    let trips: records.Trips = store.trips_for(department, period)?
+    Ok(spend_with(rs, advs, trips, None, 0))
+
+  fn department_spend_approving(store, department, period, badge, pending) =
+    let rs: reports.Reports = store.reports_for(department, period)?
+    let advs: advances.Advances = store.advances_for(department, period)?
+    let trips: records.Trips = store.trips_for(department, period)?
+    Ok(spend_with(rs, advs, trips, badge, pending))
+
+  fn department_spend_with_trip(store, department, period, committed, badge) =
+    let rs: reports.Reports = store.reports_for(department, period)?
+    let advs: advances.Advances = store.advances_for(department, period)?
+    let trips: records.Trips = store.trips_for(department, period)?
+    let base: Int = spend_with(rs, advs, trips, None, 0)
+    Ok(base + trip_commitment(committed, counted_for(rs, badge)))

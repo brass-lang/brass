@@ -1,0 +1,46 @@
+# desk/advances.brass
+module desk.advances
+import desk.ids as ids
+import desk.reports as reports
+
+interface
+  machine AdvanceStatus
+    states  Requested, Approved, Paid, Settled
+    initial Requested
+    Requested enters Approved
+    Approved  enters Paid
+    Paid      enters Settled
+
+  type Amount   = ids.Money where it >= 1
+  type Advance  = { id: ids.ReportId, badge: ids.Badge, department: ids.DepartmentId, period: ids.Period, amount: Amount, status: AdvanceStatus, approvals: reports.Approvals,
+      reference: Text      when it.status in {AdvanceStatus.Paid, AdvanceStatus.Settled},
+      owed:      ids.Money when it.status in {AdvanceStatus.Settled} }
+  type Advances = Array<Advance> where it.length in 0 to 1000
+
+  type Requested = Advance where it.status in {AdvanceStatus.Requested}
+  type Approved  = Advance where it.status in {AdvanceStatus.Approved}
+  type Paid      = Advance where it.status in {AdvanceStatus.Paid}
+  type Counted   = Advance where it.status in {AdvanceStatus.Approved, AdvanceStatus.Paid}
+
+  fn add_approval(a: Requested, who: ids.Badge) -> Advance
+    before a.approvals.length < 2
+    after  result.status in {AdvanceStatus.Requested} and result.approvals.length == a.approvals.length + 1
+  fn approve(a: Requested) -> Advance
+    after result.status in {AdvanceStatus.Approved}
+  fn pay(a: Approved, reference: Text) -> Advance
+    after result.status in {AdvanceStatus.Paid}
+  fn settle(a: Paid, report_total: Int) -> Advance
+    before report_total >= 0
+    after  result.status in {AdvanceStatus.Settled} and (a.amount < report_total or result.owed == a.amount - report_total) and (a.amount >= report_total or result.owed == 0)
+
+  fn overdue(period: ids.Period, today: ids.Period) -> Bool
+    example overdue(1, 4) == true
+    example overdue(1, 3) == false
+body
+  fn add_approval(a, who) = a with { approvals: a.approvals ++ [who] }
+  fn approve(a)           = a with { status enters AdvanceStatus.Approved }
+  fn pay(a, reference)    = a with { status enters AdvanceStatus.Paid, reference: reference }
+  fn settle(a, report_total) =
+    let owed: ids.Money = if a.amount > report_total then a.amount - report_total else 0
+    a with { status enters AdvanceStatus.Settled, owed: owed }
+  fn overdue(period, today) = period + 2 < today

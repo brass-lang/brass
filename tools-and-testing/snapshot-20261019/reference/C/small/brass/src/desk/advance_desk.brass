@@ -1,0 +1,59 @@
+# desk/advance_desk.brass
+module desk.advance_desk
+import desk.ids as ids
+import desk.staff as staff
+import desk.advances as advances
+import desk.audit as audit
+import desk.host as host
+import desk.routing as routing
+import desk.budget as budget
+import desk.review as review
+
+interface
+  fn request_advance(store: host.Store, badge: ids.Badge, period: ids.Period, amount: advances.Amount) -> Outcome<ids.ReportId>
+  fn approve_advance(store: host.Store, advance_id: ids.ReportId, approver: ids.Badge) -> Outcome<advances.AdvanceStatus>
+private
+  fn approve_last(store: host.Store, a: advances.Requested, who: staff.Active) -> Outcome<advances.AdvanceStatus>
+body
+  fn request_advance(store, badge, period, amount) =
+    let who: staff.Staff = store.staff(badge)?
+    if who is staff.Active then
+      let closed: Bool = store.period_closed(period)?
+      if not closed then
+        let id: ids.ReportId = store.next_id()?
+        store.save_advance({ id: id, badge: badge, department: who.department, period: period, amount: amount, status: advances.AdvanceStatus.Requested, approvals: [], owed: 0 })?
+        Ok(id)
+      else Err(FailureCode.Conflict, "the period is closed")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn approve_advance(store, advance_id, approver) =
+    let who: staff.Staff = store.staff(approver)?
+    if who is staff.Active then
+      let a: advances.Advance = store.advance(advance_id)?
+      if a is advances.Requested then
+        let closed: Bool = store.period_closed(a.period)?
+        if not closed then
+          if who.badge != a.badge then
+            let allowed: Bool = review.may_act_on(store, a.badge, a.department, a.approvals.length + 1, who)?
+            if allowed then
+              if a.approvals.length + 1 < routing.steps_for(a.amount) then
+                store.save_advance(advances.add_approval(a, who.badge))?
+                store.append_audit(audit.entry(who.badge, a.id, audit.Stage.Requested, audit.Stage.Requested, "approved; awaiting the next approver"))?
+                Ok(advances.AdvanceStatus.Requested)
+              else approve_last(store, a, who)
+            else Err(FailureCode.Unauthorized, "not this advance's next approver")
+          else Err(FailureCode.Unauthorized, "an advance cannot be approved by its requester")
+        else Err(FailureCode.Conflict, "the period is closed")
+      else Err(FailureCode.Conflict, "the advance is not awaiting approval")
+    else Err(FailureCode.Unauthorized, "staff member is not active")
+
+  fn approve_last(store, a, who) =
+    let spent: Int = budget.department_spend(store, a.department, a.period)?
+    let dept: staff.Department = store.department(a.department)?
+    let within: Bool = spent + a.amount <= dept.budget
+    if within or who.role in {ids.Role.Finance} then
+      let reason: ids.Reason = if within then "approved" else "approved; budget override"
+      store.save_advance(advances.approve(a))?
+      store.append_audit(audit.entry(who.badge, a.id, audit.Stage.Requested, audit.Stage.Approved, reason))?
+      Ok(advances.AdvanceStatus.Approved)
+    else Err(FailureCode.Conflict, "the department budget for this period would be exceeded")

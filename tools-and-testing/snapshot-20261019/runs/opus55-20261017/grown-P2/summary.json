@@ -1,0 +1,79 @@
+{
+ "label": "grown-P2",
+ "size": "grown",
+ "arm": "P",
+ "collected": "2026-10-17T07:10:23+00:00",
+ "started": "2026-10-17T07:05:57+00:00",
+ "session_id": "cd57c46f-b481-5b37-9466-887a6d309201",
+ "is_error": false,
+ "subtype": "success",
+ "terminal_reason": "completed",
+ "api_error_status": null,
+ "num_turns": 12,
+ "duration_ms": 151413,
+ "cost_usd": 0.8782374000000001,
+ "models": [
+  "claude-opus-5-5"
+ ],
+ "model_ok": true,
+ "thinking_tokens": 3838,
+ "output_tokens": 16780,
+ "cache_read": 690747,
+ "cache_write": 50549,
+ "input_uncached": 24,
+ "transcript_saved": true,
+ "leaks": [
+  "Read: /root/.claude/projects/-tmp-rerun-opus55-20261017-grown-P2-project/cd57c46f-b481-5b37-9466-887a6d309201/tool-results/b9b"
+ ],
+ "scores": {
+  "C.json": {
+   "held": 122,
+   "total": 122,
+   "could_not_run": 0,
+   "by_kind": {
+    "edge": [
+     9,
+     9
+    ],
+    "integration": [
+     5,
+     5
+    ],
+    "invariant": [
+     1,
+     1
+    ],
+    "new": [
+     25,
+     25
+    ],
+    "preserved": [
+     82,
+     82
+    ]
+   }
+  },
+  "baseline.json": {
+   "held": 82,
+   "total": 82,
+   "could_not_run": 0,
+   "by_kind": {
+    "preserved": [
+     82,
+     82
+    ]
+   }
+  },
+  "grown.json": {
+   "held": 112,
+   "total": 112,
+   "could_not_run": 0,
+   "by_kind": {
+    "grown": [
+     112,
+     112
+    ]
+   }
+  }
+ }
+}

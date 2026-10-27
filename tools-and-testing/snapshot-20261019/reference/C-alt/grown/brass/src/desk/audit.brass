@@ -1,0 +1,23 @@
+# desk/audit.brass
+module desk.audit
+import desk.ids as ids
+import desk.reports as reports
+
+interface
+  type Step  = Draft | Submitted | Approved | Rejected | ChangesRequested | Paid | Requested | Settled
+  type Entry = { who: ids.Badge, report: ids.ReportId, was: Step, now: Step, reason: ids.Reason }
+
+  fn entry(who: ids.Badge, report: ids.ReportId, was: Step, now: Step, reason: ids.Reason) -> Entry
+    after result.who == who and result.report == report
+  fn of_report(s: reports.ReportStatus) -> Step
+    example of_report(reports.ReportStatus.ChangesRequested) == Step.ChangesRequested
+body
+  fn entry(who, report, was, now, reason) = { who: who, report: report, was: was, now: now, reason: reason }
+
+  fn of_report(s) =
+    if s in {reports.ReportStatus.Draft} then Step.Draft
+    else if s in {reports.ReportStatus.Submitted} then Step.Submitted
+    else if s in {reports.ReportStatus.Approved} then Step.Approved
+    else if s in {reports.ReportStatus.Rejected} then Step.Rejected
+    else if s in {reports.ReportStatus.ChangesRequested} then Step.ChangesRequested
+    else Step.Paid

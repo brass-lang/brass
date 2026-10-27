@@ -1,0 +1,197 @@
+[
+ {
+  "label": "PC1",
+  "arm": "PC",
+  "cost": 1.2532454000000002,
+  "read": 2169557,
+  "reasoning": 31312,
+  "turns": 26,
+  "cases": [
+   "122/122",
+   "112/112",
+   "82/82"
+  ],
+  "tools": {
+   "Bash": 2,
+   "show": 2,
+   "show --body": 5,
+   "Grep": 2,
+   "apply": 1,
+   "Write": 3,
+   "python3": 7,
+   "Edit": 3
+  }
+ },
+ {
+  "label": "PC2",
+  "arm": "PC",
+  "cost": 1.2880745999999998,
+  "read": 1736023,
+  "reasoning": 35814,
+  "turns": 20,
+  "cases": [
+   "122/122",
+   "112/112",
+   "82/82"
+  ],
+  "tools": {
+   "Bash": 1,
+   "show": 2,
+   "show --body": 7,
+   "apply": 1,
+   "Write": 1,
+   "python3": 4,
+   "Read": 2,
+   "Edit": 1
+  }
+ },
+ {
+  "label": "PC3",
+  "arm": "PC",
+  "cost": 1.2986020000000003,
+  "read": 1803940,
+  "reasoning": 37166,
+  "turns": 20,
+  "cases": [
+   "122/122",
+   "112/112",
+   "82/82"
+  ],
+  "tools": {
+   "Bash": 1,
+   "show": 1,
+   "show --body": 3,
+   "Read": 2,
+   "apply": 1,
+   "Edit": 5,
+   "Write": 1,
+   "python3": 5
+  }
+ },
+ {
+  "label": "grown-P1",
+  "arm": "P",
+  "cost": 1.4999270000000002,
+  "read": 3362495,
+  "reasoning": 27300,
+  "turns": 50,
+  "cases": [
+   "122/122",
+   "112/112",
+   "82/82"
+  ],
+  "tools": {
+   "Bash": 4,
+   "Read": 24,
+   "Edit": 13,
+   "Write": 2,
+   "python3": 6
+  }
+ },
+ {
+  "label": "grown-P2",
+  "arm": "P",
+  "cost": 1.5803698000000002,
+  "read": 3235029,
+  "reasoning": 35228,
+  "turns": 54,
+  "cases": [
+   "122/122",
+   "112/112",
+   "82/82"
+  ],
+  "tools": {
+   "Bash": 2,
+   "Read": 32,
+   "Grep": 5,
+   "Write": 3,
+   "Edit": 6,
+   "python3": 5
+  }
+ },
+ {
+  "label": "grown-P3",
+  "arm": "P",
+  "cost": 1.4805262,
+  "read": 3840721,
+  "reasoning": 18322,
+  "turns": 56,
+  "cases": [
+   "122/122",
+   "112/112",
+   "82/82"
+  ],
+  "tools": {
+   "Bash": 2,
+   "Read": 26,
+   "Grep": 2,
+   "Edit": 16,
+   "Write": 3,
+   "python3": 6
+  }
+ },
+ {
+  "label": "grown-KC1",
+  "arm": "KC",
+  "cost": 1.7541136,
+  "read": 1727058,
+  "reasoning": 55161,
+  "turns": 18,
+  "cases": [
+   "121/122",
+   "112/112",
+   "82/82"
+  ],
+  "tools": {
+   "show": 2,
+   "show --body": 4,
+   "Bash": 6,
+   "apply": 4,
+   "Read": 1
+  }
+ },
+ {
+  "label": "grown-KC2",
+  "arm": "KC",
+  "cost": 1.2461069999999999,
+  "read": 1290415,
+  "reasoning": 45849,
+  "turns": 15,
+  "cases": [
+   "122/122",
+   "112/112",
+   "82/82"
+  ],
+  "tools": {
+   "show": 1,
+   "show --body": 6,
+   "Bash": 3,
+   "Grep": 1,
+   "Read": 1,
+   "apply": 1,
+   "check": 1
+  }
+ },
+ {
+  "label": "grown-KC3",
+  "arm": "KC",
+  "cost": 1.8580864,
+  "read": 1242552,
+  "reasoning": 105669,
+  "turns": 15,
+  "cases": [
+   "122/122",
+   "112/112",
+   "82/82"
+  ],
+  "tools": {
+   "show": 1,
+   "show --body": 3,
+   "check": 1,
+   "Grep": 1,
+   "Bash": 5,
+   "python3": 1,
+   "apply": 1
+  }
+ }
+]

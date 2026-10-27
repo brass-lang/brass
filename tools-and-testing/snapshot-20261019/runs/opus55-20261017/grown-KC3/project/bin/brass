@@ -1,0 +1,2 @@
+#!/bin/sh
+BRASS_LEAN=3 BRASS_PROJECT="$(cd "$(dirname "$0")/.." && pwd)" BRASS_SRC=desk BRASS_BASELINE=/tmp/rerun-opus55-20261017/_baseline-brass-grown exec python3 /tmp/rerun-opus55-20261017/_tools/brass.py "$@"

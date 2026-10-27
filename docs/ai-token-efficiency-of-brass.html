@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>The AI Token Efficiency of Brass</title>
+<!-- Brass palette switch: add this line back to show the Brass arms in green -->
+<!-- <script>document.documentElement.setAttribute("data-palette","green")</script> -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inconsolata:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#FFFFF8; --ink:#111110; --soft:#4A4A45; --py:#A24D44; --keel:#6F98E2; --keel-t:#4A74C8; --acc:#123A8A; --rule:#CFCFC2; --faint:#E6E6DA;
+  --panel:#FFFFFF;
+  --c-ifc:#007F5F; --c-body:#2EC48F; --c-apply:#8A1F9E; --c-check:#D79BE6; --c-read:#BDBCB2; --c-search:#E0DFD6; --c-edit:#C8372D; --c-run:#F08A24; --c-other:#EFEEE6;
+  --serif:"EB Garamond","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --mono:Inconsolata,ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --c-ifc:#3EE0A8; --c-body:#1E9E74; --c-apply:#EE8AF8; --c-check:#9C4FAE; --c-read:#5F5E58; --c-search:#3A3A35; --c-edit:#FF6B5E; --c-run:#FFA040; --c-other:#2A2A25; --paper:#151513; --panel:#1F1F1C; --ink:#ECEAE0; --soft:#B4B2A8; --py:#E0918A; --keel:#3E5F9A; --keel-t:#8FB4F5; --acc:#6FA0FF; --rule:#3E3D38; --faint:#26261F; color-scheme:dark; }
+}
+:root[data-theme="dark"]{ --c-ifc:#3EE0A8; --c-body:#1E9E74; --c-apply:#EE8AF8; --c-check:#9C4FAE; --c-read:#5F5E58; --c-search:#3A3A35; --c-edit:#FF6B5E; --c-run:#FFA040; --c-other:#2A2A25; --paper:#151513; --panel:#1F1F1C; --ink:#ECEAE0; --soft:#B4B2A8; --py:#E0918A; --keel:#3E5F9A; --keel-t:#8FB4F5; --acc:#6FA0FF; --rule:#3E3D38; --faint:#26261F; color-scheme:dark; }
+
+/* Brass in green, active only while data-palette="green" is set on the page */
+:root[data-palette="green"]{ --keel:#9ED9BF; --keel-t:#2C8A66; --acc:#007F5F; }
+@media (prefers-color-scheme: dark){ :root[data-palette="green"]:not([data-theme="light"]){ --keel:#2A6B55; --keel-t:#8FE0C0; --acc:#3EE0A8; } }
+:root[data-palette="green"][data-theme="dark"]{ --keel:#2A6B55; --keel-t:#8FE0C0; --acc:#3EE0A8; }
+.pal-green{ display:none; }
+:root[data-palette="green"] .pal-blue{ display:none; }
+:root[data-palette="green"] .pal-green{ display:inline; }
+
+html{ background:var(--paper); }
+body{ background:var(--paper); color:var(--ink); font-family:var(--serif); font-size:19px; line-height:1.5;
+  font-variant-numeric:oldstyle-nums proportional-nums; padding-inline:clamp(16px,5vw,64px); padding-block:48px 80px; }
+article{ max-width:1180px; margin:0 auto; }
+h1{ font-weight:400; font-size:2.6rem; line-height:1.1; margin:0 0 .3rem; letter-spacing:-.005em; text-wrap:balance; }
+.subtitle{ font-style:italic; font-size:1.35rem; color:var(--soft); margin:0 0 2.2rem; }
+h2{ font-weight:400; font-style:italic; font-size:1.65rem; margin:3.2rem 0 .6rem; text-wrap:balance; }
+p, ul{ max-width:34rem; margin:0 0 1.1rem; }
+ul{ padding-left:1.1rem; }
+li{ margin-bottom:.45rem; }
+code{ font-family:var(--mono); font-size:.86em; }
+.sc{ font-variant:small-caps; letter-spacing:.04em; font-variant-numeric:lining-nums; }
+.k{ color:var(--ink); background:#FAF0C6; padding:0 .15em; border-radius:2px; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .k{ background:#5C4F27; } }
+:root[data-theme="dark"] .k{ background:#5C4F27; }
+
+/* margin notes: in the margin when there is one, inline when there is not */
+.row{ display:grid; grid-template-columns:minmax(0,34rem) minmax(0,1fr); column-gap:3rem; align-items:start; }
+.mn{ font-size:.82rem; line-height:1.38; color:var(--soft); max-width:24rem; }
+.mn b{ font-weight:500; color:var(--ink); }
+@media (max-width:860px){ .row{ grid-template-columns:1fr; } .mn{ margin:-.4rem 0 1.2rem; padding-left:.8rem; border-left:1px solid var(--rule); } }
+
+figure{ margin:1.2rem 0 .6rem; }
+.notes{ display:grid; grid-template-columns:repeat(2,minmax(0,24rem)); column-gap:3rem; max-width:1100px; margin-bottom:1rem; }
+.notes .mn{ max-width:24rem; }
+@media (max-width:860px){ .notes{ grid-template-columns:1fr; } .notes .mn{ margin:0 0 .8rem; padding-left:.8rem; border-left:1px solid var(--rule); } }
+figure svg{ display:block; overflow:visible; }
+figure{ width:100%; }
+/* charts sit in a thin bordered frame on the page background */
+figure[id^="f-"]{ border:1px solid var(--rule); border-radius:3px; padding:14px 16px; box-sizing:border-box; }
+figure[id^="f-"] svg{ max-width:100%; height:auto; }
+.chartbox{ border:1px solid var(--rule); border-radius:3px; padding:14px 16px; box-sizing:border-box; max-width:1100px; }
+.chartbox figure[id^="f-"]{ border:0; padding:0; border-radius:0; }
+.chartbox .key{ margin-top:0; }
+/* the strip key lines up with the strips: group names right-aligned in the label gutter */
+@media (min-width:700px){ .strips-box .key .group{ display:inline-block; width:calc(100px - 1.3rem); text-align:right; margin-right:0; } }
+.figscroll + .row, .figscroll + .notes, .chartbox + .row, .chartbox + .notes{ margin-top:1rem; }
+.wide{ max-width:1100px; }
+.mid{ max-width:1100px; }
+.narrow{ max-width:1100px; }
+figcaption{ font-size:.82rem; line-height:1.38; color:var(--soft); max-width:34rem; margin-top:.4rem; }
+.figscroll{ overflow-x:auto; }
+
+/* svg ink, all from tokens */
+svg text{ font-family:var(--serif); font-size:16px; fill:var(--ink); font-variant-numeric:lining-nums tabular-nums; }
+/* a page-colored halo keeps chart labels readable where lines or bars cross them */
+svg text{ paint-order:stroke; stroke:var(--paper); stroke-width:4px; stroke-linejoin:round; }
+#f-grid svg text{ stroke:none; }
+svg .t-soft{ fill:var(--soft); }
+svg .t-acc{ fill:var(--acc); }
+svg .t-py{ fill:var(--py); }
+svg .t-keel{ fill:var(--keel-t); }
+svg .t-small{ font-size:14px; }
+svg .t-big{ font-size:18px; }
+svg .t-head{ font-size:16px; }
+svg .t-xs{ font-size:13px; }
+svg .t-it{ font-style:italic; }
+svg .s-rule{ stroke:var(--rule); }
+svg .s-ink{ stroke:var(--ink); }
+svg .s-soft{ stroke:var(--soft); }
+svg .s-acc{ stroke:var(--acc); }
+svg .s-py{ stroke:var(--py); }
+svg .s-keel{ stroke:var(--keel); }
+svg .f-acc{ fill:var(--acc); }
+svg .f-py{ fill:var(--py); }
+svg .f-keel{ fill:var(--keel); }
+svg .f-ink{ fill:var(--ink); }
+svg .f-paper{ fill:var(--paper); }
+svg .f-faint{ fill:var(--faint); }
+svg .f-rule{ fill:var(--rule); }
+svg .k-ifc{ fill:var(--c-ifc); } svg .k-body{ fill:var(--c-body); } svg .k-read{ fill:var(--c-read); } svg .k-search{ fill:var(--c-search); }
+svg .k-edit{ fill:var(--c-edit); } svg .k-apply{ fill:var(--c-apply); } svg .k-check{ fill:var(--c-check); } svg .k-run{ fill:var(--c-run); } svg .k-other{ fill:var(--c-other); }
+.key{ display:flex; flex-wrap:wrap; gap:.35rem 1.3rem; font-size:.86rem; color:var(--soft); margin:.5rem 0 .2rem; max-width:1100px; align-items:center; }
+.key span{ white-space:nowrap; }
+.key i{ display:inline-block; width:15px; height:11px; margin-right:7px; vertical-align:-1px; border-radius:1px; }
+.key .dot{ width:9px; height:9px; border-radius:50%; }
+.key .tick{ width:2px; height:15px; border-radius:0; vertical-align:-3px; }
+.key .group{ font-style:italic; color:var(--ink); margin-right:-.4rem; }
+
+/* the numbers, set as a book table */
+.tablewrap{ overflow-x:auto; max-width:1100px; margin-top:1.1rem; }
+table{ border-collapse:collapse; font-size:.86rem; font-variant-numeric:lining-nums tabular-nums; margin-top:.6rem; }
+.glance{ max-width:60rem; margin-bottom:1rem; font-size:.95rem; }
+.tasks{ max-width:52rem; margin-bottom:1.1rem; font-size:.92rem; min-width:0; }
+.tasks thead th{ font-weight:400; font-style:italic; text-align:left; padding:.3rem 1rem .4rem 0; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); white-space:normal; vertical-align:bottom; }
+.tasks td{ text-align:left; white-space:normal; vertical-align:top; padding:.42rem 1rem .42rem 0; border-bottom:1px solid var(--faint); line-height:1.4; }
+.tasks td:nth-child(n+5), .tasks th:nth-child(n+5){ text-align:right; padding-right:.6rem; }
+.tasks tr:last-child td{ border-bottom:1px solid var(--rule); }
+.glance th{ font-weight:400; font-style:italic; text-align:left; vertical-align:top; padding:.45rem 1.2rem .45rem 0; white-space:nowrap; color:var(--soft); border-bottom:1px solid var(--faint); }
+.glance td{ text-align:left; white-space:normal; padding:.45rem 0; border-bottom:1px solid var(--faint); line-height:1.45; }
+.glance tr:first-child th, .glance tr:first-child td{ border-top:1px solid var(--rule); }
+.glance tr:last-child th, .glance tr:last-child td{ border-bottom:1px solid var(--rule); }
+.note{ font-size:.86rem; color:var(--soft); max-width:34rem; }
+thead th{ font-weight:400; font-style:italic; text-align:right; padding:.2rem .7rem .35rem; border-top:1.5px solid var(--ink); border-bottom:1px solid var(--ink); white-space:nowrap; }
+thead th:first-child, thead th:nth-child(2), thead th:nth-child(3), tbody td:first-child, tbody td:nth-child(2), tbody td:nth-child(3){ text-align:left; }
+tbody td{ text-align:right; padding:.16rem .7rem; white-space:nowrap; }
+tbody tr:last-child td{ border-bottom:1.5px solid var(--ink); }
+tbody tr.gap td{ padding-top:.55rem; }
+.verbs td.sp{ white-space:nowrap; font-variant-numeric:lining-nums tabular-nums; }
+.verbs .bar{ display:inline-block; height:.5rem; border-radius:1px; background:var(--acc); vertical-align:.08em; margin-right:.5rem; }
+.verbs .bar-w{ background:var(--soft); opacity:.55; }
+.verbs tr.split td{ border-top:1px solid var(--rule); }
+.verbs tr.v-ifc .bar{ background:var(--c-ifc); } .verbs tr.v-body .bar{ background:var(--c-body); }
+.verbs tr.v-apply .bar{ background:var(--c-apply); opacity:1; } .verbs tr.v-check .bar{ background:var(--c-check); opacity:1; }
+.tasks td.na{ color:var(--soft); font-style:italic; }
+.tasks td:has(.tl){ padding-block:.7rem; }
+.tasks .tl{ margin:.4rem 0 0; padding-left:1.1rem; color:var(--soft); font-size:.9em; }
+.tasks .tl li{ margin:.15rem 0; }
+.foot{ margin-top:3.5rem; font-size:.82rem; color:var(--soft); max-width:34rem; }
+.tablewrap + .foot{ margin-top:1.1rem; }
+</style>
+</head>
+<body>
+<article>
+<h1>The AI Token Efficiency of Brass</h1>
+<p class="subtitle">What forty coding sessions tell us about language, tooling and cost</p>
+
+<div class="row">
+  <div>
+    <p>When an AI model changes a program, it spends tokens reading the code, working out what to change and writing the result. Brass is a new language built around that process, with models writing the code and people reviewing it. Its function declarations say what a function may do and what it promises. The full checker rejects code that breaks those declarations; the <code>brass</code> tool in these runs checks a program’s structure, runs its examples and helps the model find its way around the code. These trials ask whether it makes the work cheaper.</p>
+    <p>The trials were 40 sessions on 19 October 2026, all with the same model, Claude Sonnet. In each one, the model was handed a working expense-report system and asked to add one feature. It read the code, made the change and decided for itself when it was finished. The system exists twice, once written in Brass and once in Python, so both languages faced the same job. There were two features to add: cash advances, attempted 30 times, and trip plans, attempted 10 times. When a session ended, its program was run against a set of test cases the model never saw. Both languages were scored against the same cases, so a pass means the same thing in each.</p>
+    <p>Brass needed fewer rounds with the model. <span class="k">It used a third to half as many model calls as Python, and its average bill was 14 to 24 percent lower</span>, depending on the task and codebase size. The model spent more tokens on reasoning, but was sent less than half as much text over a session. That total includes the conversation sent again on every call; it does not mean the model opened half as much source code.</p>
+    <p>Here, Brass means the language and its tooling together. Thirteen of its 15 sessions passed every task test; Python passed them all in 15 of 15. The other ten sessions used the Brass language with ordinary file tools only. That setup was more expensive than Python on cash advances, the only task it ran.</p>
+  </div>
+</div>
+
+<h2>The trials at a glance</h2>
+<p><b>The program.</b> Every trial used an expense-report system. Staff submit reports, and the amount decides who must approve them. The system checks budgets, pays approved reports and records every action in an audit trail. Cash advances were tested on two versions of the program, the larger about 2.5 times the size of the smaller.</p>
+<p><b>The tasks.</b> Each session added one of two features. Both needed changes across several parts of the program.</p>
+<div class="tablewrap"><table class="tasks" aria-label="The two tasks">
+  <thead><tr><th>Task</th><th>The change</th><th>Starting code</th></tr></thead>
+  <tbody>
+    <tr><td>Cash advances</td><td>Let staff receive cash before a trip, then settle it against an expense report. Use the report approval rules for advances too.</td><td>Small: 448 lines of Brass, 514 of Python.<br>Larger: 1,121 lines of Brass, 1,211 of Python.</td></tr>
+    <tr><td>Trip plans</td><td>Let staff submit a travel plan for approval, amend it, reconcile it with actual spending and close it.</td><td>The cash-advance program, with that feature added: 1,331 lines of Brass, 1,398 of Python.</td></tr>
+  </tbody>
+</table></div>
+<p class="note">The larger codebase adds eleven subsystems a real expense desk acquires, such as corporate cards, vendors and forecasting, as new files only. The code the task changes is the same in both, so the difference is how much unrelated code the model has to find its way around.</p>
+<p class="note">Trip plans was written after the tooling was finished, to try it on work the tooling was not designed around. It had been used once before, in an earlier trial.</p>
+<p><b>The setups.</b> Brass was tested as a complete workflow: the language plus its tooling, which helps an AI model find its way around the code and change it. The tooling is the <code>brass</code> command, a project map and a host contract. On these pages, <b>Brass</b> means that whole package. The language also ran with ordinary file tools only, to see how much the tooling contributed. Cash advances compared three setups:</p>
+<ul>
+  <li><b>Python</b>, with ordinary tools for reading and editing files.</li>
+  <li><b>Brass, lang. only</b>, with the same file tools.</li>
+  <li><b>Brass</b>: the same file tools, plus the project map, the host contract and <code>brass</code>, which can show declarations from several modules in one call and check a patch before writing it.</li>
+</ul>
+<p>Python had ordinary file tools only, with no map. An earlier test that gave Python a similar tool and module map closed most of the reading gap, so part of what Brass saves here comes from its tooling, not the language alone.</p>
+<p>Trip plans compared Python with Brass; the language-only setup didn’t run on that task.</p>
+<p>A <b>session</b> is one attempt at a task, starting from the supplied program. Each combination of task, setup and codebase size got five sessions: 30 for cash advances and 10 for trip plans. Sessions with <code>brass</code> were asked to make their edits through it, but could still edit files directly.</p>
+
+<h2>How context piles up, turn by turn</h2>
+<div class="row">
+  <div><p>Each call sends the model the conversation so far: instructions, code, tool replies and earlier responses. A later call therefore includes much of what the model has already received, plus whatever happened since. That repeated text is part of the token bill.</p><p>Here, a <b>turn</b> means one call to the model. It can request several tool actions, such as opening three files at once.</p><p>The lines show that running total for the ten sessions. Python finished after 31 to 60 turns; Brass finished after 14 to 28. Fewer turns meant fewer times the growing conversation was sent again.</p></div>
+  <p class="mn">The ten lines are the cash-advance sessions on the larger codebase: five Python and five Brass, numbered 1 to 5 within each setup. Each line ends with its session number and total input. The same sessions appear in <i>Every tool call, in order</i>, further down; <a href="#numbers"><i>The numbers</i></a>, at the end, lists all 40.</p>
+</div>
+<p class="note"><b>A note on color.</b> In the charts, <span class="sc" style="color:var(--py)">Python</span> is red, <span class="sc" style="color:var(--acc)">Brass</span> is <span class="pal-blue">deep blue</span><span class="pal-green">deep green</span>, and <span class="sc" style="color:var(--keel-t)">Brass, lang. only</span> is <span class="pal-blue">light blue</span><span class="pal-green">light green</span>. In <i>Every tool call, in order</i>, colors mean actions instead: reading, editing or checking. A red block there is an edit, whichever language the session used.</p>
+<div class="figscroll"><figure class="wide" id="f-race" aria-label="Context accumulated turn by turn for ten cash-advance sessions"></figure></div>
+
+<h2>One session from each side, turn by turn</h2>
+<div class="row">
+  <div><p>Session 4 from each setup shows how the work unfolded. Both spent seven turns reading. On turn 8, each produced its largest block of output, mostly reasoning about the change.</p><p>Python began editing the project during that turn. Brass began drafting a patch, submitted it on turn 11 and finished on turn 14. Python continued editing individual files, then wrote and ran tests before finishing on turn 32. Each additional turn carried the conversation forward again.</p><p>Both programs passed every test; the Brass session cost $1.23, the Python session $1.51.</p></div>
+</div>
+<div class="figscroll"><figure class="wide" id="f-mirror" aria-label="Context sent and output written per turn, one Brass and one Python session"></figure></div>
+<div class="notes"><p class="mn">In the chart, the context sent appears above the line and output below it. Output includes hidden reasoning, replies and tool requests. It is drawn three times taller, so that a 10k-token output remains visible beside 100k tokens of context.</p></div>
+
+<h2>What happens to context as the codebase grows</h2>
+<p>A larger program means more to read, so every setup was sent more text on the codebase 2.5 times the size. The chart shows how much more. Each line joins a setup's average total input on the small codebase to its average on the larger one, five sessions at each size.</p>
+<div class="figscroll"><figure class="narrow" id="f-slope" aria-label="Slopegraph of context read per session, small to larger codebase"></figure></div>
+<p>Brass grew the most in percentage terms, 75 percent against Python's 46, because it started from the lowest total. Even on the larger codebase, it was sent less than half as much text as Python.</p>
+
+<h2>Every session on four measures</h2>
+<div class="row">
+  <div><p>The averages hide how much attempts varied. These panels show every session on four measures: total input, model calls, reasoning tokens and cost.</p><p>Each row groups one setup on one task and codebase size. A dot represents a session. The upright mark shows the row’s average, also printed on the right. Further left means fewer tokens, fewer calls or a lower bill.</p></div>
+  <p class="mn"><b>Reasoning tokens</b> count the model’s hidden working and are billed as output. <b>Cost</b> is the reported session bill.</p>
+</div>
+<div class="chartbox">
+<div class="key"><span><i class="dot" style="background:var(--py)"></i>one Python session</span><span><i class="dot" style="background:var(--keel)"></i>one Brass, lang. only session</span><span><i class="dot" style="background:var(--acc)"></i>one Brass session</span><span><i class="tick" style="background:var(--ink)"></i>average of the row</span></div>
+<div class="figscroll"><figure class="wide" id="f-grid" aria-label="Dot plots of context, calls, reasoning and cost for every session"></figure></div>
+</div>
+
+<h2>Every tool call, in order</h2>
+<div><p>These rows show what the ten larger-codebase sessions actually did: gather code, make changes and check their work. Each block is one tool action, in the order requested. Several blocks can belong to the same model turn.</p><p>Green blocks retrieve code through <code>brass</code>. Purple blocks apply or check a patch: dark for <code>apply</code>, light for <code>check</code>. Red blocks edit a project file directly; orange blocks run Python tests.</p><p>Gray blocks read or search with ordinary file tools such as <code>Read</code>, <code>Grep</code> and <code>cat</code>. The palest blocks work on temporary files, including draft patches and test scripts.</p></div>
+<div class="chartbox strips-box">
+<div class="key"><span class="group">reading</span><span><i style="background:var(--c-ifc)"></i><code>brass</code>: declarations</span><span><i style="background:var(--c-body)"></i><code>brass</code>: whole files</span><span><i style="background:var(--c-read)"></i>read one file</span><span><i style="background:var(--c-search)"></i>search</span></div>
+<div class="key"><span class="group">writing</span><span><i style="background:var(--c-apply)"></i><code>brass apply</code>: every edit, checked first</span><span><i style="background:var(--c-edit)"></i>edit one file</span><span><i style="background:var(--c-other);outline:1px solid var(--rule)"></i>write a scratch file</span></div>
+<div class="key"><span class="group">checking</span><span><i style="background:var(--c-check)"></i><code>brass check</code></span><span><i style="background:var(--c-run)"></i>run Python tests</span></div>
+<div class="figscroll"><figure class="wide" id="f-strips" aria-label="Every tool call of ten cash-advance sessions, in order"></figure></div>
+</div>
+<div class="notes"><p class="mn">Each row is one session, and the number at its end is the session’s total tool actions. The marker on the first row of each group points to the session’s first <code>apply</code> (Brass) or first direct edit (Python).</p></div>
+<p>The Brass sessions gathered declarations and whole files, then submitted changes through <code>apply</code>, sometimes in more than one attempt. Session 5 also edited a file directly. Python sessions opened files individually, often requesting several in one turn, then edited them and ran tests. Both the number of actions and the way they were grouped affected the number of model calls.</p>
+
+<h2>How the Brass sessions used their built-in tooling</h2>
+<div class="row">
+  <p>Across the fifteen Brass sessions, the model called <code>brass</code> 129 times. Most calls fetched code. This table separates those reads from the calls that applied or checked changes.</p>
+</div>
+<div class="tablewrap"><table class="tasks verbs" aria-label="Tool calls across the fifteen sessions">
+  <thead><tr><th>Command</th><th>What it does</th><th>Calls</th><th>Total reply size</th></tr></thead>
+  <tbody>
+    <tr class="v-ifc"><td><code>info</code></td><td>shows where a declaration is used and how</td><td class="sp"><span class="bar" style="width:11px"></span>6</td><td class="sp"><span class="bar" style="width:9px"></span>45k chars</td></tr>
+    <tr class="v-ifc"><td><code>show</code></td><td>lists every module, its declarations and imports</td><td class="sp"><span class="bar" style="width:30px"></span>16</td><td class="sp"><span class="bar" style="width:9px"></span>45k chars</td></tr>
+    <tr class="v-ifc"><td><code>show</code> <i>names</i></td><td>retrieves the named modules’ declarations and contracts</td><td class="sp"><span class="bar" style="width:17px"></span>9</td><td class="sp"><span class="bar" style="width:15px"></span>77k chars</td></tr>
+    <tr class="v-body"><td><code>show --body</code></td><td>retrieves whole files: four modules per call on average, up to eight</td><td class="sp"><span class="bar" style="width:110px"></span>59</td><td class="sp"><span class="bar" style="width:110px"></span>561k chars</td></tr>
+    <tr class="split v-apply"><td><code>apply</code></td><td>check a patch, then write all of it or none</td><td class="sp"><span class="bar bar-w" style="width:37px"></span>20</td><td class="sp"><span class="bar bar-w" style="width:12px"></span>62k chars</td></tr>
+    <tr class="v-check"><td><code>check</code></td><td>checks the current project without applying a patch</td><td class="sp"><span class="bar bar-w" style="width:35px"></span>19</td><td class="sp"><span class="bar bar-w" style="width:9px"></span>48k chars</td></tr>
+  </tbody>
+</table></div>
+<div class="notes"><p class="mn">Counts and reply sizes come from the <code>brass</code> log; each bar is scaled to the largest value in its column. For scale, 9,000 characters is roughly 2,500 tokens, though the ratio depends on the text.</p><p class="mn"><code>apply</code> and <code>check</code> return results rather than code. An <code>apply</code> reply says what was written, or why the patch was rejected. A <code>check</code> reply lists the problems it found, if any.</p></div>
+<p><b>Reading.</b> Sessions typically gathered code in about five <code>show</code> calls, starting with the index and then fetching declarations or files in batches. A reply could contain several related modules. <span class="k">Whole files from <code>show --body</code> accounted for about two thirds of the text returned.</span> The other reading commands together returned less than a third as much as <code>show --body</code>. Python sessions also requested several file reads in a single turn, so reading alone does not explain the gap in turns. On cash advances, most of the difference in turn count came after the first edit. On trip plans, however, four of the five Python sessions read one file per turn for about 30 turns. <code>info</code> appeared in five sessions. No session used <code>show --for</code>; the model mostly asked for declarations and whole files.</p>
+<p><b>Writing.</b> Of the 20 <code>apply</code> calls, 17 wrote their patch. One was refused before checking started, because a block was left unclosed. Two more failed the check: one supplied an argument to a function that took none; the other supplied two arguments where five were required. Each mistake was corrected on the next attempt. The rejected patches changed no project files. <code>check</code> catches mistakes such as calls that don’t match their declarations. Whether a program does what the task asks is a different question, and the hidden tests answer it: they found failures in programs that passed <code>check</code>.</p>
+<p><b>Direct edits.</b> Ten of the fifteen sessions made all project edits through <code>apply</code>. Two mixed it with direct edits. Three used the ordinary editor throughout and ran <code>check</code> afterwards.</p>
+<div class="tablewrap"><table class="tasks" aria-label="How the Brass sessions wrote their changes">
+  <thead><tr><th>Sessions</th><th>Cash advances, small</th><th>Cash advances, larger</th><th>Trip plans</th></tr></thead>
+  <tbody>
+    <tr><td>Wrote only through <code>apply</code></td><td>3</td><td>4</td><td>3</td></tr>
+    <tr><td>Used <code>apply</code> and also edited a file directly</td><td>0</td><td>1</td><td>1</td></tr>
+    <tr><td>Never used <code>apply</code></td><td>2</td><td>0</td><td>1</td></tr>
+  </tbody>
+</table></div>
+<p>Every session that edited directly ended with a clean <code>check</code> and passed every hidden test. Reviewers later found two Brass rule violations in directly edited files. They found neither in patches submitted through <code>apply</code>, but that does not establish that <code>apply</code> would have caught them: it runs the same check.</p>
+
+<h2>What each session paid for</h2>
+<p>Tokens have different prices, so sending less text does not reduce every part of the bill equally. These panels split the average cash-advance bill into cached input, new text written to the cache and output. Each panel shows the three setups, averaged across both codebase sizes.</p>
+<div class="figscroll"><figure class="narrow" id="f-dollars" aria-label="Cost per session split into cache reads, cache writes, and output"></figure></div>
+<p><span class="k">Brass saved mostly on cached input, the cheapest part of the bill. It spent more on output, most of it reasoning.</span> The input saving still outweighed that extra expense: the average bill was about a fifth lower on cash advances and about a seventh lower on trip plans.</p>
+<p>Familiarity may explain some of the extra reasoning. Python gives the model patterns it has encountered before; Brass asks it to work through new rules. These runs do not isolate that cause. The next test will settle more recurring language questions and measure whether reasoning falls.</p>
+
+<h2>Hidden reasoning, task by task</h2>
+<p>Brass used more reasoning tokens on both tasks. The language-only sessions showed the same pattern on cash advances. Each point in this chart is a setup’s average: first cash advances at the two codebase sizes, then trip plans.</p>
+<div class="figscroll"><figure class="narrow" id="f-step" aria-label="Mean reasoning per session by task"></figure></div>
+<div class="notes"><p class="mn">The language-only line stops at cash advances. That setup was a directional check, and it had already shown higher token use than Brass with its tooling, so it was not carried on to trip plans.</p></div>
+<p>Brass used about 1.4 to 1.8 times as many reasoning tokens as Python, with the largest difference in token count on trip plans. This identifies where the extra output went, but not which language rules caused it.</p>
+
+<h2>Cost against the size of the change</h2>
+<p>The trip-plan feature requires more code changes than cash advances. To compare the bills against that size, this chart uses a reference solution for each task and language. Every session on the same task and language gets the same horizontal position; it does not represent the size of that session’s own patch.</p>
+<div class="figscroll"><figure class="narrow" id="f-scatter" aria-label="Cost per session against lines changed"></figure></div>
+<div class="notes"><p class="mn">Each dot is a session, with higher cost plotted upwards. Filled dots show cash advances and open dots show trip plans. The reference changes count added and removed lines, including new files: 231 lines of Brass and 213 of Python for cash advances, and 326 and 278 for trip plans.</p></div>
+<p>Dividing each bill by its reference change size gives an average of 0.55 cents per line for Brass, 0.76 for Python and 0.82 for the language-only setup. The last of those covers cash advances only. Lines describe the amount of code in a change; they do not measure its difficulty.</p>
+
+<h2>What a careful read found that the tests missed</h2>
+<div class="row">
+  <p>After the runs, eight Claude Opus 5.5 agents reviewed five finished programs each. They checked Brass rules and task requirements that the behavioral tests could miss.</p>
+  <p class="mn">Each reviewer received the task, a checklist, the language spec and the starting code. Programs had random-number labels. Costs, test scores and setup labels were withheld until all reviews were complete, although the code still revealed whether a program was Python or Brass.</p>
+</div>
+<div class="tablewrap"><table class="tasks" aria-label="The hidden cases and the hand-read, by setup">
+  <thead><tr><th>Sessions that</th><th>Python</th><th>Brass, lang. only</th><th>Brass</th></tr></thead>
+  <tbody>
+    <tr><td>passed every test case</td><td>15 of 15</td><td>10 of 10</td><td>13 of 15</td></tr>
+    <tr><td>broke none of the Brass rules on the review checklist</td><td class="na">n/a</td><td>9 of 10</td><td>15 of 15</td></tr>
+    <tr><td>met the written requirements on the review checklist</td><td>15 of 15</td><td>9 of 10</td><td>15 of 15</td></tr>
+  </tbody>
+</table></div>
+<p>The checklist rows do not cover every possible defect. Reviewers also reported problems outside them, including two Brass rule violations that do not appear in those totals.</p>
+<ul>
+  <li><b>A state from the wrong workflow.</b> One language-only session built a statement row for a cash advance using an expense-report state. Every hidden test passed, but the code broke a Brass rule.</li>
+  <li><b>Different answers to an unstated question.</b> Reconciling a trip plan records what was actually spent. Repeating it should add an audit entry only if the result changes. All five Python programs compared the whole result, including the identities of the card transactions counted. The Brass programs compared selected fields and left those identities out. If the transactions changed but the fields being compared stayed the same, no new audit entry was written. The task did not define which fields counted as a changed result, so the audit difference was reported without changing the checklist score. One Brass program also skipped saving the updated result, leaving the old transaction list in place.</li>
+  <li><b>Two mistakes <code>brass</code> accepted.</b> The reviewers found a reserved keyword used as a name, and an outside-service declaration written twice. Both break Brass rules, and both passed <code>check</code>. One session edited entirely without <code>apply</code>; the other mixed <code>apply</code> with direct edits.</li>
+</ul>
+
+<h2>What this shows</h2>
+<ul>
+  <li><b>Correctness held up.</b> Working from a 3,300-word language reference and no prior exposure to Brass, the model passed 1,621 of 1,625 test executions, and 13 of 15 sessions passed every case. In Python, a language it knows deeply, it passed all 1,625 and all 15. The four misses came from two Brass sessions, two cases each. The same cases were run repeatedly across sessions.</li>
+  <li><b>Brass cost less in these runs.</b> Its average bill was 14 to 24 percent below Python's, depending on the task and codebase size. Brass used roughly one model call for every two or three Python needed, and less than half as much total input.</li>
+  <li><b>The tooling contributed to the saving.</b> Language-only sessions used more input than Python and cost the most on cash advances. This run did not give Python equivalent tooling. An earlier trial did and closed most of the gap in total input.</li>
+  <li><b>Brass used more reasoning tokens.</b> The model spent about 1.4 to 1.8 times as many as it did on Python. In an earlier trial, settling one open language question cut reasoning by nearly a third; whether settling the rest closes the gap is the next test.</li>
+  <li><b>The scope is narrow.</b> Five sessions per task, setup and size, one model, and two tasks on one program. Both tasks were written for these trials, and trip plans had been used in an earlier one. The results describe these runs; they do not show how the languages compare on other work.</li>
+</ul>
+
+<h2 id="numbers">The numbers</h2>
+<p>Calls, input, reasoning and cost are averages per session. Tests passed are totals across the five sessions. Reference lines changed counts additions and removals in the reference solution, including new files. M means million tokens; k means thousand.</p>
+<div class="tablewrap"><table id="tbl" aria-label="Mean measures by task, codebase size and setup"></table></div>
+
+<p class="foot">All 40 sessions ran on 19 October 2026: 30 on cash advances, then 10 on trip plans. An earlier attempt at the trip-plan run was stopped partway; these results cover the completed runs. The model was claude-sonnet-5 at high effort, in Claude Code 2.1.302. Each session started separately, outside the repository, with a clean environment. All setups had ordinary file tools. Brass also received <code>brass</code>, the project map and the host contract. Costs are the reported bills through the end of each session, not the cost of repairing every failed result. Each panel of the bill-breakdown chart prints its rate. Frozen inputs, transcripts and reviews are in the repository’s <code>tools-and-testing/snapshot-20261019/</code> folder.</p>
+
+<h2>Closing thoughts</h2>
+<p>In these forty sessions, Brass used fewer calls and cost less than Python, in a language the model had never seen, and the price was more reasoning. The next step is to make Brass run: the full checker, then a compiled runtime. A model will then compile its change, get an exact answer, proven or what is still missing, and run the result. That is the test that shows whether Brass makes a correct change less work, and which parts of the language still make it harder than it needs to be.</p>
+
+<h2 id="faq">FAQ</h2>
+<p><b>How can Brass cost less while using more reasoning tokens?</b><br>Reasoning is only one part of the bill. Brass sessions finished in fewer calls, so the growing conversation was sent back to the model fewer times. The savings on repeated input outweighed the extra reasoning cost.</p>
+<p><b>Does token efficiency mean writing shorter code?</b><br>No. The reference solutions in Brass changed more lines than their Python equivalents. The savings came from how the model worked through the change, not from producing a smaller program. Explicit declarations can add code while making its requirements easier to find.</p>
+<p><b>Could the same approach help models working in other languages?</b><br>Yes. An earlier trial gave Python a similar tool and project map, which closed most of the gap in total input. Giving a model related code together, and letting it check several edits in one step, is useful beyond Brass.</p>
+<p><b>What would a full checker and runtime add?</b><br>The current tool already checks program structure, catches mistakes such as calls that don’t match their declarations, and runs examples. A full checker would also prove that function bodies keep their declared promises. Together with a compiled runtime, that would let the model check and run its changes as it works, and make it possible to measure the cost through a working result, including repairs.</p>
+
+<p class="foot">This page reports the trials behind Brass v0.3. It’s a record, shared for feedback. Until 2026-10-10 the language was called Keel and its tool <code>keelc</code>; the earlier trials ran under those names. The language itself is introduced in <a href="welcome-to-brass-language.html"><i>Welcome to Brass Language</i></a>.</p>
+
+</article>
+
+<script src="data.js"></script>
+<script src="turns.js"></script>
+<script>
+(function(){
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent,text){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;if(parent)parent.appendChild(e);return e}
+function widthOf(id){const host=document.getElementById(id);const cs=getComputedStyle(host);const inner=host.clientWidth-parseFloat(cs.paddingLeft||0)-parseFloat(cs.paddingRight||0);return Math.max(320,Math.min(inner||1100,1100))}
+function svg(id,W,H){const host=document.getElementById(id);const old=host.querySelector("svg");if(old)old.remove();
+  const PAD=14;const s=el("svg",{viewBox:`0 0 ${W} ${H+PAD}`,width:W,height:H+PAD,role:"img"});host.insertBefore(s,host.firstChild);return s}
+const ARM={P:{name:"Python",cls:"py",t:"t-py"},K:{name:"Brass, lang. only",short:"Brass, lang. only",cls:"keel",t:"t-keel"},KC:{name:"Brass",cls:"acc",t:"t-acc"}};
+const mean=v=>v.reduce((a,b)=>a+b,0)/v.length;
+const fmtM=v=>(v/1e6).toFixed(2)+"M";
+const key=(s,x,y,items)=>{let cx=x;items.forEach(([name,cls,tcls])=>{el("line",{x1:cx,y1:y-5,x2:cx+18,y2:y-5,class:"s-"+cls,"stroke-width":2.2},s);
+  const tx=el("text",{x:cx+24,y,class:tcls+" t-small"},s,name);cx+=24+name.length*7.4+22})};
+
+/* the race: context accumulated turn by turn */
+function race(){const id="f-race",W=widthOf(id),narrow=W<640;
+ const L=narrow?40:70,R=narrow?76:150,T=narrow?40:24,B=T+(narrow?300:416),H=B+48;
+ const tot=r=>r.ctx.reduce((a,b)=>a+b,0),maxT=Math.max(...TURNS.map(s=>s.ctx.length)),maxY=Math.ceil(Math.max(...TURNS.map(tot))/1e6+0.2)*1e6,X=i=>L+i/maxT*(W-L-R),Y=v=>B-v/maxY*(B-T);
+ const yt=[];for(let v=0;v<=maxY;v+=(maxY>6e6?2e6:1e6))yt.push(v);
+ const s=svg(id,W,H);
+ yt.forEach(v=>el("text",{x:L-10,y:Y(v)+5,"text-anchor":"end",class:"t-soft t-small"},s,v?(v/1e6)+"M":"0"));
+ el("line",{x1:L-3,y1:Y(0),x2:L-3,y2:Y(yt[yt.length-1]),class:"s-rule"},s);el("line",{x1:L-3,y1:Y(0),x2:X(maxT),y2:Y(0),class:"s-rule"},s);
+ for(let v=0;v<=maxT;v+=10)el("text",{x:X(v),y:B+22,"text-anchor":"middle",class:"t-soft t-small"},s,v);
+ el("text",{x:X(maxT),y:B+42,"text-anchor":"end",class:"t-soft t-it t-small"},s,"turns, fewer is better");
+ if(narrow)el("text",{x:L-3,y:T-8,class:"t-soft t-it t-small"},s,"tokens sent to the model so far");
+ else el("text",{x:16,y:(T+B)/2,transform:`rotate(-90 16 ${(T+B)/2})`,"text-anchor":"middle",class:"t-soft t-it t-small"},s,"tokens sent to the model so far");
+ const ends={P:[],KC:[]};
+ [...TURNS.filter(r=>r.arm=="P"),...TURNS.filter(r=>r.arm=="KC")].forEach(r=>{let c=0,d=`M${X(0)} ${Y(0)}`;
+   r.ctx.forEach((v,i)=>{c+=v;d+=`L${X(i+1)} ${Y(c)}`});const A=ARM[r.arm];
+   el("path",{d,fill:"none",class:"s-"+A.cls,"stroke-width":r.arm=="KC"?2.2:1.5,"stroke-linejoin":"round"},s);
+   el("circle",{cx:X(r.ctx.length),cy:Y(c),r:3,class:"f-"+A.cls},s);ends[r.arm].push({x:X(r.ctx.length),y:Y(c),c,lab:"ABCDE".indexOf(r.scenario)+1})});
+ const label=(list,cls)=>{list.sort((a,b)=>a.y-b.y);let last=-99;list.forEach(e=>{const y=Math.max(e.y+5,last+16);last=y;
+   el("text",{x:e.x+8,y,class:cls+" t-small"},s,`${e.lab} · ${(e.c/1e6).toFixed(2)}M`)})};
+ if(narrow){const sum=(list,cls,dx,dy)=>{const top=list.reduce((a,b)=>a.y<b.y?a:b),lo=Math.min(...list.map(e=>e.c)),hi=Math.max(...list.map(e=>e.c));
+     el("text",{x:top.x+dx,y:top.y+dy,class:cls+" t-small","text-anchor":"end"},s,`${(lo/1e6).toFixed(1)}–${(hi/1e6).toFixed(1)}M`)};
+   sum(ends.KC,"t-acc",-4,-8);sum(ends.P,"t-py",-6,-8);
+   key(s,L,16,[["Brass","acc","t-acc"],["Python","py","t-py"]])}
+ else{label(ends.P,"t-py");label(ends.KC,"t-acc");
+      const span=a=>{const n=TURNS.filter(r=>r.arm==a).map(r=>r.ctx.length);return `${Math.min(...n)} to ${Math.max(...n)} turns`};
+      el("text",{x:X(5.5),y:Y(1.05e6),class:"t-acc t-big t-it"},s,"Brass");
+      el("text",{x:X(maxT*0.45),y:Y(maxY*0.12),class:"t-py t-big t-it"},s,"Python")}}
+
+/* one scenario, mirrored */
+function mirror(){const id="f-mirror",W=widthOf(id),narrow=W<640;
+ const pair=["KC","P"].map(a=>TURNS.find(r=>r.arm==a&&r.scenario=="D"));
+ const L=narrow?4:40,R=narrow?4:20,band=narrow?110:150,gap=narrow?40:58,T=narrow?26:34,maxT=Math.max(...pair.map(r=>r.ctx.length)),cw=(W-L-R)/maxT;
+ const maxC=Math.max(...pair.flatMap(r=>r.ctx)),up=(band-18)/maxC,dn=up*3,H=T+2*(2*band)+gap+10;
+ const s=svg(id,W,H);
+ pair.forEach((r,pi)=>{const A=ARM[r.arm],top=T+pi*(2*band+gap),mid=top+band;
+   el("text",{x:L,y:top-8,class:A.t+" t-big t-it"},s,`${A.name}, cash-advance session 4 — ${r.ctx.length} turns`);
+   el("line",{x1:L,y1:mid,x2:W-R,y2:mid,class:"s-rule"},s);el("line",{x1:L,y1:top,x2:L,y2:mid+band-8,class:"s-rule"},s);
+   r.ctx.forEach((v,i)=>{const h=v*up;el("rect",{x:L+i*cw+.5,y:mid-h,width:Math.max(cw-1.5,1.2),height:h,class:"f-rule"},s)});
+   r.out.forEach((v,i)=>{const h=Math.min(v*dn,band-8);el("rect",{x:L+i*cw+.5,y:mid+1,width:Math.max(cw-1.5,1.2),height:h,class:"f-"+A.cls},s)});
+   el("text",{x:W-R,y:mid-6,"text-anchor":"end",class:"t-soft t-small t-it"},s,"context sent ↑");
+   const ar=el("text",{x:W-R,y:mid+18,"text-anchor":"end",class:"t-soft t-small t-it"},s," ↓"),ox=W-R-(ar.getComputedTextLength()||9);el("text",{x:ox,y:mid+18,"text-anchor":"end",class:"t-soft t-small t-it"},s,"output");el("text",{x:ox,y:mid+32,"text-anchor":"end",class:"t-soft t-small t-it"},s,"(drawn 3× taller)");
+   const big=r.out.indexOf(Math.max(...r.out)),bx=L+big*cw+cw+4,by=mid+Math.min(r.out[big]*dn,band-8);
+   el("text",{x:bx,y:by-2,class:A.t+" t-small"},s,`${(r.out[big]/1e3).toFixed(1)}k`);
+   const mc=r.ctx.indexOf(Math.max(...r.ctx));
+   el("text",{x:Math.min(L+mc*cw+cw/2,W-R-16),y:mid-r.ctx[mc]*up-5,"text-anchor":"middle",class:"t-soft t-small"},s,`${Math.round(r.ctx[mc]/1e3)}k`)})}
+
+/* slopegraph */
+function slope(){const id="f-slope",W=widthOf(id),narrow=W<640;
+ const T=narrow?40:50,B=T+(narrow?300:350),H=B+34,x0=narrow?70:W*0.33,x1=narrow?W-150:W*0.62;
+ const pick=(arm,sz)=>DATA.filter(r=>r.task=="C"&&r.arm==arm&&r.size==sz).map(r=>r.ctx);
+ const vals={};["P","K","KC"].forEach(a=>vals[a]=[mean(pick(a,"small")),mean(pick(a,"grown"))]);
+ const all=Object.values(vals).flat(),lo=Math.floor(Math.min(...all)/5e5)*5e5,hi=Math.ceil(Math.max(...all)/5e5)*5e5,Y=v=>B-(v-lo)/(hi-lo)*(B-T);
+ const s=svg(id,W,H);
+ el("text",{x:x0,y:T-22,"text-anchor":"middle",class:"t-soft t-it t-small"},s,"small codebase");
+ el("text",{x:x1,y:T-22,"text-anchor":"middle",class:"t-soft t-it t-small"},s,"larger codebase");
+ ["K","P","KC"].forEach(a=>{const [v0,v1]=vals[a],A=ARM[a],g=Math.round((v1/v0-1)*100);
+   el("line",{x1:x0,y1:Y(v0),x2:x1,y2:Y(v1),class:"s-"+A.cls,"stroke-width":a=="KC"?2.2:1.5},s);
+   el("circle",{cx:x0,cy:Y(v0),r:3,class:"f-"+A.cls},s);el("circle",{cx:x1,cy:Y(v1),r:3,class:"f-"+A.cls},s);
+   el("text",{x:x0-10,y:Y(v0)+5,"text-anchor":"end",class:A.t},s,narrow?fmtM(v0):`${A.short||A.name}  ${fmtM(v0)}`);
+   if(narrow){el("text",{x:x1+10,y:Y(v1)-2,class:A.t+" t-small"},s,A.short||A.name);el("text",{x:x1+10,y:Y(v1)+15,class:A.t},s,`${fmtM(v1)} +${g}%`)}
+   else el("text",{x:x1+10,y:Y(v1)+5,class:A.t},s,`${fmtM(v1)}  +${g}%`)});
+}
+
+/* every session, four measures */
+function grid(){const id="f-grid",W=widthOf(id),per=W>=1000?4:W>=640?2:1;
+ const groups=[["C","small","Cash advances, small"],["C","grown","Cash advances, larger"],["D","grown","Trip plans"]];
+ const top=(k,step)=>Math.ceil(Math.max(...DATA.map(r=>r[k]))/step)*step;
+ const mx=k=>Math.max(...DATA.map(r=>r[k]))*1.02;
+ const cols=[["ctx","Context read","millions of tokens",v=>(v/1e6).toFixed(1)+"M",0,Math.max(8e6,mx("ctx")),[0,4e6,8e6],v=>v?(v/1e6)+"M":"0"],["calls","Model calls","round trips",v=>Math.round(v),0,Math.max(80,mx("calls")),[0,40,80],v=>String(v)],["think","Hidden reasoning","thousands of tokens",v=>v<10e3?(v/1e3).toFixed(1)+"k":Math.round(v/1e3)+"k",0,Math.max(100e3,mx("think")),[0,50e3,100e3],v=>v?(v/1e3)+"k":"0"],["cost","Cost","dollars per session",v=>"$"+v.toFixed(2),0,Math.max(3,mx("cost")),[0,1.5,3],v=>v?"$"+v.toFixed(2):"$0"]];
+ const L=124,gapC=28,rowH=22,head=22,gapG=18,T=80,colW=(W-L-(per-1)*gapC)/per-4;
+ const lines=[];groups.forEach(([t,sz,label])=>{lines.push({head:label});["P","K","KC"].forEach(a=>{const v=DATA.filter(r=>r.task==t&&r.size==sz&&r.arm==a);if(v.length)lines.push({arm:a,v})})});
+ let y=0;lines.forEach(l=>{if(l.head){y+=l===lines[0]?0:gapG;l.y=y;y+=head}else{l.y=y;y+=rowH}});const panelH=T+y+12;
+ const GAP=per<4?64:0,nRows=Math.ceil(cols.length/per),H=nRows*panelH+(nRows-1)*GAP;
+ const s=svg(id,W,H);
+ cols.forEach(([k,label,unit,fmt,lo,hi,ticks,tf],ci)=>{const pr=Math.floor(ci/per),pc=ci%per,oy=pr*(panelH+GAP),x0=L+pc*(colW+gapC),X=v=>x0+(v-lo)/(hi-lo)*(colW-62);
+   if(pr>0&&pc==0)el("line",{x1:0,y1:oy-GAP/2,x2:W,y2:oy-GAP/2,class:"s-rule","stroke-width":1},s);
+    if(pc==0){const gr=[];lines.forEach(l=>{if(l.head)gr.push({y0:l.y,y1:l.y+head});else gr[gr.length-1].y1=l.y+rowH});
+      gr.forEach((g,gi)=>{if(gi%2==0)el("rect",{x:0,y:oy+T+g.y0+1,width:W,height:g.y1-g.y0+1,class:"f-faint","fill-opacity":.32},s);
+        el("line",{x1:0,y1:oy+T+g.y0+head+1,x2:W,y2:oy+T+g.y0+head+1,class:"s-rule","stroke-width":.6},s)})}
+   el("text",{x:x0,y:oy+T-58,class:"t-head"},s,label);
+   el("text",{x:x0,y:oy+T-42,class:"t-soft t-xs t-it"},s,unit+", more →");
+   el("text",{x:x0+colW-4,y:oy+T-15,"text-anchor":"end",class:"t-soft t-xs t-it"},s,"avg");
+   if(pc==0||per==1)lines.forEach(l=>{if(l.head)el("text",{x:0,y:oy+T+l.y+head-6,class:"t-soft t-it t-small"},s,l.head);
+     else el("text",{x:L-12,y:oy+T+l.y+rowH/2+5,"text-anchor":"end",class:ARM[l.arm].t+" t-small"},s,ARM[l.arm].short||ARM[l.arm].name)});
+   lines.forEach(l=>{if(l.head)return;const A=ARM[l.arm],cy=oy+T+l.y+rowH/2;
+     el("line",{x1:x0,y1:cy,x2:x0+colW-62,y2:cy,class:"s-rule","stroke-width":.6,"stroke-dasharray":"1 3"},s);
+     l.v.forEach(x=>el("circle",{cx:X(x[k]),cy,r:3,class:"f-"+A.cls},s));
+     const m=mean(l.v.map(x=>x[k]));el("line",{x1:X(m),y1:cy-7,x2:X(m),y2:cy+7,class:"s-"+A.cls,"stroke-width":1.8},s);
+     el("text",{x:x0+colW-4,y:cy+5,"text-anchor":"end",class:A.t+" t-small"},s,fmt(m))});
+   const ay=oy+T-8;el("line",{x1:x0,y1:ay,x2:x0+colW-62,y2:ay,class:"s-rule"},s);let g0=null,g1=0;const seg=()=>{if(g0!=null)el("line",{x1:x0,y1:oy+T+g0,x2:x0,y2:oy+T+g1,class:"s-rule"},s)};lines.forEach(l=>{if(l.head){seg();g0=l.y+head+1;}else g1=l.y+rowH});seg();
+   ticks.forEach((t,i)=>{el("line",{x1:X(t),y1:ay,x2:X(t),y2:ay+3,class:"s-rule"},s);el("text",{x:X(t),y:ay-7,"text-anchor":i==0?"start":"middle",class:"t-soft t-small"},s,tf(t))})})}
+
+/* read, then one patch */
+function strips(){const id="f-strips",W=widthOf(id),narrow=W<640;
+ const KIND={ifc:"ifc",body:"body",read:"read",search:"search",edit:"edit",apply:"apply",check:"check",run:"run",stage:"other",other:"other"};
+ const kind=k=>KIND[k]||"other",fill=new Proxy({},{get:(_,k)=>"k-"+k});
+ const pick=arm=>SEQ.filter(r=>r.arm==arm&&r.task.startsWith("C")).slice(0,5);
+ const kc=pick("KC"),py=pick("P"),maxN=Math.max(...[...kc,...py].map(r=>r.seq.length));
+ const L=narrow?22:100,R=narrow?30:44,rowH=narrow?16:21,gap=34,T=44,cw=(W-L-R)/maxN,H=T+10*rowH+gap+30;
+ const s=svg(id,W,H);let y=T;
+ const block=(sessions,title,tcls,first,label)=>{const tt=el("text",{x:L,y:y-10,class:tcls+" t-it"},s,title);const titleEnd=L+(tt.getComputedTextLength?tt.getComputedTextLength():title.length*9)+18;
+   sessions.forEach((r,i)=>{el("text",{x:L-8,y:y+rowH-4,"text-anchor":"end",class:"t-soft t-small"},s,(narrow?"":"Session ")+(i+1));
+     r.seq.forEach((k,j)=>el("rect",{x:L+j*cw,y:y+1,width:Math.max(cw-1,1),height:rowH-3,class:fill[kind(k)]},s));
+     el("text",{x:L+r.seq.length*cw+5,y:y+rowH-4,class:"t-soft t-small"},s,r.seq.length);
+     if(i==0){const a=r.seq.findIndex(k=>k.startsWith(first));if(a>=0){const ax=L+a*cw+cw/2,lx=Math.max(ax+14,titleEnd);
+       el("line",{x1:ax,y1:y-1,x2:lx-4,y2:y-12,class:"s-soft","stroke-width":1},s);el("text",{x:lx,y:y-10,class:"t-soft t-small t-it"},s,label)}}
+     y+=rowH})};
+ block(kc,"Brass","t-acc","apply","first apply");y+=gap;block(py,"Python","t-py","edit","first edit");
+ el("text",{x:L,y:H-6,class:"t-soft t-small t-it"},s,"tool actions, in order; the number is the session's total")}
+
+/* where the dollars go */
+function dollars(){const id="f-dollars",W=widthOf(id),per=W>=760?3:1;
+ const comp=[["cr","cache reads",.20,"per million tokens"],["cw","cache writes",4.0,"per million tokens"],["out","output",10.0,"per million tokens"]];
+ const arms=["P","K","KC"],v=a=>DATA.filter(r=>r.task=="C"&&r.arm==a);
+ const L=104,gap=30,rowH=34,T=46,colW=(W-L-(per-1)*gap)/per,panelH=T+arms.length*rowH+16,H=Math.ceil(comp.length/per)*panelH;
+ const s=svg(id,W,H);
+ comp.forEach(([k,label,price,unit],ci)=>{const pr=Math.floor(ci/per),pc=ci%per,oy=pr*panelH,x0=L+pc*(colW+gap),X=d=>x0+d/1.0*(colW-60);
+   const tt=el("text",{x:x0,y:oy+T-18,class:"t-head"},s,label);const tw=tt.getComputedTextLength?tt.getComputedTextLength():label.length*9;
+    el("line",{x1:x0+tw+11,y1:oy+T-30,x2:x0+tw+11,y2:oy+T-17,class:"s-rule"},s);
+    el("text",{x:x0+tw+22,y:oy+T-19,class:"t-soft t-xs t-it"},s,"$"+price.toFixed(2)+" "+unit);
+   el("line",{x1:x0,y1:oy+T-6,x2:x0,y2:oy+T+arms.length*rowH-6,class:"s-rule"},s);
+   arms.forEach((a,i)=>{const A=ARM[a],d=mean(v(a).map(r=>r[k]))*price/1e6,cy=oy+T+i*rowH+rowH/2-6;
+     if(pc==0||per==1)el("text",{x:L-12,y:cy+5,"text-anchor":"end",class:A.t+" t-small"},s,A.short||A.name);
+     el("line",{x1:x0,y1:cy,x2:X(d),y2:cy,class:"s-"+A.cls,"stroke-width":6},s);
+     el("text",{x:X(d)+6,y:cy+5,class:A.t+" t-small"},s,"$"+d.toFixed(2))});
+   0})}
+
+/* the reasoning step */
+function step(){const id="f-step",W=widthOf(id),narrow=W<640;
+ const tasks=[["C","small",narrow?["Cash adv.","small"]:"Cash advances, small"],["C","grown",narrow?["Cash adv.","larger"]:"Cash advances, larger"],["D","grown",narrow?["Trip","plans"]:"Trip plans"]];
+ const L=50,R=narrow?104:210,T=20,B=T+(narrow?280:360),H=B+40,X=i=>L+(narrow?34:60)+i*(W-L-R-(narrow?68:120))/(tasks.length-1),Y=v=>B-v/100e3*(B-T);
+ const s=svg(id,W,H);
+ [0,25e3,50e3,75e3,100e3].forEach(t=>el("text",{x:L-10,y:Y(t)+5,"text-anchor":"end",class:"t-soft t-small"},s,t?Math.round(t/1e3)+"k":"0"));
+ el("line",{x1:L,y1:Y(0),x2:L,y2:Y(100e3),class:"s-rule"},s);el("line",{x1:L,y1:Y(0),x2:X(tasks.length-1)+60,y2:Y(0),class:"s-rule"},s);
+ tasks.forEach(([t,sz,lab],i)=>{if(!Array.isArray(lab))return el("text",{x:X(i),y:H-10,"text-anchor":"middle",class:"t-soft t-small"},s,lab);lab.forEach((l,j)=>el("text",{x:X(i),y:H-22+j*14,"text-anchor":"middle",class:"t-soft t-small"},s,l))});
+ ["K","P","KC"].forEach(a=>{const A=ARM[a],pts=tasks.map(([t,sz],i)=>{const v=DATA.filter(r=>r.task==t&&r.size==sz&&r.arm==a);return v.length?[X(i),Y(mean(v.map(r=>r.think)))]:null});
+   let d="",pen=false;pts.forEach(p=>{if(!p){pen=false;return}d+=(pen?"L":"M")+p[0]+" "+p[1];pen=true});
+   el("path",{d,fill:"none",class:"s-"+A.cls,"stroke-width":a=="KC"?2.2:1.5},s);
+   pts.forEach(p=>p&&el("circle",{cx:p[0],cy:p[1],r:3,class:"f-"+A.cls},s));
+   const last=pts.filter(Boolean).pop();el("text",{x:last[0]+10,y:last[1]+5,class:A.t+" t-small"},s,A.short||A.name)})}
+
+/* cost against lines changed, range frame */
+function scatter(){const id="f-scatter",W=widthOf(id),narrow=W<640;
+ const L=70,R=narrow?96:150,T=20,B=T+(narrow?290:360),H=B+50,v=DATA,xs=v.map(r=>r.change),ys=v.map(r=>r.cost);
+ const XM=Math.ceil(Math.max(...xs)/50)*50,YM=Math.ceil(Math.max(...ys)*2)/2,X=x=>L+x/XM*(W-L-R),Y=y=>B-y/YM*(B-T);
+ const s=svg(id,W,H);
+ const mnx=Math.min(...xs),mxx=Math.max(...xs),mny=Math.min(...ys),mxy=Math.max(...ys);
+ el("line",{x1:L,y1:B,x2:X(XM),y2:B,class:"s-rule"},s);
+ el("line",{x1:L,y1:B,x2:L,y2:Y(YM),class:"s-rule"},s);
+ for(let t=0;t<=XM;t+=100)el("text",{x:X(t),y:B+22,"text-anchor":"middle",class:"t-soft t-small"},s,t);
+ for(let t=0;t<=YM;t+=1)el("text",{x:L-10,y:Y(t)+5,"text-anchor":"end",class:"t-soft t-small"},s,"$"+t.toFixed(2));
+ el("text",{x:X(XM),y:B+42,"text-anchor":"end",class:"t-soft t-it t-small"},s,"lines changed");
+ ["P","K","KC"].forEach(a=>{const A=ARM[a],pts=v.filter(r=>r.arm==a);
+   pts.forEach(r=>el("circle",{cx:X(r.change),cy:Y(r.cost),r:r.task=="D"?3.6:3,class:r.task=="D"?"f-paper s-"+A.cls:"f-"+A.cls,"stroke-width":1.4},s));
+   const byTask={};pts.forEach(r=>(byTask[r.task]=byTask[r.task]||[]).push(r));
+   Object.values(byTask).forEach(g=>{const m=mean(g.map(r=>r.cost)),x=X(g[0].change),dy={P:-14,K:0,KC:14}[a];el("line",{x1:x-9,y1:Y(m),x2:x+9,y2:Y(m),class:"s-"+A.cls,"stroke-width":1.8},s);
+     el("text",{x:x+13,y:Y(m)+5+dy,class:A.t+" t-small"},s,`${A.short||A.name} $${m.toFixed(2)}`)});return;
+   const mx=mean(sm.map(p=>p[0])),my=mean(sm.map(p=>p[1])),b=sm.reduce((t,p)=>t+(p[0]-mx)*(p[1]-my),0)/sm.reduce((t,p)=>t+(p[0]-mx)**2,0),a0=my-b*mx;
+   const xa=Math.min(...sm.map(p=>p[0])),xb=Math.max(...sm.map(p=>p[0]));
+   el("line",{x1:X(xa),y1:Y(a0+b*xa),x2:X(xb),y2:Y(a0+b*xb),class:"s-"+A.cls,"stroke-width":a=="KC"?2.2:1.5},s);
+   el("text",{x:X(xb)+10,y:Y(a0+b*xb)+5+(a=="KC"?12:a=="K"?-8:0),class:A.t+" t-small"},s,A.short||A.name)})}
+
+/* the numbers */
+function table(){const g={};DATA.forEach(r=>{const k=[r.task,r.size,r.arm].join("|");(g[k]=g[k]||[]).push(r)});
+ const order=[["C","small"],["C","grown"],["D","grown"]];
+ const name={C:"Cash advances",D:"Trip plans"},sizeName={small:"small",grown:"larger"};
+ let h="<thead><tr><th>Task</th><th>Codebase</th><th>Setup</th><th>Sessions</th><th>Tests passed</th><th>Calls</th><th>Context</th><th>Reasoning</th><th>Reference lines changed</th><th>Cost</th></tr></thead><tbody>";
+ order.forEach(([t,sz],gi)=>{["P","K","KC"].forEach((a,ai)=>{const v=g[[t,sz,a].join("|")];if(!v)return;
+   const held=v.reduce((s,r)=>s+(r.held||0),0),tot=v.reduce((s,r)=>s+(r.total||0),0);
+   h+=`<tr class="${ai==0&&gi>0?"gap":""}"><td>${ai==0?name[t]:""}</td><td>${sizeName[sz]}, ${v[0].lines.toLocaleString("en-US")} lines</td><td style="color:var(--${{P:"py",K:"keel-t",KC:"acc"}[a]})">${ARM[a].name}</td><td>${v.length}</td><td>${held} of ${tot}</td><td>${Math.round(mean(v.map(r=>r.calls)))}</td><td>${fmtM(mean(v.map(r=>r.ctx)))}</td><td>${(mean(v.map(r=>r.think))/1e3).toFixed(1)}k</td><td>${v[0].change}</td><td>$${mean(v.map(r=>r.cost)).toFixed(2)}</td></tr>`})});
+ document.getElementById("tbl").innerHTML=h+"</tbody>"}
+
+function drawAll(){[race,mirror,slope,grid,strips,dollars,step,scatter].forEach(f=>{try{f()}catch(e){console.error(f.name,e)}});
+ document.querySelectorAll('figure[id^="f-"] svg').forEach(sv=>sv.querySelectorAll("text").forEach(t=>sv.appendChild(t)))}
+drawAll();table();
+let lastW=window.innerWidth,timer=null;
+window.addEventListener("resize",()=>{clearTimeout(timer);timer=setTimeout(()=>{if(Math.abs(window.innerWidth-lastW)>20){lastW=window.innerWidth;drawAll()}},150)});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(drawAll);
+})();
+</script>
+</body>
+</html>

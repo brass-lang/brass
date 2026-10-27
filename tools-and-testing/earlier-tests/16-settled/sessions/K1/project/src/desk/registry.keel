@@ -1,0 +1,38 @@
+# desk/registry.keel
+module desk.registry
+import desk.ids as ids
+import desk.records as records
+
+interface
+  access Registry
+    allow vendor(id: records.VendorId) -> Outcome<records.Vendor>
+      after result.id == id
+    allow po(id: records.PoId) -> Outcome<records.PurchaseOrder>
+      after result.id == id
+    allow pos_for(department: ids.DepartmentId, period: ids.Period) -> Outcome<records.POs>
+    allow txn(id: records.TxnId) -> Outcome<records.CardTxn>
+      after result.id == id
+    allow txns_for(period: ids.Period) -> Outcome<records.Txns>
+    allow delegation(id: records.DelegationId) -> Outcome<records.Delegation>
+      after result.id == id
+    allow delegations_from(badge: ids.Badge) -> Outcome<records.Delegations>
+    allow cost_center(id: records.CostCenterId) -> Outcome<records.CostCenter>
+      after result.id == id
+    allow departments_of(cost_center: records.CostCenterId) -> Outcome<records.DeptIds>
+    allow entity(id: records.EntityId) -> Outcome<records.Entity>
+      after result.id == id
+    allow allowance(department: ids.DepartmentId, period: ids.Period) -> Outcome<ids.Money>
+    allow pos_of_vendor(vendor: records.VendorId) -> Outcome<records.POs>
+    allow card_limit(badge: ids.Badge) -> Outcome<records.CardLimit>
+      after result.badge == badge
+    allow departments() -> Outcome<records.DeptIds>
+    allow exception(id: records.ExceptionId) -> Outcome<records.PolicyException>
+      after result.id == id
+    allow exceptions_for(report: ids.ReportId) -> Outcome<records.Exceptions>
+    allow save_exception(e: records.PolicyException) -> Outcome<Done>
+    allow save_po(po: records.PurchaseOrder) -> Outcome<Done>
+    allow save_vendor(v: records.Vendor) -> Outcome<Done>
+    allow save_card_limit(l: records.CardLimit) -> Outcome<Done>
+    allow save_txn(t: records.CardTxn) -> Outcome<Done>
+    allow save_delegation(d: records.Delegation) -> Outcome<Done>
+body

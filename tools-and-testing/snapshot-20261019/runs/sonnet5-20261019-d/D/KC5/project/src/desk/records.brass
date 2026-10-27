@@ -1,0 +1,142 @@
+# desk/records.brass
+module desk.records
+import desk.ids as ids
+import desk.reports as reports
+
+interface
+  type VendorId     = Text
+  type PoId         = Text
+  type TxnId        = Text
+  type DelegationId = Text
+  type CostCenterId = Text
+  type EntityId     = Text
+  type Region       = Island | Mainland | Offsite
+  type Vehicle      = Car | Truck | Boat
+  type Amount       = Int where it in 1 to 1000000000
+
+  machine PoStatus
+    states  Requested, Approved, Rejected, Received, Closed
+    initial Requested
+    Requested enters Approved | Rejected
+    Approved  enters Received
+    Received  enters Closed
+
+  machine CardStatus
+    states  Open, Matched, Disputed
+    initial Open
+    Open     enters Matched | Disputed
+    Disputed enters Open
+
+  type Vendor        = { id: VendorId, name: Text, active: Bool }
+  type PurchaseOrder = { id: PoId, vendor: VendorId, requested_by: ids.Badge, department: ids.DepartmentId, period: ids.Period, amount: Amount, status: PoStatus, approvals: reports.Approvals, received: ids.Money }
+  type POs           = Array<PurchaseOrder> where it.length in 0 to 1000
+  type PoRequested   = PurchaseOrder where it.status in {PoStatus.Requested}
+  type PoApproved    = PurchaseOrder where it.status in {PoStatus.Approved}
+  type PoReceived    = PurchaseOrder where it.status in {PoStatus.Received}
+
+  type CardTxn  = { id: TxnId, badge: ids.Badge, period: ids.Period, amount: Amount, category: ids.Category, merchant: ids.Description, status: CardStatus, matched: Maybe<ids.ReportId> }
+  type Txns     = Array<CardTxn> where it.length in 0 to 1000
+  type OpenTxn  = CardTxn where it.status in {CardStatus.Open}
+
+  type Delegation  = { id: DelegationId, delegator: ids.Badge, delegate: ids.Badge, first: ids.Period, last: ids.Period, revoked: Bool }
+  type Delegations = Array<Delegation> where it.length in 0 to 100
+
+  type CostCenter = { id: CostCenterId, entity: EntityId, name: Text }
+  type Entity     = { id: EntityId, name: Text }
+  type DeptIds    = Array<ids.DepartmentId> where it.length in 0 to 50
+  type CardLimit  = { badge: ids.Badge, limit: ids.Money }
+  type ExceptionId = Text
+
+  machine ExceptionStatus
+    states  Pending, Granted, Denied
+    initial Pending
+    Pending enters Granted | Denied
+
+  type PolicyException = { id: ExceptionId, report: ids.ReportId, position: Int, badge: ids.Badge, reason: ids.Reason, status: ExceptionStatus, decided_by: Maybe<ids.Badge> }
+  type Exceptions      = Array<PolicyException> where it.length in 0 to 50
+  type PendingException = PolicyException where it.status in {ExceptionStatus.Pending}
+  type Badges     = Array<ids.Badge> where it.length in 0 to 1000
+
+  machine TripStatus
+    states  Requested, Approved, Reconciled, Closed
+    initial Requested
+    Requested enters Approved | Closed
+    Approved  enters Requested | Reconciled | Closed
+
+  type TripReconciliation = { committed: Int, actual: Int, report: ids.ReportId, counted: Array<TxnId> where it.length in 0 to 1000 }
+  type Trip  = { id: ids.ReportId, badge: ids.Badge, department: ids.DepartmentId, period: ids.Period,
+                 region: Region, days: Int, vehicle: Vehicle, km: Int, committed: Int,
+                 approvals: reports.Approvals, status: TripStatus,
+                 reconciliation: TripReconciliation when it.status in {TripStatus.Reconciled} }
+  type Trips = Array<Trip> where it.length in 0 to 1000
+  type TripRequested  = Trip where it.status in {TripStatus.Requested}
+  type TripApproved   = Trip where it.status in {TripStatus.Approved}
+  type TripReconciled = Trip where it.status in {TripStatus.Reconciled}
+
+  fn commitments(pos: POs) -> Int
+    after result >= 0
+  fn in_force(d: Delegation, period: ids.Period) -> Bool
+    example in_force({ id: "d", delegator: "a", delegate: "b", first: 2, last: 4, revoked: false }, 4) == true
+    example in_force({ id: "d", delegator: "a", delegate: "b", first: 2, last: 4, revoked: true }, 3) == false
+  fn per_diem_rate(r: Region) -> Int
+    example per_diem_rate(Region.Offsite) == 12000
+  fn mileage_rate(v: Vehicle) -> Int
+    example mileage_rate(Vehicle.Boat) == 250
+
+  fn add_po_approval(po: PoRequested, who: ids.Badge) -> PurchaseOrder
+    before po.approvals.length < 2
+  fn approve_po(po: PoRequested) -> PurchaseOrder
+  fn reject_po(po: PoRequested) -> PurchaseOrder
+  fn receive_po(po: PoApproved, received: ids.Money) -> PurchaseOrder
+  fn close_po(po: PoReceived) -> PurchaseOrder
+  fn decide(e: PendingException, grant: Bool, by: ids.Badge) -> PolicyException
+  fn match_txn(t: OpenTxn, report: ids.ReportId) -> CardTxn
+  fn dispute_txn(t: OpenTxn) -> CardTxn
+
+  fn trip_price(region: Region, days: Int, vehicle: Vehicle, km: Int) -> Int
+    example trip_price(Region.Island, 2, Vehicle.Car, 0) == 18000
+    example trip_price(Region.Mainland, 0, Vehicle.Truck, 100) == 9000
+  fn add_trip_approval(t: TripRequested, who: ids.Badge) -> Trip
+    before t.approvals.length < 2
+  fn approve_trip(t: TripRequested) -> Trip
+  fn amend_trip_requested(t: TripRequested, region: Region, days: Int, vehicle: Vehicle, km: Int, committed: Int) -> Trip
+  fn amend_trip_approved(t: TripApproved, region: Region, days: Int, vehicle: Vehicle, km: Int, committed: Int) -> Trip
+  fn close_trip_requested(t: TripRequested) -> Trip
+  fn close_trip_approved(t: TripApproved) -> Trip
+  fn reconcile_trip(t: TripApproved, r: TripReconciliation) -> Trip
+  fn reconcile_trip_again(t: TripReconciled, r: TripReconciliation) -> Trip
+body
+  fn commitments(pos) =
+    let sum: Int = 0
+    for p in pos
+      if p.status in {PoStatus.Approved} then sum = sum + p.amount
+      else if p.status in {PoStatus.Received, PoStatus.Closed} then sum = sum + p.received
+    sum
+
+  fn in_force(d, period) = not d.revoked and d.first <= period and period <= d.last
+
+  fn per_diem_rate(r) = if r in {Region.Island} then 9000 else if r in {Region.Mainland} then 6000 else 12000
+
+  fn mileage_rate(v) = if v in {Vehicle.Car} then 60 else if v in {Vehicle.Truck} then 90 else 250
+
+  fn add_po_approval(po, who) = po with { approvals: po.approvals ++ [who] }
+  fn approve_po(po)           = po with { status enters PoStatus.Approved }
+  fn reject_po(po)            = po with { status enters PoStatus.Rejected }
+  fn receive_po(po, received) = po with { status enters PoStatus.Received, received: received }
+  fn close_po(po)             = po with { status enters PoStatus.Closed }
+  fn decide(e, grant, by)     = if grant then e with { status enters ExceptionStatus.Granted, decided_by: by } else e with { status enters ExceptionStatus.Denied, decided_by: by }
+  fn match_txn(t, report)     = t with { status enters CardStatus.Matched, matched: report }
+  fn dispute_txn(t)           = t with { status enters CardStatus.Disputed }
+
+  fn trip_price(region, days, vehicle, km) = per_diem_rate(region) * days + mileage_rate(vehicle) * km
+
+  fn add_trip_approval(t, who) = t with { approvals: t.approvals ++ [who] }
+  fn approve_trip(t) = t with { status enters TripStatus.Approved }
+  fn amend_trip_requested(t, region, days, vehicle, km, committed) =
+    t with { region: region, days: days, vehicle: vehicle, km: km, committed: committed, approvals: [] }
+  fn amend_trip_approved(t, region, days, vehicle, km, committed) =
+    t with { status enters TripStatus.Requested, region: region, days: days, vehicle: vehicle, km: km, committed: committed, approvals: [] }
+  fn close_trip_requested(t) = t with { status enters TripStatus.Closed }
+  fn close_trip_approved(t)  = t with { status enters TripStatus.Closed }
+  fn reconcile_trip(t, r)       = t with { status enters TripStatus.Reconciled, reconciliation: r }
+  fn reconcile_trip_again(t, r) = t with { reconciliation: r }

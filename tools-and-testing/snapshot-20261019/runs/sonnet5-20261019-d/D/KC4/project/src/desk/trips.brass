@@ -1,0 +1,58 @@
+# desk/trips.brass
+module desk.trips
+import desk.ids as ids
+import desk.records as records
+import desk.reports as reports
+
+interface
+  type Days = Int where it in 0 to 30
+  type Km   = Int where it in 0 to 2000
+
+  machine TripStatus
+    states  Requested, Approved, Reconciled, Closed
+    initial Requested
+    Requested enters Approved | Closed
+    Approved  enters Requested | Reconciled | Closed
+
+  type Plan           = { region: records.Region, days: Days, vehicle: records.Vehicle, km: Km }
+  type TxnIds         = Array<records.TxnId> where it.length in 0 to 1000
+  type Reconciliation = { committed: Int, actual: Int, report: ids.ReportId, txns: TxnIds }
+
+  type Trip  = { id: ids.ReportId, badge: ids.Badge, department: ids.DepartmentId, period: ids.Period, plan: Plan, committed: Int, approvals: reports.Approvals, status: TripStatus,
+      reconciliation: Reconciliation when it.status in {TripStatus.Reconciled} }
+  type Trips = Array<Trip> where it.length in 0 to 1000
+
+  type Requested    = Trip where it.status in {TripStatus.Requested}
+  type Approved     = Trip where it.status in {TripStatus.Approved}
+  type Reconciled   = Trip where it.status in {TripStatus.Reconciled}
+  type Open         = Trip where it.status in {TripStatus.Requested, TripStatus.Approved}
+  type Reconcilable = Trip where it.status in {TripStatus.Approved, TripStatus.Reconciled}
+  type Counted      = Trip where it.status in {TripStatus.Approved}
+
+  fn price(plan: Plan) -> Int
+    after result >= 0
+    example price({ region: records.Region.Mainland, days: 2, vehicle: records.Vehicle.Car, km: 10 }) == 12600
+
+  fn add_approval(t: Requested, who: ids.Badge) -> Trip
+    before t.approvals.length < 2
+  fn approve(t: Requested) -> Trip
+    after result.status in {TripStatus.Approved}
+  fn amend(t: Open, plan: Plan, committed: Int) -> Trip
+    after result.status in {TripStatus.Requested} and result.approvals.length == 0
+  fn reconcile_new(t: Approved, r: Reconciliation) -> Trip
+    after result.status in {TripStatus.Reconciled}
+  fn reconcile_again(t: Reconciled, r: Reconciliation) -> Trip
+    after result.status in {TripStatus.Reconciled}
+  fn close(t: Open) -> Trip
+    after result.status in {TripStatus.Closed}
+body
+  fn price(plan) = records.per_diem_rate(plan.region) * plan.days + records.mileage_rate(plan.vehicle) * plan.km
+
+  fn add_approval(t, who) = t with { approvals: t.approvals ++ [who] }
+  fn approve(t)           = t with { status enters TripStatus.Approved }
+  fn amend(t, plan, committed) =
+    if t is Requested then t with { plan: plan, committed: committed, approvals: [] }
+    else t with { status enters TripStatus.Requested, plan: plan, committed: committed, approvals: [] }
+  fn reconcile_new(t, r)   = t with { status enters TripStatus.Reconciled, reconciliation: r }
+  fn reconcile_again(t, r) = t with { reconciliation: r }
+  fn close(t)              = t with { status enters TripStatus.Closed }

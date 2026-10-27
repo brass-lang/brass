@@ -1,0 +1,42 @@
+# desk/vendors.brass
+module desk.vendors
+import desk.ids as ids
+import desk.staff as staff
+import desk.records as records
+import desk.host as host
+import desk.registry as registry
+
+interface
+  fn onboard_vendor(store: host.Store, reg: registry.Registry, finance_badge: ids.Badge, name: Text) -> Outcome<records.VendorId>
+  fn deactivate_vendor(store: host.Store, reg: registry.Registry, finance_badge: ids.Badge, vendor_id: records.VendorId) -> Outcome<Done>
+  fn vendor_spend(reg: registry.Registry, vendor_id: records.VendorId) -> Outcome<Int>
+body
+  fn onboard_vendor(store, reg, finance_badge, name) =
+    let who: staff.Staff = store.staff(finance_badge)?
+    if who is staff.Finance then
+      if name.length >= 1 and name.length <= 200 then
+        let id: records.VendorId = store.next_id()?
+        reg.save_vendor({ id: id, name: name, active: true })?
+        Ok(id)
+      else Err(FailureCode.InvalidInput, "a vendor name is 1 to 200 characters")
+    else Err(FailureCode.Unauthorized, "only active finance staff may onboard a vendor")
+
+  fn deactivate_vendor(store, reg, finance_badge, vendor_id) =
+    let who: staff.Staff = store.staff(finance_badge)?
+    if who is staff.Finance then
+      let v: records.Vendor = reg.vendor(vendor_id)?
+      if v.active then
+        let pos: records.POs = reg.pos_of_vendor(v.id)?
+        if any p in pos where p.status in {records.PoStatus.Requested, records.PoStatus.Approved} then
+          Err(FailureCode.Conflict, "the vendor has POs still requested or approved")
+        else reg.save_vendor(v with { active: false })
+      else Err(FailureCode.Conflict, "the vendor is already inactive")
+    else Err(FailureCode.Unauthorized, "only active finance staff may deactivate a vendor")
+
+  fn vendor_spend(reg, vendor_id) =
+    let v: records.Vendor = reg.vendor(vendor_id)?
+    let pos: records.POs = reg.pos_of_vendor(v.id)?
+    let sum: Int = 0
+    for p in pos
+      if p.status in {records.PoStatus.Received, records.PoStatus.Closed} then sum = sum + p.received
+    Ok(sum)

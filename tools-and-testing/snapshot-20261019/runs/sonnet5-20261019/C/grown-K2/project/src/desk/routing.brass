@@ -1,0 +1,54 @@
+# desk/routing.brass
+module desk.routing
+import desk.ids as ids
+import desk.staff as staff
+import desk.host as host
+
+interface
+  type Step = Int where it in 1 to 3
+  type ApprovalCount = Int where it in 0 to 2
+
+  fn steps_for(total: Int) -> Step
+    after not (total <= 50000) or result == 1
+    after not (total > 50000 and total <= 500000) or result == 2
+    after not (total > 500000) or result == 3
+    example steps_for(50000) == 1
+    example steps_for(50001) == 2
+    example steps_for(500001) == 3
+
+  fn role_for(step: Step) -> ids.Role
+    example role_for(1) == ids.Role.Supervisor
+    example role_for(3) == ids.Role.Finance
+
+  fn required_for(store: host.Store, submitter: ids.Badge, department: ids.DepartmentId, approvals_so_far: ApprovalCount) -> Outcome<Maybe<ids.Badge>>
+  fn stand_in(store: host.Store, required: ids.Badge) -> Outcome<Maybe<ids.Badge>>
+  fn may_act(store: host.Store, submitter: ids.Badge, department: ids.DepartmentId, approvals_so_far: ApprovalCount, who: staff.Active) -> Outcome<Bool>
+body
+  fn steps_for(total) = if total <= 50000 then 1 else if total <= 500000 then 2 else 3
+
+  fn role_for(step) = if step == 1 then ids.Role.Supervisor else if step == 2 then ids.Role.Director else ids.Role.Finance
+
+  fn required_for(store, submitter, department, approvals_so_far) =
+    let role: ids.Role = role_for(approvals_so_far + 1)
+    if role in {ids.Role.Finance} then Ok(None)
+    else if role in {ids.Role.Supervisor} then
+      let person: staff.Staff = store.staff(submitter)?
+      if person.supervisor != None then stand_in(store, person.supervisor)
+      else Err(FailureCode.Conflict, "the submitter has no supervisor")
+    else
+      let dept: staff.Department = store.department(department)?
+      stand_in(store, dept.director)
+
+  fn stand_in(store, required) =
+    let person: staff.Staff = store.staff(required)?
+    if person.active then Ok(required)
+    else if person.supervisor != None then
+      let up: staff.Staff = store.staff(person.supervisor)?
+      if up.active then Ok(person.supervisor)
+      else Err(FailureCode.Conflict, "no active approver stands in for " ++ required)
+    else Err(FailureCode.Conflict, "no active approver stands in for " ++ required)
+
+  fn may_act(store, submitter, department, approvals_so_far, who) =
+    let required: Maybe<ids.Badge> = required_for(store, submitter, department, approvals_so_far)?
+    if required == None then Ok(who.role in {ids.Role.Finance})
+    else Ok(who.badge == required)

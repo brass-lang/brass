@@ -1,0 +1,52 @@
+# desk/advances.brass
+module desk.advances
+import desk.ids as ids
+import desk.reports as reports
+import desk.records as records
+
+interface
+  type AdvanceId = Text
+
+  machine AdvanceStatus
+    states  Requested, Approved, Paid, Settled
+    initial Requested
+    Requested enters Approved
+    Approved  enters Paid
+    Paid      enters Settled
+
+  type Advance = { id: AdvanceId, badge: ids.Badge, department: ids.DepartmentId, period: ids.Period, amount: records.Amount, status: AdvanceStatus, approvals: reports.Approvals,
+      reference: Text     when it.status in {AdvanceStatus.Paid, AdvanceStatus.Settled},
+      owed:      ids.Money when it.status in {AdvanceStatus.Settled} }
+  type Advances   = Array<Advance> where it.length in 0 to 1000
+  type AdvanceIds = Array<AdvanceId> where it.length in 0 to 1000
+
+  type Requested = Advance where it.status in {AdvanceStatus.Requested}
+  type Approved  = Advance where it.status in {AdvanceStatus.Approved}
+  type Paid      = Advance where it.status in {AdvanceStatus.Paid}
+  type Counted   = Advance where it.status in {AdvanceStatus.Approved, AdvanceStatus.Paid}
+
+  fn add_approval(a: Requested, who: ids.Badge) -> Advance
+    before a.approvals.length < 2
+    after  result.status in {AdvanceStatus.Requested} and result.approvals.length == a.approvals.length + 1
+  fn approve(a: Requested) -> Advance
+    after result.status in {AdvanceStatus.Approved}
+  fn pay(a: Approved, reference: Text) -> Advance
+    after result.status in {AdvanceStatus.Paid}
+  fn settle(a: Paid, report_total: Int) -> Advance
+    before report_total >= 0
+    after  result.status in {AdvanceStatus.Settled}
+
+  fn owed_of(amount: records.Amount, report_total: Int) -> ids.Money
+    before report_total >= 0
+    after  not (amount > report_total) or result == amount - report_total
+    after  not (amount <= report_total) or result == 0
+    example owed_of(5000, 3000) == 2000
+    example owed_of(5000, 5000) == 0
+    example owed_of(3000, 5000) == 0
+body
+  fn add_approval(a, who)     = a with { approvals: a.approvals ++ [who] }
+  fn approve(a)               = a with { status enters AdvanceStatus.Approved }
+  fn pay(a, reference)        = a with { status enters AdvanceStatus.Paid, reference: reference }
+  fn settle(a, report_total)  = a with { status enters AdvanceStatus.Settled, owed: owed_of(a.amount, report_total) }
+
+  fn owed_of(amount, report_total) = if amount > report_total then amount - report_total else 0

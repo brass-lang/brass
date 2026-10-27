@@ -1,0 +1,36 @@
+# desk/allowances.brass
+module desk.allowances
+import desk.ids as ids
+import desk.lines as lines
+import desk.staff as staff
+import desk.reports as reports
+import desk.records as records
+import desk.host as host
+
+interface
+  fn add_per_diem(store: host.Store, report_id: ids.ReportId, badge: ids.Badge, region: records.Region, days: Int) -> Outcome<Done>
+  fn add_mileage(store: host.Store, report_id: ids.ReportId, badge: ids.Badge, vehicle: records.Vehicle, km: Int) -> Outcome<Done>
+private
+  fn append(store: host.Store, report_id: ids.ReportId, badge: ids.Badge, l: lines.Line, valid: Bool) -> Outcome<Done>
+body
+  fn add_per_diem(store, report_id, badge, region, days) =
+    let amount: Int = if days >= 1 and days <= 30 then records.per_diem_rate(region) * days else 0
+    append(store, report_id, badge, { category: ids.Category.Travel, amount: amount, description: "per diem", receipt: true }, days >= 1 and days <= 30)
+
+  fn add_mileage(store, report_id, badge, vehicle, km) =
+    let amount: Int = if km >= 1 and km <= 2000 then records.mileage_rate(vehicle) * km else 0
+    append(store, report_id, badge, { category: ids.Category.Travel, amount: amount, description: "mileage", receipt: true }, km >= 1 and km <= 2000)
+
+  fn append(store, report_id, badge, l, valid) =
+    let who: staff.Staff = store.staff(badge)?
+    if who is staff.Active then
+      let r: reports.Report = store.report(report_id)?
+      if r.badge == badge then
+        if r is reports.Editable then
+          if r.lines.length < 50 then
+            if valid then store.save_report(reports.add_line(r, l))
+            else Err(FailureCode.InvalidInput, "days are 1 to 30 and kilometres 1 to 2,000")
+          else Err(FailureCode.InvalidInput, "a report holds at most 50 lines")
+        else Err(FailureCode.Conflict, "the report is not editable")
+      else Err(FailureCode.Unauthorized, "only the submitter may add to this report")
+    else Err(FailureCode.Unauthorized, "staff member is not active")

@@ -1,0 +1,52 @@
+{
+ "P1": {
+  "arm": "P",
+  "prompt_sha256": "2e21eb44e5b1e89d",
+  "prompt_chars": 9218
+ },
+ "KC1": {
+  "arm": "KC",
+  "prompt_sha256": "a106a072f20ff97e",
+  "prompt_chars": 36176
+ },
+ "P2": {
+  "arm": "P",
+  "prompt_sha256": "eae479f76fcb75a5",
+  "prompt_chars": 9218
+ },
+ "KC2": {
+  "arm": "KC",
+  "prompt_sha256": "1178680e97e3087a",
+  "prompt_chars": 36176
+ },
+ "P3": {
+  "arm": "P",
+  "prompt_sha256": "42d090ee9bef2dd5",
+  "prompt_chars": 9218
+ },
+ "KC3": {
+  "arm": "KC",
+  "prompt_sha256": "f0c39b760e2e35dd",
+  "prompt_chars": 36176
+ },
+ "P4": {
+  "arm": "P",
+  "prompt_sha256": "a144a7c7a2502a3e",
+  "prompt_chars": 9218
+ },
+ "KC4": {
+  "arm": "KC",
+  "prompt_sha256": "150e06bf3211568a",
+  "prompt_chars": 36176
+ },
+ "P5": {
+  "arm": "P",
+  "prompt_sha256": "3eede84ffc195356",
+  "prompt_chars": 9218
+ },
+ "KC5": {
+  "arm": "KC",
+  "prompt_sha256": "3a39175aed4369de",
+  "prompt_chars": 36176
+ }
+}

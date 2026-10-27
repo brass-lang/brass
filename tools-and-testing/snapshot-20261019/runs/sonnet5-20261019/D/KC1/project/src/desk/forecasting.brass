@@ -1,0 +1,26 @@
+# desk/forecasting.brass
+module desk.forecasting
+import desk.ids as ids
+import desk.lines as lines
+import desk.staff as staff
+import desk.reports as reports
+import desk.records as records
+import desk.host as host
+import desk.registry as registry
+
+interface
+  type Forecast = { department: ids.DepartmentId, period: ids.Period, budget: ids.Money, committed: Int, pending: Int, projected: Int, headroom: Int }
+
+  fn forecast(store: host.Store, reg: registry.Registry, department: ids.DepartmentId, period: ids.Period) -> Outcome<Forecast>
+body
+  fn forecast(store, reg, department, period) =
+    let dept: staff.Department = store.department(department)?
+    let rs: reports.Reports = store.reports_for(dept.id, period)?
+    let committed: Int = 0
+    let pending: Int = 0
+    for r in rs
+      if r.status in {reports.ReportStatus.Approved, reports.ReportStatus.Paid} then committed = committed + lines.total(r.lines)
+      else if r.status in {reports.ReportStatus.Submitted} then pending = pending + lines.total(r.lines)
+    let pos: records.POs = reg.pos_for(dept.id, period)?
+    let all_committed: Int = committed + records.commitments(pos)
+    Ok({ department: dept.id, period: period, budget: dept.budget, committed: all_committed, pending: pending, projected: all_committed + pending, headroom: dept.budget - (all_committed + pending) })

@@ -1,0 +1,11 @@
+# desk/audit.brass
+module desk.audit
+import desk.ids as ids
+
+interface
+  type Entry = { who: ids.Badge, report: ids.ReportId, was: ids.Status, now: ids.Status, reason: ids.Reason }
+
+  fn entry(who: ids.Badge, report: ids.ReportId, was: ids.Status, now: ids.Status, reason: ids.Reason) -> Entry
+    after result.who == who and result.report == report
+body
+  fn entry(who, report, was, now, reason) = { who: who, report: report, was: was, now: now, reason: reason }

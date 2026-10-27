@@ -1,0 +1,57 @@
+# desk/trips.brass
+module desk.trips
+import desk.ids as ids
+import desk.reports as reports
+import desk.records as records
+
+interface
+  machine TripStatus
+    states  Requested, Approved, Reconciled, Closed
+    initial Requested
+    Requested enters Approved | Closed
+    Approved  enters Requested | Reconciled | Closed
+
+  type Days = Int where it in 0 to 30
+  type Km   = Int where it in 0 to 2000
+  type Plan = { region: records.Region, days: Days, vehicle: records.Vehicle, km: Km }
+  type CountedTxns = Array<records.TxnId> where it.length in 0 to 1000
+
+  type Trip = { id: ids.ReportId, badge: ids.Badge, department: ids.DepartmentId, period: ids.Period, plan: Plan, committed: ids.Money, approvals: reports.Approvals, status: TripStatus,
+      actual: Int             when it.status in {TripStatus.Reconciled},
+      report_id: ids.ReportId when it.status in {TripStatus.Reconciled},
+      counted_txns: CountedTxns when it.status in {TripStatus.Reconciled} }
+  type Trips = Array<Trip> where it.length in 0 to 1000
+
+  type Requested  = Trip where it.status in {TripStatus.Requested}
+  type Approved   = Trip where it.status in {TripStatus.Approved}
+  type Reconciled = Trip where it.status in {TripStatus.Reconciled}
+  type Open       = Trip where it.status in {TripStatus.Requested, TripStatus.Approved}
+
+  fn commit_amount(region: records.Region, days: Days, vehicle: records.Vehicle, km: Km) -> Int
+
+  fn add_approval(t: Requested, who: ids.Badge) -> Trip
+    before t.approvals.length < 2
+    after  result.status in {TripStatus.Requested} and result.approvals.length == t.approvals.length + 1
+  fn approve(t: Requested) -> Trip
+    after result.status in {TripStatus.Approved}
+  fn amend_requested(t: Requested, plan: Plan, committed: Int) -> Trip
+    after result.status in {TripStatus.Requested} and result.approvals.length == 0
+  fn amend_approved(t: Approved, plan: Plan, committed: Int) -> Trip
+    after result.status in {TripStatus.Requested} and result.approvals.length == 0
+  fn reconcile_approved(t: Approved, actual: Int, report_id: ids.ReportId, counted_txns: CountedTxns) -> Trip
+    after result.status in {TripStatus.Reconciled} and result.actual == actual and result.report_id == report_id
+  fn reconcile_again(t: Reconciled, actual: Int, report_id: ids.ReportId, counted_txns: CountedTxns) -> Trip
+    after result.status in {TripStatus.Reconciled} and result.actual == actual and result.report_id == report_id
+  fn close(t: Open) -> Trip
+    after result.status in {TripStatus.Closed}
+body
+  fn commit_amount(region, days, vehicle, km) =
+    (if days >= 1 then records.per_diem_rate(region) * days else 0) + (if km >= 1 then records.mileage_rate(vehicle) * km else 0)
+
+  fn add_approval(t, who) = t with { approvals: t.approvals ++ [who] }
+  fn approve(t)           = t with { status enters TripStatus.Approved }
+  fn amend_requested(t, plan, committed) = t with { plan: plan, committed: committed, approvals: [] }
+  fn amend_approved(t, plan, committed)  = t with { status enters TripStatus.Requested, plan: plan, committed: committed, approvals: [] }
+  fn reconcile_approved(t, actual, report_id, counted_txns) = t with { status enters TripStatus.Reconciled, actual: actual, report_id: report_id, counted_txns: counted_txns }
+  fn reconcile_again(t, actual, report_id, counted_txns)    = t with { actual: actual, report_id: report_id, counted_txns: counted_txns }
+  fn close(t) = t with { status enters TripStatus.Closed }

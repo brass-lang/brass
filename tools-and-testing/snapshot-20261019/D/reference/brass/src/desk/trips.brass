@@ -1,0 +1,74 @@
+# desk/trips.brass
+module desk.trips
+import desk.ids as ids
+import desk.lines as lines
+import desk.reports as reports
+import desk.records as records
+
+interface
+  machine TripStatus
+    states  Requested, Approved, Reconciled, Closed
+    initial Requested
+    Requested enters Approved | Closed
+    Approved  enters Requested | Reconciled | Closed
+
+  type Days   = Int where it in 0 to 30
+  type Km     = Int where it in 0 to 2000
+  type TxnIds = Array<records.TxnId> where it.length in 0 to 1000
+  type Plan   = { region: records.Region, days: Days, vehicle: records.Vehicle, km: Km }
+  type Reconciliation = { committed: ids.Money, actual: Int, report: ids.ReportId, txns: TxnIds }
+  type Trip   = { id: ids.ReportId, badge: ids.Badge, department: ids.DepartmentId, period: ids.Period, plan: Plan,
+                  committed: ids.Money, status: TripStatus, approvals: reports.Approvals,
+                  reconciliation: Reconciliation when it.status in {TripStatus.Reconciled} }
+  type Trips  = Array<Trip> where it.length in 0 to 1000
+
+  type Requested      = Trip where it.status in {TripStatus.Requested}
+  type ApprovedTrip   = Trip where it.status in {TripStatus.Approved}
+  type Open           = Trip where it.status in {TripStatus.Requested, TripStatus.Approved}
+  type ReconciledTrip = Trip where it.status in {TripStatus.Reconciled}
+
+  fn plan_valid(p: Plan) -> Bool
+    example plan_valid({ region: records.Region.Island, days: 0, vehicle: records.Vehicle.Car, km: 0 }) == false
+    example plan_valid({ region: records.Region.Island, days: 0, vehicle: records.Vehicle.Car, km: 10 }) == true
+  fn priced(p: Plan) -> Int
+    after result >= 0
+    example priced({ region: records.Region.Island, days: 2, vehicle: records.Vehicle.Car, km: 0 }) == 18000
+    example priced({ region: records.Region.Offsite, days: 0, vehicle: records.Vehicle.Boat, km: 4 }) == 1000
+  fn add_approval(t: Requested, who: ids.Badge) -> Trip
+    before t.approvals.length < 2
+    after  result.status in {TripStatus.Requested}
+  fn approve(t: Requested) -> Trip
+    after result.status in {TripStatus.Approved}
+  fn amend_requested(t: Requested, p: Plan, committed: ids.Money) -> Trip
+    after result.status in {TripStatus.Requested} and result.approvals.length == 0
+  fn amend_approved(t: ApprovedTrip, p: Plan, committed: ids.Money) -> Trip
+    after result.status in {TripStatus.Requested} and result.approvals.length == 0
+  fn reconcile_first(t: ApprovedTrip, r: Reconciliation) -> Trip
+    after result.status in {TripStatus.Reconciled}
+  fn reconcile_again(t: ReconciledTrip, r: Reconciliation) -> Trip
+    after result.status in {TripStatus.Reconciled}
+  fn close(t: Open) -> Trip
+    after result.status in {TripStatus.Closed}
+  fn counted(t: Trip, rs: reports.Reports, extra: Int) -> Int
+    before extra >= 0
+    after  result >= 0
+body
+  fn plan_valid(p) = p.days > 0 or p.km > 0
+
+  fn priced(p) = records.per_diem_rate(p.region) * p.days + records.mileage_rate(p.vehicle) * p.km
+
+  fn add_approval(t, who)               = t with { approvals: t.approvals ++ [who] }
+  fn approve(t)                         = t with { status enters TripStatus.Approved }
+  fn amend_requested(t, p, committed)   = t with { plan: p, committed: committed, approvals: [] }
+  fn amend_approved(t, p, committed)    = t with { status enters TripStatus.Requested, plan: p, committed: committed, approvals: [] }
+  fn reconcile_first(t, r)              = t with { status enters TripStatus.Reconciled, reconciliation: r }
+  fn reconcile_again(t, r)              = t with { reconciliation: r }
+  fn close(t)                           = t with { status enters TripStatus.Closed }
+
+  fn counted(t, rs, extra) =
+    if t.status in {TripStatus.Approved} then
+      let covered: Int = extra
+      for r in rs
+        if r is reports.Counted and r.badge == t.badge and r.period == t.period then covered = covered + lines.budgeted_total(r.lines)
+      if t.committed > covered then t.committed - covered else 0
+    else 0

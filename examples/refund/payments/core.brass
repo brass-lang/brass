@@ -1,0 +1,23 @@
+# payments/core.brass — the payment processor as a door, and the case types it refunds against.
+module payments.core
+
+interface
+  type Money = Int where it in 0 to 100000000          # cents, so one million dollars; a program-declared unit, not a built-in
+  type Processor = Stripe | Adyen
+
+  machine CaseStatus
+    states  Open, Closed
+    initial Open
+    Open enters Closed
+
+  type CaseRecord = { id: Int, merchant: Int, customer: Int, paid_total: Money, status: CaseStatus }
+  type OpenCase   = CaseRecord where it.status in {CaseStatus.Open}
+  type Receipt    = { amount: Money, customer: Int }
+
+  access Pay { processor: Processor, per_txn_max: Money }
+    allow refund(case: OpenCase, amount: Money) -> Outcome<Receipt>
+      before amount > 0                                 # contract: the caller proves it
+      before amount <= per_txn_max                      # authority check: the runtime enforces it
+      after  result.amount == amount and result.customer == case.customer
+
+body

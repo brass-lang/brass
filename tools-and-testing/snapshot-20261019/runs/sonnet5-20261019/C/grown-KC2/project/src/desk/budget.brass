@@ -1,0 +1,22 @@
+# desk/budget.brass
+module desk.budget
+import desk.lines as lines
+import desk.reports as reports
+
+interface
+  fn spend_of(rs: reports.Reports) -> Int
+    after result >= 0
+  fn advance_spend_of(advs: reports.Advances) -> Int
+    after result >= 0
+body
+  fn spend_of(rs) =
+    let sum: Int = 0
+    for r in rs
+      if r is reports.Counted then sum = sum + lines.budgeted_total(r.lines)
+    sum
+
+  fn advance_spend_of(advs) =
+    let sum: Int = 0
+    for a in advs
+      if a is reports.CountedAdvance then sum = sum + a.amount
+    sum

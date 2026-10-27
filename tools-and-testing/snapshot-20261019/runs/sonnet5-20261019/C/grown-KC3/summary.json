@@ -1,0 +1,198 @@
+{
+ "run_id": "sonnet5-20261019",
+ "task": "C",
+ "label": "grown-KC3",
+ "size": "grown",
+ "arm": "KC",
+ "lang": "brass",
+ "started": "2026-10-19T05:47:23+00:00",
+ "collected": "2026-10-19T05:58:57+00:00",
+ "provenance": {
+  "model": "claude-sonnet-5",
+  "effort": "high",
+  "cap": 150,
+  "claude_version": "2.1.302 (Claude Code)",
+  "git_head": "c4793c030ab686fd720ab2abd93e94ee3ab965cf",
+  "tool_hash": "1e611b1327ba33d3",
+  "prompt_sha256": "d08cd071a75b2b32",
+  "prompt_chars": 30514,
+  "freeze": [
+   "| baselines | `rerun/baseline` | `37e9e7815c64d173` |",
+   "| case evaluator | `rerun/tools/evaluate.py` | `753e74281565ae52` |",
+   "| cases | `rerun/cases` | `eed967342bfa8c3b` |",
+   "| frozen tool lean 8 | `rerun/tools/brass-lean8` | `3a2d086df0fcc20b` |",
+   "| launcher | `rerun/tools/launch.sh` | `72d3b2edcc748c25` |",
+   "| live evaluator | `validation/proxy/bin/brasseval.py` | `c6936b3bfc179282` |",
+   "| live stand-in | `validation/proxy/bin/brass` | `1e611b1327ba33d3` |",
+   "| material port | `rerun/tools/port_materials.py` | `df257bb6eeff9b60` |",
+   "| materials | `rerun/materials` | `234607275a4e57bc` |",
+   "| references | `rerun/reference` | `e96c7d75cebcc572` |",
+   "| respeller | `rerun/tools/respell.py` | `9af47db8a46e5511` |",
+   "| runner | `rerun/tools/run.py` | `854a93192a38d849` |",
+   "| session builder | `rerun/tools/build.py` | `215a37b0764cb9d0` |",
+   "| task d builder | `rerun/tools/build_d.py` | `9401f9a2b2624d68` |",
+   "| task d evaluator | `rerun/tools/evaluate_d.py` | `1c0627a9b48a60c1` |",
+   "| task d inputs | `rerun/D` | `90d0403c71563f04` |",
+   "| task d variants | `rerun/tools/variants_d.py` | `b3e201eab181c8a1` |",
+   "| variants | `rerun/tools/variants.py` | `15295894f63c7312` |"
+  ]
+ },
+ "session_id": "50c46ca2-a127-4d62-8a73-2f66467daedf",
+ "own_instance": true,
+ "shares_id_with": null,
+ "is_error": false,
+ "subtype": "success",
+ "terminal_reason": "completed",
+ "api_error_status": null,
+ "num_turns": 28,
+ "duration_ms": 512984,
+ "cost_usd": 1.4839152000000002,
+ "models": [
+  "claude-sonnet-5"
+ ],
+ "model_ok": true,
+ "thinking_tokens": 34309,
+ "output_tokens": 53067,
+ "cache_read": 2565426,
+ "cache_write": 110012,
+ "input_uncached": 56,
+ "transcript_saved": true,
+ "leaks": [
+  "Bash: /tmp",
+  "Bash: /tmp/patch.txt",
+  "Edit: /tmp/patch.txt",
+  "Read: /tmp/patch.txt"
+ ],
+ "harness_paths": [],
+ "telemetry": {
+  "models": {
+   "claude-sonnet-5": 51
+  },
+  "calls": 28,
+  "ctx_first": 44146,
+  "ctx_second": 45756,
+  "ctx_final": 131340,
+  "task_tokens": 85584,
+  "input_total": 2675494,
+  "fresh_input": 110068,
+  "output_written_chars": 41548,
+  "output_tokens_logged_unreliable": 53067,
+  "tools": {
+   "Bash": 24,
+   "Read": 2,
+   "Edit": 1
+  },
+  "shell": {
+   "ls": 2,
+   "brass show": 6,
+   "find": 1,
+   "grep": 4,
+   "brass info": 2,
+   "echo": 1,
+   "sed": 1,
+   "cat": 7,
+   "Submitted": 1,
+   "Approved": 1,
+   "Rejected": 2,
+   "ChangesRequested": 1,
+   "Paid": 1,
+   "Requested": 1,
+   "Settled": 1,
+   "Mainland": 1,
+   "Offsite": 1,
+   "Truck": 1,
+   "Boat": 1,
+   "Disputed": 1,
+   "Denied": 1,
+   "awaiting": 2,
+   "budget": 2,
+   "python3": 1,
+   "awk": 1,
+   "head": 1,
+   "brass apply": 2,
+   "tail": 3,
+   "brass check": 1
+  },
+  "files_read": [
+   "/private/tmp/rerun-sonnet5-20261019/C/grown-KC3/project/src/system.brass",
+   "/tmp/patch.txt"
+  ],
+  "edits": 1,
+  "tool_errors": 0,
+  "seconds": 514,
+  "answer_chars": 2704
+ },
+ "brass_log_verbs": {
+  "show": 6,
+  "info": 2,
+  "apply": 2,
+  "check": 1
+ },
+ "scores": {
+  "C.json": {
+   "held": 122,
+   "total": 122,
+   "could_not_run": 0,
+   "failed": [],
+   "by_kind": {
+    "edge": [
+     9,
+     9
+    ],
+    "integration": [
+     5,
+     5
+    ],
+    "invariant": [
+     1,
+     1
+    ],
+    "new": [
+     25,
+     25
+    ],
+    "preserved": [
+     82,
+     82
+    ]
+   }
+  },
+  "baseline.json": {
+   "held": 82,
+   "total": 82,
+   "could_not_run": 0,
+   "failed": [],
+   "by_kind": {
+    "preserved": [
+     82,
+     82
+    ]
+   }
+  },
+  "grown.json": {
+   "held": 112,
+   "total": 112,
+   "could_not_run": 0,
+   "failed": [],
+   "by_kind": {
+    "grown": [
+     112,
+     112
+    ]
+   }
+  }
+ },
+ "apply_calls": 2,
+ "edits_outside_apply": [
+  "Bash: cat > /tmp/patch.txt << 'PATCHEOF'\n@@@ new src/desk/audit.brass\n# desk/audit.brass\nmodule desk.audit",
+  "Bash: cat >> /tmp/patch.txt << 'PATCHEOF'\n@@@ new src/desk/records.brass\n# desk/records.brass\nmodule desk.",
+  "Bash: cat >> /tmp/patch.txt << 'PATCHEOF'\n@@@ new src/desk/host.brass\n# desk/host.brass\nmodule desk.host\ni",
+  "Bash: cat >> /tmp/patch.txt << 'PATCHEOF'\n@@@ new src/desk/review.brass\n# desk/review.brass\nmodule desk.re",
+  "Bash: cat >> /tmp/patch.txt << 'PATCHEOF'\n@@@ new src/desk/payment.brass\n# desk/payment.brass\nmodule desk.",
+  "Bash: cat >> /tmp/patch.txt << 'PATCHEOF'\n@@@ new src/desk/advances.brass\n# desk/advances.brass\nmodule des",
+  "Bash: cat >> /tmp/patch.txt << 'PATCHEOF'\n@@@ new src/system.brass\n# system.brass\nsystem expenses\n  grants"
+ ],
+ "thinking_before_first_edit": 62074,
+ "final_check": "done        nothing else to run",
+ "check_warnings": []
+}

@@ -1,0 +1,71 @@
+# desk/budget.brass
+module desk.budget
+import desk.ids as ids
+import desk.lines as lines
+import desk.reports as reports
+import desk.advances as advances
+import desk.trips as trips
+import desk.host as host
+
+interface
+  fn spend_of(rs: reports.Reports, advs: advances.Advances) -> Int
+    after result >= 0
+  fn department_spend(store: host.Store, department: ids.DepartmentId, period: ids.Period) -> Outcome<Int>
+  fn badge_reports_budgeted(rs: reports.Reports, badge: ids.Badge) -> Int
+    after result >= 0
+  fn trip_remaining(committed: Int, charged: Int) -> Int
+    after result >= 0
+    example trip_remaining(1000, 400) == 600
+    example trip_remaining(400, 1000) == 0
+  fn trips_spend(trps: trips.Trips, rs: reports.Reports) -> Int
+    after result >= 0
+  fn trips_spend_with(trps: trips.Trips, rs: reports.Reports, badge: ids.Badge, extra: Int) -> Int
+    after result >= 0
+  fn department_spend_for_approval(store: host.Store, department: ids.DepartmentId, period: ids.Period, badge: ids.Badge, extra: Int) -> Outcome<Int>
+
+
+
+
+
+body
+  fn spend_of(rs, advs) =
+    let sum: Int = 0
+    for r in rs
+      if r is reports.Counted then sum = sum + lines.budgeted_total(r.lines)
+    for a in advs
+      if a is advances.Counted then sum = sum + a.amount
+    sum
+
+  fn department_spend(store, department, period) =
+    let rs: reports.Reports = store.reports_for(department, period)?
+    let advs: advances.Advances = store.advances_for(department, period)?
+    let trps: trips.Trips = store.trips_for(department, period)?
+    Ok(spend_of(rs, advs) + trips_spend(trps, rs))
+
+  fn badge_reports_budgeted(rs, badge) =
+    let sum: Int = 0
+    for r in rs
+      if r.badge == badge and r is reports.Counted then sum = sum + lines.budgeted_total(r.lines)
+    sum
+
+  fn trip_remaining(committed, charged) = if committed > charged then committed - charged else 0
+
+  fn trips_spend(trps, rs) =
+    let sum: Int = 0
+    for t in trps
+      if t is trips.Counted then sum = sum + trip_remaining(t.committed, badge_reports_budgeted(rs, t.badge))
+    sum
+
+  fn trips_spend_with(trps, rs, badge, extra) =
+    let sum: Int = 0
+    for t in trps
+      if t is trips.Counted then
+        let charged: Int = if t.badge == badge then badge_reports_budgeted(rs, t.badge) + extra else badge_reports_budgeted(rs, t.badge)
+        sum = sum + trip_remaining(t.committed, charged)
+    sum
+
+  fn department_spend_for_approval(store, department, period, badge, extra) =
+    let rs: reports.Reports = store.reports_for(department, period)?
+    let advs: advances.Advances = store.advances_for(department, period)?
+    let trps: trips.Trips = store.trips_for(department, period)?
+    Ok(spend_of(rs, advs) + trips_spend_with(trps, rs, badge, extra))

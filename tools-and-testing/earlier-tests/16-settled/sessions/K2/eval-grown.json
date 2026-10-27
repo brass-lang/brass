@@ -1,0 +1,1016 @@
+{
+ "language": "keel",
+ "mode": "stand-in execution",
+ "held": 112,
+ "total": 112,
+ "cases": [
+  {
+   "id": "G01",
+   "op": "grant_delegation",
+   "rule": "G5",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "G02",
+   "op": "grant_delegation",
+   "rule": "G1",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "G03",
+   "op": "grant_delegation",
+   "rule": "G1",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "G04",
+   "op": "grant_delegation",
+   "rule": "G2",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "G05",
+   "op": "grant_delegation",
+   "rule": "G2",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "G06",
+   "op": "grant_delegation",
+   "rule": "G3",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "G07",
+   "op": "grant_delegation",
+   "rule": "G3",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "G08",
+   "op": "grant_delegation",
+   "rule": "G3",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "G09",
+   "op": "grant_delegation",
+   "rule": "G4",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "G10",
+   "op": "grant_delegation",
+   "rule": "G4",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "G11",
+   "op": "revoke_delegation",
+   "rule": "V5",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "G12",
+   "op": "revoke_delegation",
+   "rule": "V3",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "G13",
+   "op": "revoke_delegation",
+   "rule": "V4",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "G14",
+   "op": "revoke_delegation",
+   "rule": "V2",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P01",
+   "op": "raise_po",
+   "rule": "P5",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P02",
+   "op": "raise_po",
+   "rule": "P2",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P03",
+   "op": "raise_po",
+   "rule": "P2",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P04",
+   "op": "raise_po",
+   "rule": "P3",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P05",
+   "op": "raise_po",
+   "rule": "P4",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P06",
+   "op": "raise_po",
+   "rule": "P1",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P07",
+   "op": "approve_po",
+   "rule": "A8",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P08",
+   "op": "approve_po",
+   "rule": "A6",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P09",
+   "op": "approve_po",
+   "rule": "delegation",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P10",
+   "op": "approve_po",
+   "rule": "delegation",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P11",
+   "op": "approve_po",
+   "rule": "delegation",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P12",
+   "op": "approve_po",
+   "rule": "delegation",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P13",
+   "op": "approve_po",
+   "rule": "\u00a73",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P14",
+   "op": "approve_po",
+   "rule": "\u00a73",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P15",
+   "op": "approve_po",
+   "rule": "A8",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P16",
+   "op": "approve_po",
+   "rule": "A8",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P17",
+   "op": "approve_po",
+   "rule": "A7",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P18",
+   "op": "approve_po",
+   "rule": "A7",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P19",
+   "op": "approve_po",
+   "rule": "\u00a73",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P20",
+   "op": "approve_po",
+   "rule": "A5",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P21",
+   "op": "approve_po",
+   "rule": "A3",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P22",
+   "op": "approve_po",
+   "rule": "\u00a73",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P23",
+   "op": "reject_po",
+   "rule": "reject",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P24",
+   "op": "reject_po",
+   "rule": "reject",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P25",
+   "op": "receive_po",
+   "rule": "receive",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P26",
+   "op": "receive_po",
+   "rule": "receive",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P27",
+   "op": "receive_po",
+   "rule": "receive",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P28",
+   "op": "receive_po",
+   "rule": "receive",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P29",
+   "op": "receive_po",
+   "rule": "receive",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P30",
+   "op": "close_po",
+   "rule": "close",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P31",
+   "op": "close_po",
+   "rule": "close",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P32",
+   "op": "close_po",
+   "rule": "close",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P33",
+   "op": "po_commitments",
+   "rule": "\u00a73",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "P34",
+   "op": "po_commitments",
+   "rule": "commitments",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K01",
+   "op": "import_txn",
+   "rule": "import",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K02",
+   "op": "import_txn",
+   "rule": "import",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K03",
+   "op": "import_txn",
+   "rule": "import",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K04",
+   "op": "import_txn",
+   "rule": "import",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K05",
+   "op": "import_txn",
+   "rule": "import",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K06",
+   "op": "import_txn",
+   "rule": "import",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K07",
+   "op": "match_txn",
+   "rule": "M10",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K08",
+   "op": "match_txn",
+   "rule": "M9",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K09",
+   "op": "match_txn",
+   "rule": "M9",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K10",
+   "op": "match_txn",
+   "rule": "M8",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K11",
+   "op": "match_txn",
+   "rule": "M7",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K12",
+   "op": "match_txn",
+   "rule": "M6",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K13",
+   "op": "match_txn",
+   "rule": "M3",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K14",
+   "op": "match_txn",
+   "rule": "M4",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K15",
+   "op": "match_txn",
+   "rule": "M8",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K16",
+   "op": "dispute_txn",
+   "rule": "dispute",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K17",
+   "op": "dispute_txn",
+   "rule": "dispute",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "K18",
+   "op": "unmatched",
+   "rule": "unmatched",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "L01",
+   "op": "add_per_diem",
+   "rule": "per diem",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "L02",
+   "op": "add_per_diem",
+   "rule": "per diem",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "L03",
+   "op": "add_per_diem",
+   "rule": "per diem",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "L04",
+   "op": "add_per_diem",
+   "rule": "per diem",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "L05",
+   "op": "add_per_diem",
+   "rule": "per diem",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "L06",
+   "op": "add_per_diem",
+   "rule": "per diem",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "L07",
+   "op": "add_per_diem",
+   "rule": "per diem",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "L08",
+   "op": "add_mileage",
+   "rule": "mileage",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "L09",
+   "op": "add_mileage",
+   "rule": "mileage",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "L10",
+   "op": "add_mileage",
+   "rule": "mileage",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "E01",
+   "op": "cost_center_summary",
+   "rule": "summary",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "E02",
+   "op": "cost_center_summary",
+   "rule": "summary",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "E03",
+   "op": "cost_center_summary",
+   "rule": "summary",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "R01",
+   "op": "period_summary",
+   "rule": "summary",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "R02",
+   "op": "period_summary",
+   "rule": "summary",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "F01",
+   "op": "forecast",
+   "rule": "forecast",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "F02",
+   "op": "forecast",
+   "rule": "forecast",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "W01",
+   "op": "onboard_vendor",
+   "rule": "onboard",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "W02",
+   "op": "onboard_vendor",
+   "rule": "onboard",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "W03",
+   "op": "onboard_vendor",
+   "rule": "onboard",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "W04",
+   "op": "deactivate_vendor",
+   "rule": "deactivate",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "W05",
+   "op": "deactivate_vendor",
+   "rule": "deactivate",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "W06",
+   "op": "deactivate_vendor",
+   "rule": "deactivate",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "W07",
+   "op": "deactivate_vendor",
+   "rule": "deactivate",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "W08",
+   "op": "vendor_spend",
+   "rule": "spend",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "C01",
+   "op": "set_card_limit",
+   "rule": "limit",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "C02",
+   "op": "set_card_limit",
+   "rule": "limit",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "C03",
+   "op": "set_card_limit",
+   "rule": "limit",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "C04",
+   "op": "set_card_limit",
+   "rule": "limit",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "C05",
+   "op": "over_limit",
+   "rule": "over",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "C06",
+   "op": "over_limit",
+   "rule": "over",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "Q01",
+   "op": "period_readiness",
+   "rule": "ready",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "Q02",
+   "op": "period_readiness",
+   "rule": "ready",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "Q04",
+   "op": "period_readiness",
+   "rule": "ready",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "Q03",
+   "op": "period_readiness",
+   "rule": "ready",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "X01",
+   "op": "request_exception",
+   "rule": "request",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "X02",
+   "op": "request_exception",
+   "rule": "request",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "X03",
+   "op": "request_exception",
+   "rule": "request",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "X04",
+   "op": "request_exception",
+   "rule": "request",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "X05",
+   "op": "request_exception",
+   "rule": "request",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "X06",
+   "op": "request_exception",
+   "rule": "request",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "X07",
+   "op": "decide_exception",
+   "rule": "decide",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "X08",
+   "op": "decide_exception",
+   "rule": "decide",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "X09",
+   "op": "decide_exception",
+   "rule": "decide",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "X10",
+   "op": "decide_exception",
+   "rule": "decide",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  },
+  {
+   "id": "X11",
+   "op": "decide_exception",
+   "rule": "decide",
+   "kind": "grown",
+   "holds": true,
+   "run": "ran",
+   "problems": []
+  }
+ ]
+}
