@@ -109,7 +109,7 @@ The full contract checker, followed by a compiled runtime. The next trials can t
 
 ## Request for comments
 
-Where does brass make sense to you or what needs clarity? Brass is still a new idea, I'd like to hear what you think.
+Where does Brass make sense to you or what needs clarity? Brass is still a new idea, I'd like to hear what you think.
 
 [Open an issue](https://github.com/brass-lang/brass/issues) with your question or comment, or write to pcnofelt@[your standard google email provider].com.
 
