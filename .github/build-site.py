@@ -31,9 +31,17 @@ body{{margin:0;background:#fff}}
 @media (prefers-color-scheme: dark){{body{{background:#0d1117}}}}
 .markdown-body{{box-sizing:border-box;max-width:980px;margin:0 auto;padding:45px}}
 @media (max-width:767px){{.markdown-body{{padding:15px}}}}
+.top{{box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;max-width:980px;margin:0 auto;padding:12px 45px 0;
+  font:14px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif}}
+.top a{{color:#59636e;text-decoration:none}}
+.top a:hover{{color:#0969da;text-decoration:underline}}
+.top .name{{font-weight:600;color:#1f2328}}
+@media (prefers-color-scheme: dark){{.top a{{color:#9198a1}}.top .name{{color:#f0f6fc}}.top a:hover{{color:#4493f8}}}}
+@media (max-width:767px){{.top{{padding:10px 15px 0}}}}
 </style>
 </head>
 <body>
+<nav class="top"><a class="name" href="{root}index.html">Brass</a><a href="https://github.com/{repo}">GitHub</a></nav>
 <article class="markdown-body">
 {body}
 </article>
@@ -111,7 +119,8 @@ def main():
         out.parent.mkdir(parents=True, exist_ok=True)
         md = src.read_text()
         html = anchor_headings(relink(render(md), depth=len(rel.parts) - 1))
-        out.write_text(TEMPLATE.format(title=title_of(md, rel.stem), css=CSS, body=html))
+        root = "../" * (len(rel.parts) - 1)
+        out.write_text(TEMPLATE.format(title=title_of(md, rel.stem), css=CSS, body=html, root=root, repo=REPO))
         count += 1
     for src in sorted((ROOT / "docs").glob("*.html")) + sorted((ROOT / "docs").glob("*.js")):
         shutil.copy(src, SITE / src.name)
