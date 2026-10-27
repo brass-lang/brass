@@ -112,7 +112,7 @@ tbody tr:last-child td{{ border-bottom:1.5px solid var(--ink); }}
 
 # The look of the rendered Markdown pages. "brass" matches the two reader pages (serif on paper);
 # "github" is the plain GitHub rendering. Flip this one line to revert.
-THEME = "brass"
+THEME = "github"
 THEMES = {"github": GITHUB, "brass": BRASS}
 TEMPLATE = THEMES[THEME]
 
