@@ -1,0 +1,24 @@
+name: Checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Grammar examples agree with the spec
+        run: python3 tools-and-testing/checks/check-grammar-agreement.py
+      - name: brass check passes on paddock
+        run: sh tools-and-testing/checks/check-example.sh paddock
+      - name: brass check passes on feeding
+        run: sh tools-and-testing/checks/check-example.sh feeding
+      - name: refund reports exactly its known false rejection
+        # brass reads one source folder; refund has two. The check must fail with this one line and nothing else.
+        run: |
+          out="$(sh tools-and-testing/checks/check-example.sh refund || true)"
+          printf '%s\n' "$out"
+          printf '%s\n' "$out" | grep -q 'grants support.refund.issue: no such function'
+          [ "$(printf '%s\n' "$out" | grep -c 'no such function')" = 1 ]

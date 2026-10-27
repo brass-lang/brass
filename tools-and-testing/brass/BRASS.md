@@ -2,7 +2,7 @@
 
 `bin/brass` checks a Brass program's structure, runs its examples and answers questions about the code. It reads the project's `src/` folder: the directory above `bin/`, or `$BRASS_PROJECT` when set. The full checker adds proofs of every `before` and `after`; until then every answer says what it covered and what it did not.
 
-Every answer ends with a `query` id. Cite it; `brass verify <id>` re-runs the query and says whether the answer still holds after an edit.
+**Run it as `BRASS_LEAN=8 bin/brass …`.** That is the mode the trials used and the one to use: one `check` runs everything and ends with `done` or what to fix, and answers take the shape that costs a model the fewest steps ([Lean mode](#lean-mode) lists what differs). The sections below describe the full output, which is what the tool prints with `BRASS_LEAN` unset; in full mode every answer ends with a `query` id. Cite it; `brass verify <id>` re-runs the query and says whether the answer still holds after an edit.
 
 ## Check
 

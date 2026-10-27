@@ -10,7 +10,13 @@ Read these in order to follow authority, contracts, and state changes through co
 
 These programs were reviewed by hand and through three blind reads. Their verdicts and tiers are what the full checker establishes; `brass` today checks structure and runs the examples.
 
-**Running `brass` on them.** From the repository root, `tools-and-testing/checks/check-example.sh paddock` (or `feeding`, `refund`). Paddock and feeding pass. Refund spans two source folders and `brass` reads one, so it reports one false rejection.
+**First run: paddock.** It needs Python 3.9 or newer and nothing else. From the repository root:
+
+```sh
+sh tools-and-testing/checks/check-example.sh paddock
+```
+
+The last line is `done        nothing else to run`. Feeding passes the same way. Refund spans two source folders and `brass` reads one, so it reports one false rejection, `grants support.refund.issue: no such function`; that is a limit of the current tool, not of the example.
 
 **Where to find the rules.** The [spec](../docs/brass-core-spec.md) defines types and names (§2), local bindings (§3), modules and imports (§4), failure (§5), accesses (§8), and system limits (§10.1).
 
