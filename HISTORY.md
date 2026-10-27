@@ -1,6 +1,6 @@
 # History
 
-Brass began in early September 2026 with a question: how could a programming language help AI models build context and reason about code more efficiently? By October 25, about 615 commits over seven weeks had brought the specification to v0.3.
+Brass began in early September 2026 with a question: how could a programming language help AI models build context and reason about code more efficiently? By October 25, about 615 commits over seven weeks had brought the specification to v0.3, and on October 27 it was published.
 
 This history follows the decisions, reviews and trials that shaped the language and its tooling, including the questions that remain open.
 
@@ -113,6 +113,16 @@ Eight reviewers read the programs without scores or setup labels. They found two
 Worked through *Welcome to Brass Language* (first called Brass in Plain Ink) line by line. The park examples became a connected story: update a paddock's record, give the code authority to close the door, then show which wrong edits the declarations catch. The page explains the design through code; the spec and grammar hold the detailed rules.
 
 A cheat sheet put the forms in one place, with notes for Python and Rust programmers. The README became a shorter introduction, and the public repository was trimmed to the records behind the published results.
+
+## Week 8 — Publication
+
+The public repository took its final shape. The language documents, the design companions and the two reader pages moved under `docs/`, leaving the README, this history and the licenses at the root. Both pages were exported from their drafts as standalone files, linked to each other, and a site builder was written to render the README and the documents as GitHub Pages with the same look they have on GitHub.
+
+The README gained two charts from the write-up, a short FAQ and a request for comments. Two outside reviews prompted the last corrections: the licensing was stated in one place, CC BY 4.0 for the documents and trial records and Apache 2.0 for the code; references to private notes were replaced with plain statements of what is unpublished; the tool's guide opened with the recommended mode; and the examples README named a first command to run, with its expected result. The tool folder lost a generator that could only run from the private repository, an evaluator for unpublished trials and a lab note.
+
+Checks now run on every push: the grammar's examples against the spec, and the three example programs through `brass`, with refund's known false rejection asserted rather than ignored.
+
+On October 27 the repository went public at [github.com/brass-lang/brass](https://github.com/brass-lang/brass), with a fresh history, and the site went live at [brass-lang.github.io/brass](https://brass-lang.github.io/brass/). Brass v0.3 is out for comment, with issues, email and a Discord as the ways in.
 
 ## Still to decide
 
