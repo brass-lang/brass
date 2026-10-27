@@ -109,7 +109,9 @@ The full contract checker, followed by a compiled runtime. The next trials can t
 
 ## Request for comments
 
-What would you need to see before trusting a model's edit? What would you want to build that Brass cannot express? [Open an issue](https://github.com/brass-lang/brass/issues) with your question or example, or write to pcnofelt@[your standard google email provider].com.
+Where does brass make sense to you or what needs clarity? Brass is still a new idea, I'd like to hear what you think.
+
+[Open an issue](https://github.com/brass-lang/brass/issues) with your question or comment, or write to pcnofelt@[your standard google email provider].com.
 
 There is also a Discord, new and worth a try: [join the Brass Discord](https://discord.gg/gW5qqWF2R).
 
