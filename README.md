@@ -1,4 +1,4 @@
-# The Brass Language
+# Brass: an AI-first programming language
 
 **A token-efficient programming language designed for AI to write and humans to trust.**
 
