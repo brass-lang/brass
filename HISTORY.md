@@ -116,9 +116,7 @@ A cheat sheet put the forms in one place, with notes for Python and Rust program
 
 ## Week 8 — Publication
 
-The public repository took its final shape: the language documents and the two reader pages under `docs/`, the README, this history and the licenses at the root. Both pages were exported as standalone files, and a site builder renders the README and the documents as GitHub Pages.
-
-The README gained two charts from the write-up, a short FAQ and a request for comments. Two outside reviews prompted the last corrections: licensing stated in one place, CC BY 4.0 for documents and Apache 2.0 for code; references to private notes replaced with what is unpublished; a first command to run in the examples README. Checks now run on every push: the grammar against the spec, and the three examples through `brass`.
+The public repository took its final shape, with the language documents and the two reader pages under `docs/` and a site builder that renders them as GitHub Pages. The README gained two charts from the write-up, a short FAQ and a request for comments. Two outside reviews prompted the last corrections: licensing stated in one place, CC BY 4.0 for documents and Apache 2.0 for code, and references to private notes replaced. Checks now run on every push.
 
 On October 27 the repository went public at [github.com/brass-lang/brass](https://github.com/brass-lang/brass), with a fresh history, and the site went live at [brass-lang.github.io/brass](https://brass-lang.github.io/brass/). Brass v0.3 is out for comment.
 
