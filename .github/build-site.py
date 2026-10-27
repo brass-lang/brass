@@ -19,7 +19,7 @@ TREE = f"https://github.com/{REPO}/tree/main/"
 CSS = "https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.8.1/github-markdown.min.css"
 SKIP = {"tools-and-testing", "site", ".github", ".git"}
 
-TEMPLATE = """<!doctype html>
+GITHUB = """<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -48,6 +48,73 @@ body{{margin:0;background:#fff}}
 </body>
 </html>
 """
+
+BRASS = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inconsolata:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap">
+<style>
+:root{{
+  --paper:#FFFFF8; --ink:#111110; --soft:#4A4A45; --faint:#8C8B84; --rule:#CFCFC2; --wash:#F2F1EA; --wash2:#E9E8DF;
+  --keel:#1C4FB8; --code-tint:#F6F5EE;
+  --sign:"Barlow Condensed","Arial Narrow","Helvetica Neue",sans-serif;
+  --serif:"EB Garamond","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --mono:Inconsolata,ui-monospace,"SF Mono",Menlo,monospace;
+}}
+@media (prefers-color-scheme: dark){{
+  :root{{ --paper:#151513; --ink:#ECEAE0; --soft:#B4B2A8; --faint:#85847C; --rule:#3E3D38; --wash:#1E1E1B; --wash2:#2A2A26;
+    --keel:#6FA0FF; --code-tint:#1C1C1A; color-scheme:dark; }}
+}}
+html{{ background:var(--paper); }}
+body{{ margin:0; background:var(--paper); color:var(--ink); font-family:var(--serif); font-size:19px; line-height:1.5;
+  font-variant-numeric:oldstyle-nums proportional-nums; padding-inline:clamp(16px,5vw,64px); padding-block:28px 80px; }}
+.top{{ display:flex; justify-content:space-between; align-items:baseline; max-width:980px; margin:0 auto 2.6rem; padding-bottom:.6rem; border-bottom:1px solid var(--rule);
+  font-family:var(--sign); font-weight:600; font-size:.82rem; letter-spacing:.18em; text-transform:uppercase; }}
+.top a{{ color:var(--soft); text-decoration:none; }}
+.top a:hover{{ color:var(--keel); }}
+.top .name{{ color:var(--ink); }}
+.markdown-body{{ max-width:980px; margin:0 auto; }}
+h1{{ font-weight:500; font-size:2.6rem; line-height:1.1; margin:0 0 1.2rem; letter-spacing:-.005em; text-wrap:balance; }}
+h2{{ font-weight:500; font-style:italic; font-size:1.8rem; line-height:1.2; margin:3.2rem 0 .7rem; text-wrap:balance; }}
+h3{{ font-weight:500; font-style:italic; font-size:1.35rem; line-height:1.25; margin:2.2rem 0 .5rem; text-wrap:balance; }}
+h4, h5, h6{{ font-weight:600; font-size:1.05rem; margin:1.8rem 0 .4rem; }}
+p, ul, ol, blockquote{{ margin:0 0 1rem; }}
+ul, ol{{ padding-left:1.3rem; }} li{{ margin-bottom:.45rem; }}
+strong, b{{ font-weight:600; }}
+a{{ color:var(--keel); }}
+hr{{ border:0; border-top:1px solid var(--rule); margin:2.6rem 0; }}
+blockquote{{ border-left:2px solid var(--rule); padding-left:1rem; color:var(--soft); }}
+img{{ max-width:100%; height:auto; border:1px solid var(--rule); border-radius:3px; }}
+code{{ font-family:var(--mono); font-size:.86em; color:var(--soft); background:var(--code-tint); padding:.02em .22em; border-radius:2px; }}
+pre{{ font-family:var(--mono); font-size:.8rem; line-height:1.55; margin:.6rem 0 1rem; padding:.8rem 1rem; background:var(--wash); border-radius:3px;
+  overflow-x:auto; white-space:pre; font-variant-numeric:lining-nums; color:var(--ink); }}
+pre code{{ font-size:inherit; color:inherit; background:none; padding:0; }}
+.highlight pre{{ margin:0; }} .highlight{{ margin:.6rem 0 1rem; }}
+table{{ border-collapse:collapse; font-size:.9rem; line-height:1.38; margin:.6rem 0 1rem; display:block; max-width:100%; overflow-x:auto; }}
+thead th{{ font-weight:400; font-style:italic; text-align:left; padding:.2rem 1.2rem .35rem 0; border-top:1.5px solid var(--ink); border-bottom:1px solid var(--ink); white-space:nowrap; }}
+tbody td{{ padding:.32rem 1.2rem .32rem 0; vertical-align:top; border-bottom:1px solid var(--wash2); }}
+tbody tr:last-child td{{ border-bottom:1.5px solid var(--ink); }}
+.markdown-body > :first-child{{ margin-top:0; }}
+</style>
+</head>
+<body>
+<nav class="top"><a class="name" href="{root}index.html">Brass</a><a href="https://github.com/{repo}">GitHub</a></nav>
+<article class="markdown-body">
+{body}
+</article>
+</body>
+</html>
+"""
+
+# The look of the rendered Markdown pages. "brass" matches the two reader pages (serif on paper);
+# "github" is the plain GitHub rendering. Flip this one line to revert.
+THEME = "brass"
+THEMES = {"github": GITHUB, "brass": BRASS}
+TEMPLATE = THEMES[THEME]
 
 
 def render(md: str) -> str:
