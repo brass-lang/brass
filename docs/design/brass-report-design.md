@@ -1,6 +1,10 @@
-Status: companion to `brass-core-spec.md` §11. Defines the `brass` report and error format. The spec states what `brass` is and the two rules a report obeys; this file states every row, phrase, and flag. Where they disagree, the spec wins. **§0 below is the v0.2 amendment, written 2026-09-25 at assembly; §1 to §14 are the v0.1 design and stand only where §0 does not replace them.** A full rewrite is scheduled for the tool pass that follows the language firming (review E44's standing direction).
-
 # Brass Info Report
+
+Models and reviewers need to see what a function requires, what it can affect and what depends on it. This document defines how `brass` presents those facts, including its report format, query options and error messages.
+
+The [specification](../brass-core-spec.md) defines what those facts mean and takes precedence if the documents disagree.
+
+Section 0 contains the v0.2 update to the report design. Sections 1–14 retain the earlier v0.1 design and apply only where section 0 does not replace them. A full rewrite is planned.
 
 ## 0. The v0.2 amendment
 
@@ -46,7 +50,7 @@ Two readers, one format. A model reads it instead of loading bodies, the system 
 
 ## 2. Header and footer
 
-> **Synchronization flag (2026-09-18). This section is amended by review E42 (`keel-review.md`, a private record); read E42's Decided blocks with it, and where they differ E42 wins.** The five-row header and the `end` trailer are not the default any more. Full hashes are identity, verification, and `lock`; a 12-character prefix is display, and an ambiguous prefix is a rejection asking for a longer one. `interfaces_id`, `module`, `lock`, and `checker` move to `--provenance`. The `end` trailer is kept, in short form `end q:<12 hex>`; documented with its limit, which is that it detects a missing tail and nothing more, completeness being established by recomputation. A query id is a checkable citation, not a retrieval key — no report archive is kept, `brass` recomputes from the tree, and a report whose tree is gone cannot be rebuilt. The "identifies facts, not rendered bytes" rule below stands. Rewritten at assembly, not now.
+> **Note (2026-09-18). This section describes the report format before the trials measured it. The decisions below, made during the v0.2 review, replace it where they differ; the section itself has not yet been rewritten.** The shape that measured best is the declaration and its users, tiers once as a legend, impact sets on request, zero-count lines omitted, and one short query id line. The five-row header and the `end` trailer are not the default any more. Full hashes are identity, verification, and `lock`; a 12-character prefix is display, and an ambiguous prefix is a rejection asking for a longer one. `interfaces_id`, `module`, `lock`, and `checker` move to `--provenance`. The `end` trailer is kept, in short form `end q:<12 hex>`; documented with its limit, which is that it detects a missing tail and nothing more, completeness being established by recomputation. A query id is a checkable citation, not a retrieval key — no report archive is kept, `brass` recomputes from the tree, and a report whose tree is gone cannot be rebuilt. The "identifies facts, not rendered bytes" rule below stands. Rewritten at assembly, not now.
 
 Every report opens with hashed header rows and closes with `end`. Three rows are standard in every verb; the rest are per verb.
 
@@ -680,7 +684,7 @@ Status symbols (ok / warning / error): that is judgment, and "wrong" lives in `d
 - **Validation.** The token table in §4 shows the report can answer particular maintenance questions in less context than the source. It does not show that a model completes changes more cheaply or more correctly. Test that with the payment workflow from §9.5: ask a model to locate a function, understand its preconditions, modify a body, and assess an interface change. Count everything it reads (type blocks, repeated headers, diagnostics, any `show`), and check the changes. Do this before further work on wording, delimiters, or flags.
 - **Transitions performed.** `states` says which state a parameter must be in; nothing says which state a function moves it to (`o enters Paid`). A row for the edge taken is a surface fact (spec §9.2) a reviewer wants. Form open, given the `->` history.
 
-## 14. `brass show` (proposed, `keel-core-considerations.v0.1.md` §25)
+## 14. `brass show` (proposed in the v0.1 considerations, unpublished)
 
 `info` answers "what is true"; `show` answers "what does the source say". Different question, so a different verb, not a flag. Same header rows, same column rule, same spider rule: bare lists, named answers, nothing dumps.
 
@@ -830,7 +834,7 @@ What the evaluator gained for it: `with { field: v, status enters S }`, `length`
 
 ## 18. The lean shape: answers sized to the step, not the question (built in the proxy 2026-10-01; measured)
 
-**Finding.** An agent's cost is model calls times context, not what a tool returns (`validation/13-evolution-benchmark/results.md`). Each brass call in the first benchmark phase took its own model call (63 of 64), so brass doubled Brass's cost while returning small answers. Reshaping the tool, not the language, removed the gap: Brass with brass went from 3.47M mean input to 2.09M (lean v1) to 1.31M (lean v2), the lowest of any arm, with correctness unchanged.
+**Finding.** An agent's cost is model calls times context, not what a tool returns (the unfamiliar-program trial, unpublished). Each brass call in the first benchmark phase took its own model call (63 of 64), so brass doubled Brass's cost while returning small answers. Reshaping the tool, not the language, removed the gap: Brass with brass went from 3.47M mean input to 2.09M (lean v1) to 1.31M (lean v2), the lowest of any arm, with correctness unchanged.
 
 **The shape** (`tools-and-testing/brass/BRASS.md`, "Lean mode"): several names per call; one `check` that runs everything and ends with `done` or what to fix; `show` of declarations only, whole files on request, several modules at once; no trailer on every answer; `apply` writing every edit in one call and checking in the same call. Two checks earned their place there by catching real defects from the benchmark: effect order (a write before a possible refusal: five of six Brass sessions on one task) and the host contract (an invented host operation).
 

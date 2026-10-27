@@ -1,16 +1,22 @@
-Brass documentation license
+Brass licensing
 
-Copyright 2026 Peter Nofelt
+Copyright © 2026 Peter Nofelt
 
-Which license applies where:
+Unless otherwise noted:
 
-- Prose: the specification, grammar, principles, considerations, change log,
-  everyday-code file, results, history, research records, and every README.
-  Licensed under the Creative Commons Attribution 4.0 International License
-  (CC BY 4.0): https://creativecommons.org/licenses/by/4.0/legalcode
-- Code: the example programs under examples/, the stand-in tool under
-  validation/proxy/, and every other script and tool in this repository.
-  Licensed under the Apache License, Version 2.0, in LICENSE.
+- The specification, documentation, articles, illustrations, diagrams,
+  results and trial records are licensed under the Creative Commons
+  Attribution 4.0 International License (CC BY 4.0):
+  https://creativecommons.org/licenses/by/4.0/
 
-Session transcripts under validation/ are records of trial runs and are
-shared under CC BY 4.0.
+- Source code, scripts, tools and example code are licensed under the
+  Apache License, Version 2.0. See LICENSE for the full terms.
+  This includes code examples embedded in documentation and trial records.
+
+The tool and trial materials are under tools-and-testing/.
+Complete example programs are under examples/.
+
+Third-party material retains its own license and attribution notices.
+
+Brass is a trademark of Peter Nofelt. These licenses do not grant
+trademark rights.

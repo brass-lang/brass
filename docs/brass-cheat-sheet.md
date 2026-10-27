@@ -1,8 +1,8 @@
 # Brass cheat sheet
 
-Brass v0.3 on one page, for lookup. The [spec](brass-core-spec.md) decides what is valid; each section links to the rule. Every "rejected" below is a rule the spec sets for the checker. `brass` today checks a program's structure, runs its examples and answers questions about the code; the full checker adds proofs of every `before` and `after`.
+Use this sheet to look up Brass syntax through short examples from a dinosaur park. Each section links to the rule in the [specification](brass-core-spec.md), which decides what is valid.
 
-The examples use one program, a park that keeps dinosaurs in paddocks.
+The rejection notes describe language rules, including checks still to be implemented. Today's `brass` tool checks program structure, runs examples and answers questions about the code. Proving function contracts requires the full checker.
 
 ## The smallest program
 

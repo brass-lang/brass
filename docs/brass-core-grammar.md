@@ -1,6 +1,8 @@
 # Brass Core Grammar v0.3
 
-Use this file to look up syntax, operators and keywords. The [specification](brass-core-spec.md) defines the rules and takes precedence if the two disagree. Its examples are reproduced here for lookup. Ellipses mark omitted source; excerpts are not complete modules.
+Use this reference to look up how a Brass construct is written or how its operators are grouped. Each section pairs examples with a link to the rule in the [specification](brass-core-spec.md).
+
+The examples are copied from the specification, which takes precedence if the documents disagree. Ellipses mark omitted source; excerpts are not complete modules.
 
 ## 1. Module layout
 

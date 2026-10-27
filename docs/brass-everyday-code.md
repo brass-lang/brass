@@ -1,18 +1,10 @@
-These six programs are reviewed by hand, not verified by a checker. Unsettled rules are noted beside the examples that need them.
-
-This file is not a spec. When a change to the language affects a form used here, update the program and read it again.
-
 # Brass — everyday code
 
-**These are warm-ups.** Six programs every language gets asked to write: an area, FizzBuzz, Fibonacci, a bank transfer, a filter, a retry. Small on purpose: this is the code a model writes all day, and it should read well in Brass too.
+Brass has to make ordinary code readable as well as express permissions and contracts. These six programs cover everyday work: calculating an area, FizzBuzz, Fibonacci, a bank transfer, filtering an array and retrying a call.
 
-**What Brass is for:** code where a wrong edit costs money or trust. A refund must name the right customer. A door needs an operator. A feeding has a signer only when delivered. `examples/` shows those three programs whole.
+Each program explains the Brass features it uses and where the language feels clear or awkward. The verdicts are the author's assessments. For complete programs combining authority, state and contracts, see [examples](../examples/).
 
-Their declarations carry authority, state, and promises for a reviewer to inspect. **The bet:** a checker can reject edits that break those declarations. It cannot catch mistakes the declarations do not describe.
-
-This file asks the smaller question: **does the ordinary code around them read well?** The model writes the payout and the FizzBuzz. A reviewer has to read both.
-
-Each program says what is distinctive about it and where the language is limited or leans on something unsettled. The verdicts are the author's.
+These programs have been reviewed by hand, not verified by a checker. Unsettled rules are noted beside the examples that need them. The [specification](brass-core-spec.md) defines what is valid; these examples need to be updated and reviewed again when the rules they use change.
 
 | # | Program | Verdict |
 |---|---|---|

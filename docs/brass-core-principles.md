@@ -1,6 +1,8 @@
 # Brass Core Principles v0.3
 
-This file explains the design choices and the evidence behind them. The [specification](brass-core-spec.md) defines the rules. Claims here are labeled **design choice**, **bet**, or **measured**.
+This document explains why Brass's rules take the form they do, what the design gives up and what the trials have established.
+
+Claims are labeled **design choice**, **bet**, or **measured** to distinguish decisions and expectations from observed results. The [specification](brass-core-spec.md) defines the rules themselves.
 
 ## 1. Intended use and evidence
 
@@ -10,9 +12,9 @@ This file explains the design choices and the evidence behind them. The [specifi
 
 **Bet.** Declaring requirements reduces how much a model must read to make a correct edit. Checker diagnostics reduce repair work. Test both on equivalent tasks with the same correctness requirements, counting work through the accepted patch.
 
-**Measured.** The early understanding-task comparisons reported 39% more attributable tokens than Python without tooling and 6% fewer with an early version of `brass`, excluding references. These are task-token comparisons, not source-read counts. They come from separate trial conditions on a 2,418-line corpus, one model family, and small samples. That tool ran no proofs. These results do not establish the performance of the full checker. See trial results (private record).
+**Measured.** The early understanding-task comparisons reported 39% more attributable tokens than Python without tooling and 6% fewer with an early version of `brass`, excluding references. These are task-token comparisons, not source-read counts. They come from separate trial conditions on a 2,418-line corpus, one model family, and small samples. That tool ran no proofs. These results do not establish the performance of the full checker. The trial records behind this are unpublished.
 
-**Measured.** In run 8, the reviewer found body reading largely unavoidable. See trial results (private record).
+**Measured.** In run 8, the reviewer found body reading largely unavoidable. The trial records behind this are unpublished.
 
 ## 2. Design choices and testable bets
 
@@ -22,7 +24,7 @@ This file explains the design choices and the evidence behind them. The [specifi
 
 **Design choice.** Use an explicit projection for a smaller record view. The source declaration identifies the target and the fields it can supply, without a class hierarchy to inspect. See spec §7.4. Use function signatures to expose inputs and authority; see spec §4 and §8.
 
-**Bet.** Limited factual redundancy costs less than reconstructing hidden relationships. Compare reasoning, reading, writing, and repair costs at equal correctness. The reported reasoning gap on complex edits, and its absence on simple edits, are consistent with this bet but do not establish its cause. See output analysis (private record) and simple-edit trials (private record).
+**Bet.** Limited factual redundancy costs less than reconstructing hidden relationships. Compare reasoning, reading, writing, and repair costs at equal correctness. The reported reasoning gap on complex edits, and its absence on simple edits, are consistent with this bet but do not establish its cause. The output analysis and the simple-edit trial records are unpublished.
 
 ### 2.2 Reviewed interfaces constrain body replacement
 
@@ -96,7 +98,7 @@ This file explains the design choices and the evidence behind them. The [specifi
 
 **Bet.** Their review benefit exceeds their writing cost. Measure review accuracy and total cost through an accepted patch.
 
-**Measured.** The results record reports 2,418 language-source lines against 3,210 Python lines. Run 7 session answers used 25–85% more words. These figures describe those samples, not all Brass programs. See trial results (private record).
+**Measured.** The results record reports 2,418 language-source lines against 3,210 Python lines. Run 7 session answers used 25–85% more words. These figures describe those samples, not all Brass programs. The trial records behind this are unpublished.
 
 ## 3. Design guidance
 
@@ -112,9 +114,9 @@ Each item is a **design choice**, not an additional language rule.
 
 ## 4. Evidence limits
 
-**Measured.** Trials 6–8 reported no invented syntax. This does not establish how a working checker would detect behavioral defects. See trial results (private record).
+**Measured.** Trials 6–8 reported no invented syntax. This does not establish how a working checker would detect behavioral defects. The trial records behind this are unpublished.
 
-**Measured.** Six sessions split the feeding record and added a storage operation before conditional fields were available. This observation motivated a design investigation; it does not establish the efficiency of the resulting form. See trial results (private record).
+**Measured.** Six sessions split the feeding record and added a storage operation before conditional fields were available. This observation motivated a design investigation; it does not establish the efficiency of the resulting form. The trial records behind this are unpublished.
 
 **Design choice — influences.** The design draws on capability authority from E, refinements from Ada, contracts from Dafny, interface separation from OCaml, and locked dependencies from Cargo. The combination and its intended use are design choices, not measured benefits.
 

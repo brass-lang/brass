@@ -1,6 +1,8 @@
-Status: design note, started 2026-09-25 at assembly. Companion to `brass-core-spec.md` §3 and §11. Normative for what it holds: the spec says what *proven* means and what is rejected; this file says what a conforming checker must accept and reject, and what stays its own business. No checker exists.
-
 # Brass Checker
+
+A conforming checker must accept the valid cases promised by the language as well as reject programs that break its rules. This document defines those cases, the proof limits and the required diagnostics.
+
+The [specification](../brass-core-spec.md) defines what **proven** means and which programs are legal. This design sets the checker's obligations and identifies the implementation choices that remain open. The full proof checker is not yet implemented.
 
 ## 1. The split
 
@@ -10,7 +12,7 @@ The language decides what is true and promised. The checker decides how cheaply 
 
 A proof across a module boundary uses the imported declaration and its contracts only, never the imported body, so each module is proved alone and re-proved only when its own text or an imported interface changes. Inside a module, a helper is proved through its contract when it has one, else through its body. Contracts are optional on every declaration; a caller's clause that needs an absent callee contract is rejected as not proven, naming the callee.
 
-The fragment is the spec's §3.2. Every intermediate a clause evaluates must fit `Int`; the checker may show that from the operands' types or from the body, as it proves any `after`. A product of two variables is admitted when their widths or ranges bound it. Floats are carried, never reasoned about.
+The fragment is the spec's §11.1. Every intermediate a clause evaluates must fit `Int`; the checker may show that from the operands' types or from the body, as it proves any `after`. A product of two variables is admitted when their widths or ranges bound it. Floats are carried, never reasoned about.
 
 ## 3. Required cases
 

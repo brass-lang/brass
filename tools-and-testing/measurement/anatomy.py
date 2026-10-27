@@ -7,7 +7,7 @@ Per session: first-call context, final context, own text (non-thinking output), 
 tool results in context (final - first - own text), attributable (tool + own + thinking),
 model calls, cumulative context processed, fresh (uncached) share, tool-result bytes,
 final answer characters. One request counted once; the last logged line of a request carries
-its full output figure. See validation/token-anatomy.md for why this and not the harness summary.
+its full output figure. The harness summary undercounts; this counts each request once from the log.
 """
 import json
 import sys

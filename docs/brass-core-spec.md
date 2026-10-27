@@ -1,8 +1,10 @@
 # Brass Core Specification v0.3
 
-This file defines the language rules. The [grammar](brass-core-grammar.md) provides syntax examples and lookup tables. [Principles](brass-core-principles.md) records design choices, reasons, and evidence. Open and deferred questions are kept in a private considerations file; [HISTORY](../HISTORY.md) lists what is still to decide.
+This specification defines the rules of Brass v0.3: which programs are valid, what checking establishes and how programs behave at runtime. It takes precedence when a companion document disagrees.
 
-Companion documents define [report formats](design/brass-report-design.md), runtime mechanics (a private design note, to be rewritten once the runtime is decided), and [required checker cases](design/brass-checker-design.md). This specification takes precedence when a companion disagrees.
+For syntax examples and lookup tables, use the [grammar](brass-core-grammar.md). For the reasons behind the rules and the evidence supporting them, see [principles](brass-core-principles.md). Companion designs cover [report formats](design/brass-report-design.md) and [required checker cases](design/brass-checker-design.md).
+
+[HISTORY](../HISTORY.md) lists what remains to decide. Detailed considerations and runtime mechanics are recorded in private working notes.
 
 ## 0. Scope and tiers
 

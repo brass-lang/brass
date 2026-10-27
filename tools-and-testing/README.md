@@ -4,7 +4,7 @@ This folder contains the `brass` tool and the records behind the published resul
 
 | Folder | What it is |
 |---|---|
-| [`brass/`](brass/) | The `brass` tool: checks a program's structure, runs its examples and answers questions about the code. `bin/brass` is the command; `BRASS.md` documents it. The README's "Try it" starts here. |
+| [`brass/`](brass/) | The `brass` tool: checks a program's structure, runs its examples and answers questions about the code. `bin/brass` is the command; [`BRASS.md`](brass/BRASS.md) documents it. |
 | [`snapshot-20261019/`](snapshot-20261019/) | The 40-session Sonnet comparison: cash advances at two codebase sizes, plus trip plans, in Brass and Python. Includes prompts, transcripts, finished programs and scores. Frozen on 2026-10-19. |
 | [`earlier-tests/`](earlier-tests/) | Two earlier comparisons: supplying a shared state vocabulary (`16-settled`), and giving Python a similar tool and project map (`18-python-tool`). |
 | [`reference/`](reference/) | The editing reference for models. Frozen copies in the snapshot show what each setup received. |

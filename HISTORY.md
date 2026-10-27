@@ -1,14 +1,14 @@
 # History
 
-Brass began in early September 2026. From the start, the idea was to build a language designed to be efficient for AI to understand and reason with. Seven weeks later, by October 25, the work covered about 615 commits — producing the spec in its current form, v0.3.
+Brass began in early September 2026 with a question: how could a programming language help AI models build context and reason about code more efficiently? By October 25, about 615 commits over seven weeks had brought the specification to v0.3.
 
-Every language decision was the author's. AI models drafted most of the text, built the trial tooling, and were also the trial subjects. As historical context, Brass was originally called Keel, so that name shows up early in Brass's history and in the earlier trial records.
+This history follows the decisions, reviews and trials that shaped the language and its tooling, including the questions that remain open.
 
-This document is meant to detail the high-level themes of work, effort and thinking that went into the current published spec; mostly for posterity, but also in case it's useful to others.
+The author made the language decisions. AI models drafted most of the text, built the trial tooling and took part as trial subjects. The language was originally called Keel, so earlier sections and trial records retain that name.
 
 ## In brief
 
-Brass started with a practical question: how much code should a model need to read before changing one function? Its declarations say what the function needs, promises and may touch. `brass` finds those facts today; the full checker will reject edits that break them.
+The design puts the facts a model needs in declarations, reducing the need to search for them or work them out from an implementation. Each function says what it needs, promises and may touch. `brass` finds those facts today; the full checker will reject edits that break them.
 
 - **Fewer calls, less repeated context.** In the latest Sonnet trial, Brass took fewer than half as many model calls as Python and sent less than half as much text across them. The average bill was 14 to 24 percent lower.
 - **More reasoning.** Sonnet used 1.4 to 1.8 times as many reasoning tokens in Brass. The working explanation is unfamiliarity; that remains to be tested.

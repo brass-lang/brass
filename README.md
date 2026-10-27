@@ -14,7 +14,7 @@ Enter Brass, a language designed to help AI models spend fewer tokens understand
 
 3. **Help models find and change code.** The `brass` command shows declarations, finds their uses and checks patches before writing them. Those answers help a model decide what else it needs to read and which code to change.
 
-Currently, Brass v0.3 exists as: a language specification, tooling to support AI-driven code navigation, and a "checker" which allows the AI model to confirm syntactic correctness. With this, we are able to demonstrate the language's token efficiency, showing that models can develop Brass code at a lower token cost than Python.
+Brass v0.3 includes the language specification and a working tool for navigating, editing and checking code. The tool checks program structure and runs examples. Trials have measured this setup against Python; the results follow below.
 
 A formal compiler and runtime are what's up next for Brass.
 
@@ -105,7 +105,7 @@ The trial sessions worked from a language reference and existing Brass programs,
 No. Brass favors explicit declarations, even when they add lines. The aim is to reduce the work a model does to understand and change a program while keeping the code clear enough for a person to review.
 
 **What comes next?**\
-A more robust contract checker, followed by a compiled runtime. The next trials can then measure the work needed to reach a running result that meets the task's requirements, including failed attempts and repairs.
+The full contract checker, followed by a compiled runtime. The next trials can then measure the work needed to reach a running result that meets the task's requirements, including failed attempts and repairs.
 
 ## Request for comments
 
