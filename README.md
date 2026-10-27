@@ -111,6 +111,8 @@ The full contract checker, followed by a compiled runtime. The next trials can t
 
 What would you need to see before trusting a model's edit? What would you want to build that Brass cannot express? [Open an issue](https://github.com/brass-lang/brass/issues) with your question or example, or write to pcnofelt@[your standard google email provider].com.
 
+There is also a Discord, new and worth a try: [join the Brass Discord](https://discord.gg/gW5qqWF2R).
+
 ---
 
 The Brass specification and documentation are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), and the code under the [Apache License 2.0](LICENSE). See [LICENSE-docs](LICENSE-docs) for details. © 2026 Peter Nofelt. Brass is a trademark of Peter Nofelt.
