@@ -74,6 +74,23 @@ def relink(html: str, depth: int) -> str:
     return re.sub(r'href="([^"]*)"', fix, html)
 
 
+def anchor_headings(html: str) -> str:
+    """Give each heading the id GitHub's page scripts would: lowercased, punctuation dropped,
+    spaces to hyphens, duplicates suffixed -1, -2. The Markdown API leaves headings without ids."""
+    seen = {}
+
+    def slug(text: str) -> str:
+        s = re.sub(r"<[^>]+>", "", text).lower()
+        s = re.sub(r"[^\w\- ]", "", s).replace(" ", "-")
+        n = seen.get(s, 0)
+        seen[s] = n + 1
+        return s if n == 0 else f"{s}-{n}"
+
+    return re.sub(r'<h([1-6])([^>]*)>(.*?)</h\1>',
+                  lambda m: f'<h{m.group(1)}{m.group(2)} id="{slug(m.group(3))}">{m.group(3)}</h{m.group(1)}>',
+                  html, flags=re.S)
+
+
 def title_of(md: str, fallback: str) -> str:
     m = re.search(r"^# (.+)$", md, re.M)
     return m.group(1).strip() if m else fallback
@@ -93,7 +110,7 @@ def main():
             out = out.with_name("index.html")
         out.parent.mkdir(parents=True, exist_ok=True)
         md = src.read_text()
-        html = relink(render(md), depth=len(rel.parts) - 1)
+        html = anchor_headings(relink(render(md), depth=len(rel.parts) - 1))
         out.write_text(TEMPLATE.format(title=title_of(md, rel.stem), css=CSS, body=html))
         count += 1
     for src in sorted((ROOT / "docs").glob("*.html")) + sorted((ROOT / "docs").glob("*.js")):
