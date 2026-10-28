@@ -25,13 +25,13 @@ TOPBAR_CSS = """
 .top{{box-sizing:border-box;display:flex;justify-content:space-between;align-items:flex-start;padding:12px clamp(16px,5vw,64px) 0;
   font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif;letter-spacing:normal}}
 .top .links, .top .group{{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px 18px}}
-.top .links{{column-gap:36px}}
 .top a{{color:#59636e;text-decoration:none}}
-.top a:hover{{color:#1C4FB8;text-decoration:underline}}
+.top a:hover, .top a[aria-current]{{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.4em}}
+.top a:hover{{color:#1C4FB8}}
 .top .name{{font-weight:600;color:#1f2328}}
-.top a[aria-current]{{color:#1f2328;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.4em}}
+.top a[aria-current]{{color:#1f2328}}
 @media (prefers-color-scheme: dark){{.top a{{color:#9198a1}}.top .name, .top a[aria-current]{{color:#f0f6fc}}.top a:hover{{color:#6FA0FF}}}}
-@media (max-width:767px){{.top .group{{column-gap:14px}}.top .links{{column-gap:24px}}}}
+@media (max-width:767px){{.top .links, .top .group{{column-gap:14px}}}}
 """
 # Two groups: the essays, then the reference documents.
 NAV = [[("Welcome", "welcome-to-brass-language.html"), ("Token efficiency", "ai-token-efficiency-of-brass.html")],
