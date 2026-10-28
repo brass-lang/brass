@@ -4,9 +4,7 @@
 
 [Welcome to Brass Language](https://brass-lang.github.io/brass/welcome-to-brass-language.html) • [The AI Token Efficiency of Brass](https://brass-lang.github.io/brass/ai-token-efficiency-of-brass.html) • [Grammar](docs/brass-core-grammar.md) • [Request for comments](#request-for-comments)
 
-Today, AI models write code in languages that were never designed for them. C++, Python and Rust were built for people doing that now-ancient thing of writing code by hand, so they reward clever abstractions and hidden dependencies. That's great when you already know the codebase. For a model, it means navigating five parent classes to understand one method.
-
-Enter Brass, a language designed to help AI models spend fewer tokens understanding and changing code. The language itself favors explicitness over abstraction and is designed with built-in tooling, allowing AI models to navigate code and gather context more efficiently. Brass the language (and its tooling) is built around three ideas:
+Brass is a language designed to help AI models spend fewer tokens understanding and changing code. The language itself favors explicitness over abstraction and is designed with built-in tooling, allowing AI models to navigate code and gather context more efficiently. Brass the language (and its tooling) is built around three ideas:
 
 1. **Keep meaning local.** Each record lists its own fields. A function’s declaration shows its inputs, promises and access to outside services, so a model or reviewer can find those facts without tracing them through other implementations.
 

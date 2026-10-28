@@ -35,7 +35,8 @@ TOPBAR_CSS = """
 """
 # Two groups: the essays, then the reference documents.
 NAV = [[("Welcome", "welcome-to-brass-language.html"), ("Token efficiency", "ai-token-efficiency-of-brass.html")],
-       [("Spec", "docs/brass-core-spec.html"), ("Grammar", "docs/brass-core-grammar.html")]]
+       [("Spec", "docs/brass-core-spec.html"), ("Grammar", "docs/brass-core-grammar.html"),
+        ("Everyday code", "docs/brass-everyday-code.html")]]
 
 
 def topbar(root: str, here: str) -> str:
