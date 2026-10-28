@@ -19,17 +19,19 @@ TREE = f"https://github.com/{REPO}/tree/main/"
 CSS = "https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.8.1/github-markdown.min.css"
 SKIP = {"tools-and-testing", "site", ".github", ".git"}
 
-# The top bar every page shares, the two reader pages included.
+# The top bar every page shares, the two reader pages included: full width, the same margins everywhere,
+# and the current page underlined rather than bold, so no link moves between pages.
 TOPBAR_CSS = """
-.top{{box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;max-width:980px;margin:0 auto;padding:12px 45px 0;
+.top{{box-sizing:border-box;display:flex;justify-content:space-between;align-items:flex-start;padding:12px clamp(16px,5vw,64px) 0;
   font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif;letter-spacing:normal}}
 .top .links, .top .group{{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px 18px}}
 .top .links{{column-gap:36px}}
 .top a{{color:#59636e;text-decoration:none}}
 .top a:hover{{color:#1C4FB8;text-decoration:underline}}
-.top .name, .top a[aria-current]{{font-weight:600;color:#1f2328}}
+.top .name{{font-weight:600;color:#1f2328}}
+.top a[aria-current]{{color:#1f2328;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.4em}}
 @media (prefers-color-scheme: dark){{.top a{{color:#9198a1}}.top .name, .top a[aria-current]{{color:#f0f6fc}}.top a:hover{{color:#6FA0FF}}}}
-@media (max-width:767px){{.top{{padding:10px 15px 0;align-items:flex-start}}.top .group{{column-gap:14px}}.top .links{{column-gap:24px}}}}
+@media (max-width:767px){{.top .group{{column-gap:14px}}.top .links{{column-gap:24px}}}}
 """
 # Two groups: the essays, then the reference documents.
 NAV = [[("Welcome", "welcome-to-brass-language.html"), ("Token efficiency", "ai-token-efficiency-of-brass.html")],
@@ -83,10 +85,11 @@ body{{margin:0;background:#fff}}
 </html>
 """
 
-# On the reader pages the bar opens their <article>, so it takes that page's column; it steps up into the body's top padding.
+# The reader pages pad their body (48px top, the bar's side margins); the bar steps out of that padding.
+# Below it, the label and title land where a Markdown page's title does.
 READER_CSS = ("<style>" + TOPBAR_CSS + """
-article > .top{{max-width:none;margin:-36px 0 30px;padding:0}}
-@media (max-width:767px){{article > .top{{margin-bottom:16px}}}}
+body > .top{{margin:-48px calc(-1 * clamp(16px,5vw,64px)) 30px}}
+@media (max-width:767px){{body > .top{{margin-bottom:18px}}}}
 </style>
 """).format()
 
@@ -168,7 +171,7 @@ def main():
         page = src.read_text()
         if page.count("<body>\n<article>\n") != 1:
             sys.exit(f"{src.name}: expected the page to open with <body> then <article>, to put the top bar in")
-        (SITE / src.name).write_text(page.replace("<body>\n<article>\n", "<body>\n<article>\n" + READER_CSS + topbar("", src.name) + "\n"))
+        (SITE / src.name).write_text(page.replace("<body>\n<article>\n", "<body>\n" + READER_CSS + topbar("", src.name) + "\n<article>\n"))
     for src in sorted((ROOT / "docs").glob("*.js")):
         shutil.copy(src, SITE / src.name)
     shutil.copytree(ROOT / "docs" / "images", SITE / "docs" / "images")
