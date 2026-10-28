@@ -16,7 +16,7 @@ Brass v0.3 includes the language specification and a working tool for navigating
 
 A formal compiler and runtime are what's up next for Brass.
 
-**Interested and looking for a place to start?** Go with **[Welcome to Brass Language](https://brass-lang.github.io/brass/welcome-to-brass-language.html)**, a tour of the language through a park of dinosaurs and the doors that keep them in.
+**Interested and looking for a place to start?** Go with **[Welcome to Brass Language](https://brass-lang.github.io/brass/welcome-to-brass-language.html)**, a walk through the language, set in a dinosaur park where the code keeps the gates shut.
 
 ## The AI model token performance of Brass
 
