@@ -8,7 +8,7 @@
 <!-- Brass palette switch: add this line back to show the Brass arms in green -->
 <!-- <script>document.documentElement.setAttribute("data-palette","green")</script> -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inconsolata:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inconsolata:wght@400;500&display=swap">
 <style>
 :root{
   --paper:#FFFFF8; --ink:#111110; --soft:#4A4A45; --py:#A24D44; --keel:#6F98E2; --keel-t:#4A74C8; --acc:#123A8A; --rule:#CFCFC2; --faint:#E6E6DA;
@@ -34,9 +34,10 @@ html{ background:var(--paper); }
 body{ background:var(--paper); color:var(--ink); font-family:var(--serif); font-size:19px; line-height:1.5;
   font-variant-numeric:oldstyle-nums proportional-nums; padding-inline:clamp(16px,5vw,64px); padding-block:48px 80px; }
 article{ max-width:1180px; margin:0 auto; }
-h1{ font-weight:400; font-size:2.6rem; line-height:1.1; margin:0 0 .3rem; letter-spacing:-.005em; text-wrap:balance; }
+h1{ font-weight:500; font-size:2.6rem; line-height:1.1; margin:0 0 .3rem; letter-spacing:-.005em; text-wrap:balance; }
 .subtitle{ font-style:italic; font-size:1.35rem; color:var(--soft); margin:0 0 2.2rem; }
-h2{ font-weight:400; font-style:italic; font-size:1.65rem; margin:3.2rem 0 .6rem; text-wrap:balance; }
+.kicker{ font-variant:small-caps; letter-spacing:.08em; color:var(--soft); font-size:1rem; margin:0 0 .2rem; }
+h2{ font-weight:500; font-style:italic; font-size:1.8rem; line-height:1.2; margin:3.4rem 0 .7rem; text-wrap:balance; }
 p, ul{ max-width:34rem; margin:0 0 1.1rem; }
 ul{ padding-left:1.1rem; }
 li{ margin-bottom:.45rem; }
@@ -144,6 +145,7 @@ tbody tr.gap td{ padding-top:.55rem; }
 </head>
 <body>
 <article>
+<p class="kicker">essay</p>
 <h1>The AI Token Efficiency of Brass</h1>
 <p class="subtitle">What forty coding sessions tell us about language, tooling and cost</p>
 
