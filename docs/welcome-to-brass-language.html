@@ -351,7 +351,7 @@ body
 <!-- 3. framing -->
 <div class="sign ">Concept: language design choices</div>
 <h2>Where Brass departs from the usual form</h2>
-<p>Before moving to the next phase of code development, let’s spend a moment to consider the language in broader terms. Though most of Brass will look familiar, core differences come from one of three critical design choices:</p>
+<p>Before moving to the next phase of code development, let’s spend a moment to consider the language in broader terms. Though most of Brass will look familiar, the differences you’ll notice come from three critical design choices:</p>
 <ol>
   <li><b>Keep meaning local.</b> Business logic is kept as local to the source file as possible. This means Brass leaves out inheritance, dynamic dispatch and mutable global state, to cut down on the cross-file detective work that generally comes with navigating a pre-AI language.</li>
   <li><b>Say it one way.</b> Each Brass keyword has one meaning, or a few closely related ones, and tries to narrow its use case to one kind. This means no overloading and no mixing of metaphors (such as using <code>+</code> to mean the summing of numbers <i>and</i> the concatenation of strings).</li>
