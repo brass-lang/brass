@@ -120,11 +120,19 @@ The public repository took its final shape, with the language documents and the 
 
 On October 27 the repository went public at [github.com/brass-lang/brass](https://github.com/brass-lang/brass), with a fresh history, and the site went live at [brass-lang.github.io/brass](https://brass-lang.github.io/brass/). Brass v0.3 is out for comment.
 
+## Up next
+
+Brass today bounds what a program may ever do. Two failures remain, and the work after v0.3 goes at them.
+
+- **An allowed operation, for the wrong task.** A program granted refunds up to $50,000 can refund the wrong order, or the right order twice. The plan: the boundary hands an entry point a narrower access for one task, with a fixed order, a lower ceiling, a call count and an expiry. The model proposes; it does not choose the order, the recipient or the ceiling. Enforced by the host, no proof obligation.
+- **An allowed destination, the wrong information.** A program allowed to read a database and allowed to call a support service can copy one into the other. The first step costs nothing: outbound operations take typed payloads, so an operation that takes contact details cannot be handed a network map. Where a type is not enough, the five-system exercise will show it.
+
 ## Still to decide
 
 - **How Brass runs.** Compile directly, perhaps to WebAssembly, or translate to a language with a mature compiler.
 - **Memory.** Values do not change in place, and each task has a memory limit. The implementation still needs to decide how those values are stored, shared and freed.
 - **The full checker.** How to prove the declared promises quickly enough to support repeated edits.
+- **What the transcript records.** Every access call and its outcome, and the values of a failed runtime check, are written without any grant. Identifiers and decisions by default, with payloads only under a grant, is the leading design.
 - **Python with tooling like `brass`.** Early tests included some preliminary testing of Python with context tooling similar to `brass`. Not investigated further due to time constraints; worth revisiting.
 
 ## Ideas from other languages

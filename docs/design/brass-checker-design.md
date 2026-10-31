@@ -38,6 +38,20 @@ A conforming checker produces the specified acceptance or rejection for each of 
 
 The loop procedure behind the first rows, from review S1: a local rebound each iteration by a value in `lo to hi` over at most N iterations is known at exit to lie in `start + k·lo` to `start + k·hi` for `k in 0 to N`; any other loop-carried value is known by its declared type alone. Whether an explicit invariant clause is ever needed waits for a real loop the inferred shape misses.
 
+### Authority cases
+
+What the checker establishes about authority, and what it does not. The second column is the honest one.
+
+| Case | Verdict |
+|---|---|
+| An access value built from a literal, a record, bytes or a reply; an access stored, returned or captured | rejected (§8.1); authority exists only as a grant or a parameter |
+| An `allow` called with a literal or `const` destination outside a bound of the grant | rejected at check time; a run-time value is refused by the host before any effect (§8.3) |
+| Input choosing between two operations the function may perform, or filling an argument an `allow` sends | accepted; input selects among permitted actions and cannot widen them. The check does not establish that the choice matches anyone's intent |
+| A body holding two accesses that reads through one and sends through the other | accepted when types fit; nothing in v0.3 establishes which data may reach which recipient |
+| The same `allow` called twice where the contracts hold each time | accepted; a successful check does not bound effect count or order (§11.2) |
+| A grant widened in `system`, within the access type | accepted and hashed into `lock`; the check is not proof of review (§10.1) |
+| A grant outside the access type's refinement | rejected (§8.4) |
+
 ## 4. Bounds on proving
 
 The proof bound per obligation is a checker-defined unit of work, a `brass` setting recorded in `lock` beside the checker identity; the spec promises only that the bound exists and that exceeding it is the rejection *not proven in time*, a third answer beside proven and refuted. Interval reasoning against exact search for bounded products, and where the bound bites, is this file's to decide.

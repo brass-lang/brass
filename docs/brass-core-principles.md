@@ -100,6 +100,14 @@ Claims are labeled **design choice**, **bet**, or **measured** to distinguish de
 
 **Measured.** The results record reports 2,418 language-source lines against 3,210 Python lines. Run 7 session answers used 25–85% more words. These figures describe those samples, not all Brass programs. The trial records behind this are unpublished.
 
+### 2.15 Input never widens authority
+
+**Design choice.** A runtime value never chooses which access is used or which host operation runs. A host call names an access parameter and one of its `allow` operations; there are no function values, no dynamic loading and no open-world names (spec §2, §8.1, §15). A value may select between accesses a function already holds. It cannot add one, because the parameter list is the function's complete authority (§8.1). Input that arrives as data, a request, a page or a reply, can inform what a program does. It cannot widen what the program may do.
+
+### 2.16 Logging is a sink
+
+**Design choice.** Brass has no print and no ambient output. Writing a log line, a file or a message is an `allow` on a granted access, like any other effect, and every call is written to the transcript (§8.1, §10.3). A function without the access cannot log. A grant carries identifiers, never secrets (§8.5), so the program never holds a credential that a log could leak. One record is written without a grant: the runtime's own transcript, and the clause and values of a failed runtime check (§6, §10.3). What it records, and who reads it, is a runtime design question still open.
+
 ## 3. Design guidance
 
 Each item is a **design choice**, not an additional language rule.
@@ -117,6 +125,8 @@ Each item is a **design choice**, not an additional language rule.
 **Measured.** Trials 6–8 reported no invented syntax. This does not establish how a working checker would detect behavioral defects. The trial records behind this are unpublished.
 
 **Measured.** Six sessions split the feeding record and added a storage operation before conditional fields were available. This observation motivated a design investigation; it does not establish the efficiency of the resulting form. The trial records behind this are unpublished.
+
+**Design choice — limits.** Brass governs the artifact, not the author's session. The checker and the runtime bound what a compiled program may do and record what it did. Neither can stop a person from handing a credential to the tool that writes the program. Nor does the rule against minting reach a credential that arrives as data: a bearer token read from a reply, plus a broad network access, can still authenticate somewhere else. No minting protects Brass's access values, not tokens from the outside world. The host, which implements every `allow` and enforces every bound, is the most security-critical code in a deployment, and it is not written in Brass. It is small, named in `lock`, and audited once. That is a design choice, not a guarantee.
 
 **Design choice — influences.** The design draws on capability authority from E, refinements from Ada, contracts from Dafny, interface separation from OCaml, and locked dependencies from Cargo. The combination and its intended use are design choices, not measured benefits.
 

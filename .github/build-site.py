@@ -35,8 +35,8 @@ TOPBAR_CSS = """
 """
 # Two groups: the essays, then the reference documents.
 NAV = [[("Welcome", "welcome-to-brass-language.html"), ("Token efficiency", "ai-token-efficiency-of-brass.html")],
-       [("Spec", "docs/brass-core-spec.html"), ("Grammar", "docs/brass-core-grammar.html"),
-        ("Everyday code", "docs/brass-everyday-code.html")]]
+       [("Spec", "docs/brass-core-spec.html"), ("All docs", "docs/index.html")]]
+DOCS_INDEX = ROOT / "docs" / "README.md"
 
 
 def topbar(root: str, here: str) -> str:
@@ -144,6 +144,14 @@ def anchor_headings(html: str) -> str:
                   html, flags=re.S)
 
 
+def unlisted(sources: list) -> list:
+    """Markdown pages the docs index does not link to; the home page and the index itself need no entry."""
+    listed = {(DOCS_INDEX.parent / href).resolve()
+              for href in re.findall(r"\]\(([^)#\s]+\.md)\)", DOCS_INDEX.read_text())}
+    exempt = {(ROOT / "README.md").resolve(), DOCS_INDEX.resolve()}
+    return [s.relative_to(ROOT).as_posix() for s in sources if s.resolve() not in listed | exempt]
+
+
 def title_of(md: str, fallback: str) -> str:
     m = re.search(r"^# (.+)$", md, re.M)
     return m.group(1).strip() if m else fallback
@@ -153,11 +161,13 @@ def main():
     if SITE.exists():
         shutil.rmtree(SITE)
     SITE.mkdir()
+    sources = [s for s in sorted(ROOT.rglob("*.md")) if s.relative_to(ROOT).parts[0] not in SKIP]
+    missing_docs = unlisted(sources)
+    if missing_docs:
+        sys.exit(f"docs/README.md does not list: {missing_docs}")
     count = 0
-    for src in sorted(ROOT.rglob("*.md")):
+    for src in sources:
         rel = src.relative_to(ROOT)
-        if rel.parts[0] in SKIP:
-            continue
         out = SITE / rel.with_suffix(".html")
         if src.name == "README.md":
             out = out.with_name("index.html")
