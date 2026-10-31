@@ -2,7 +2,7 @@
 
 **A token-efficient programming language designed for AI to write and humans to trust.**
 
-[Welcome to Brass Language](https://brass-lang.github.io/brass/welcome-to-brass-language.html) • [The AI Token Efficiency of Brass](https://brass-lang.github.io/brass/ai-token-efficiency-of-brass.html) • [All docs](docs/README.md) • [Request for comments](#request-for-comments)
+[Welcome to Brass](https://brass-lang.github.io/brass/welcome-to-brass-language.html) • [AI Token Efficiency](https://brass-lang.github.io/brass/ai-token-efficiency-of-brass.html) • [All Docs](docs/README.md) • [Request for Comments](#request-for-comments)
 
 Brass is a language designed to help AI models spend fewer tokens understanding and changing code. The language itself favors explicitness over abstraction and is designed with built-in tooling, allowing AI models to navigate code and gather context more efficiently. Brass, the language and its tooling, comes down to three ideas:
 

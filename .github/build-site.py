@@ -34,8 +34,8 @@ TOPBAR_CSS = """
 @media (max-width:767px){{.top .links, .top .group{{column-gap:14px}}}}
 """
 # Two groups: the essays, then the reference documents.
-NAV = [[("Welcome", "welcome-to-brass-language.html"), ("Token efficiency", "ai-token-efficiency-of-brass.html")],
-       [("Spec", "docs/brass-core-spec.html"), ("All docs", "docs/index.html")]]
+NAV = [[("Welcome", "welcome-to-brass-language.html"), ("Token Efficiency", "ai-token-efficiency-of-brass.html")],
+       [("Spec", "docs/brass-core-spec.html"), ("All Docs", "docs/index.html")]]
 DOCS_INDEX = ROOT / "docs" / "README.md"
 
 
