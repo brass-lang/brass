@@ -62,7 +62,7 @@ Every proven clause is evaluated again at run time where it applies, always; the
 
 ## 6. Diagnostics
 
-An error says what is wrong and what to change. The decided lines are listed in `brass-report-design.md` §0. Two things a checker distinguishes, because the repair differs: a demonstrated violation (a counterexample) and an undischarged obligation (not proven). A hole (`@@name`) is a rejection that lists the hole's expected type, the bindings in scope with their narrowings, and what would have to be established for each candidate.
+An error says what is wrong and what to change. The decided lines are listed in `brass-report-design.md` §6. Two things a checker distinguishes, because the repair differs: a demonstrated violation (a counterexample) and an undischarged obligation (not proven). A hole (`@@name`) is a rejection that lists the hole's expected type, the bindings in scope with their narrowings, and what would have to be established for each candidate.
 
 ## 7. Parked
 
