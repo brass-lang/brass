@@ -134,7 +134,7 @@ WebAssembly was chosen as the execution target. The remaining question is whethe
 
 Brass today bounds what a program may ever do. Two failures remain, and the work after v0.3 goes at them.
 
-- **An allowed operation, for the wrong task.** A program granted refunds up to $50,000 can refund the wrong order, or the right order twice. The plan: the boundary hands an entry point a narrower access for one task, with a fixed order, a lower ceiling, a call count and an expiry. The model proposes; it does not choose the order, the recipient or the ceiling. Enforced by the host, no proof obligation.
+- **An allowed operation, for the wrong task.** A program granted refunds up to $500 each can refund the wrong order, or the right order twice. The plan: the boundary hands an entry point a narrower access for one task, with a fixed order, a lower ceiling, a call count and an expiry. The model proposes; it does not choose the order, the recipient or the ceiling. Enforced by the host, no proof obligation.
 - **An allowed destination, the wrong information.** A program allowed to read a database and allowed to call a support service can copy one into the other. The first step costs nothing: outbound operations take typed payloads, so an operation that takes contact details cannot be handed a network map. Where a type is not enough, the five-system exercise will show it.
 
 ## Still to decide
