@@ -120,6 +120,16 @@ The public repository took its final shape, with the language documents and the 
 
 On October 27 the repository went public at [github.com/brass-lang/brass](https://github.com/brass-lang/brass), with a fresh history, and the site went live at [brass-lang.github.io/brass](https://brass-lang.github.io/brass/). Brass v0.3 is out for comment.
 
+## Week 9 — After publication
+
+The README and introductory pages were simplified, and the site gained consistent navigation and a page listing all the documentation. The tool design notes now distinguish current behavior from planned checks.
+
+The security proposals addressed two risks: a model using an allowed operation for the wrong task, and sensitive information escaping through logs. They explored restricting permissions to the current task and controlling which data a log may contain.
+
+Sealed functions became a proposal for protecting reviewed code from unapproved changes. A model could prepare an edit, but the changed function would need approval before passing the build. The idea is open for comment as [issue #1](https://github.com/brass-lang/brass/issues/1).
+
+WebAssembly was chosen as the execution target. The remaining question is whether Brass should compile through Rust or directly to WebAssembly.
+
 ## Up next
 
 Brass today bounds what a program may ever do. Two failures remain, and the work after v0.3 goes at them.
@@ -129,7 +139,7 @@ Brass today bounds what a program may ever do. Two failures remain, and the work
 
 ## Still to decide
 
-- **How Brass runs.** Compile directly, perhaps to WebAssembly, or translate to a language with a mature compiler.
+- **How Brass runs.** WebAssembly is the target. Open: translate to Rust first and use its compiler, or compile straight to WebAssembly.
 - **Memory.** Values do not change in place, and each task has a memory limit. The implementation still needs to decide how those values are stored, shared and freed.
 - **The full checker.** How to prove the declared promises quickly enough to support repeated edits.
 - **What the transcript records.** Every access call and its outcome, and the values of a failed runtime check, are written without any grant. Identifiers and decisions by default, with payloads only under a grant, is the leading design.
