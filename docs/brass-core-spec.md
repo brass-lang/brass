@@ -680,6 +680,24 @@ Entering the states through `with` requires the field in the same update. A tran
 
 For equality, see §3.1.
 
+### 9.5 A value that holds a state of one of several machines
+
+A field has one machine type, and a sum carries no data (§2), so no type means "a state of one of these machines". A record that must hold a state from several machines declares a shared vocabulary, a plain sum of state names, and one converter per machine into it. A field that held one machine's state holds the vocabulary; callers convert where they build the record. When readers must know which machine a value came from, the record carries a subject field, a sum naming the machines, beside a neutral id.
+
+```brass
+# park/log.brass — declaration excerpt
+type Subject = Feeding | Gate
+type Step    = Planned | Delivered | Skipped | Shut | Open
+type Entry   = { subject: Subject, subject_id: Text, was: Step, now: Step }
+
+fn of_feeding(s: feeding.FeedingStatus) -> Step
+  example of_feeding(feeding.FeedingStatus.Delivered) == Step.Delivered
+fn of_gate(s: gates.GateStatus) -> Step
+  example of_gate(gates.GateStatus.Open) == Step.Open
+```
+
+A converter's direct `example` for each state is checked like any example (§6.1). The checker does not establish that a hand-built record's subject agrees with its states; constructors that take each machine's own states make every ordinary call site agree. Widening such a field to `Text`, or adding a second record or host operation for the second machine, is legal and loses what the type said.
+
 ## 10. The system file, lock, transcript, and abort
 
 ### 10.1 `system`
