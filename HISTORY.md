@@ -130,6 +130,19 @@ Sealed functions became a proposal for protecting reviewed code from unapproved 
 
 WebAssembly was chosen as the execution target. The remaining question is whether Brass should compile through Rust or directly to WebAssembly.
 
+## Week 10 — Choosing the route
+
+Decided that Brass should first compile to Rust, with compiling straight to WebAssembly as the eventual target. Rust reduces the initial complexity: its tools already handle optimization and correct code generation, so the effort can go to the language and its syntax.
+
+Mapped out the build in five milestones, each ending in something that runs. The parser comes first.
+
+Worked through the open questions and answered many of them. One real conflict surfaced: [the spec](docs/brass-core-spec.md#6-contracts-are-proved-or-the-program-is-rejected) and [the checker design](docs/design/brass-checker-design.md#2-what-a-proof-may-use) disagree about helper functions with no written promises.
+
+**Questions at the time**
+
+- If a helper function makes no promises, should the checker read its code or refuse to rely on it?
+- Will building through Rust be fast enough to run after every edit?
+
 ## Up next
 
 Brass today bounds what a program may ever do. Two failures remain, and the work after v0.3 goes at them.
@@ -139,7 +152,7 @@ Brass today bounds what a program may ever do. Two failures remain, and the work
 
 ## Still to decide
 
-- **How Brass runs.** WebAssembly is the target. Open: translate to Rust first and use its compiler, or compile straight to WebAssembly.
+- **How Brass runs.** The route is through Rust to a WebAssembly component. Open: whether the first experiment confirms it, including how long a build takes after each edit.
 - **Memory.** Values do not change in place, and each task has a memory limit. The implementation still needs to decide how those values are stored, shared and freed.
 - **The full checker.** How to prove the declared promises quickly enough to support repeated edits.
 - **What the transcript records.** Every access call and its outcome, and the values of a failed runtime check, are written without any grant. Identifiers and decisions by default, with payloads only under a grant, is the leading design.
