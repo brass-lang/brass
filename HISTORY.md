@@ -143,6 +143,33 @@ Worked through the open questions and answered many of them. One real conflict s
 - If a helper function makes no promises, should the checker read its code or refuse to rely on it?
 - Will building through Rust be fast enough to run after every edit?
 
+## Week 11 — MIA
+
+MIA for most of the week, so nothing was built or decided. Kept thinking about the route: compile to Rust first, with a WebAssembly runtime as the target.
+
+A conversation with a friend raised an idea. Some promises are too hard to prove. Instead of taking them on trust, write the rule in plain words, such as "a customer never gets back more than they paid," and have a model turn it into tests.
+
+**Questions at the time**
+
+- Should a rule that is tested, but not proved, get its own label?
+
+## Week 12 — Answering the questions
+
+Seven questions needed answers before the compiler could start. Took them one at a time. Outside reviewers checked each answer and changed two. None of this is in the spec yet.
+
+One rule shaped every answer: Brass runs on WebAssembly, so each answer has to work with what WebAssembly offers.
+
+- **When one function relies on another.** If the function it calls states no promise, the checker reads that function's code. Across modules, a stated promise is required.
+- **Text length.** `length` counts Unicode scalar values. The same stored text always gives the same count.
+- **The memory limit.** It caps the WebAssembly memory a task may hold.
+- **The time limit.** It counts time while the program's own code runs. Waiting on an outside service is not counted.
+- **Reading a result.** Once code has checked that a result succeeded, it may read the value inside. Reading why a result failed comes later.
+
+**Questions at the time**
+
+- Should a function list the ways it can fail, so a caller can react to each one safely?
+- Should the time limit keep the name `cpu_ms` if it does not measure CPU time?
+
 ## Up next
 
 Brass today bounds what a program may ever do. Two failures remain, and the work after v0.3 goes at them.
