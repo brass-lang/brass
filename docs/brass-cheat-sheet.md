@@ -79,7 +79,7 @@ Constructors are qualified by their type: `Species.Rex`, `FailureCode.NotFound`.
 | `Int` | signed 64-bit integer; also `Int8 Int16 Int32 Int64` |
 | `Float` | 64-bit IEEE float |
 | `Bool` | `true` or `false` |
-| `Text` | text; `length` counts characters |
+| `Text` | text; `length` counts Unicode scalar values |
 | `Bytes` | a byte sequence |
 | `Array<T>` | ordered; literals `[]`, `[a, b]` |
 | `Set<T>` | for membership and bounds; literal `{a, b}`; not iterable |

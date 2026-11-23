@@ -47,7 +47,7 @@ Refinements are defined in §7. Failure and absence types are defined in §5.1.
 | `Int8 Int16 Int32 Int64 Int` | fixed-width signed integers, two's complement; `Int` is `Int64` |
 | `Float` | IEEE 754 binary64, one width |
 | `Bool` | A Boolean value. Its literals are `true` and `false`. |
-| `Text` | Text. `length` counts characters. |
+| `Text` | A sequence of Unicode scalar values. `length` counts them. Nothing normalizes a `Text`, and equality compares the stored sequence. |
 | `Bytes` | a byte sequence; a size is an `Int` named for its unit |
 | `Array<T>` | one ordered collection; `[]` and `[a, b]` are its literals; `length` is a field-like path |
 | `Set<T>` | A set used for bounds and membership. Its literal is `{a, b}`. Sets are not iterable. |
@@ -286,6 +286,8 @@ A function with no success payload declares `-> Outcome<Done>`. `Done` is both t
 `Err` always takes a code from the closed set and text for the transcript and reader. A body may choose a code when constructing an `Err`, but cannot read one. It can only test `x is Err` and pass the value on.
 
 A failure code describes the operation that produced it. An `Unauthorized` passed up by `?` says that operation had no effect. Effects from earlier operations in the same function remain (§10.4).
+
+A body constructs a new `Unauthorized` only to refuse before this call has caused an effect, itself or through a function it called. Nothing checks this in v0.3. An `Unauthorized` that is forwarded, by `?` or by returning the outcome unchanged, keeps its original meaning: that one operation had no effect. It says nothing about the rest of the call.
 
 The following codes have specified meanings:
 
@@ -773,7 +775,7 @@ A `before`, an `after`, and a `where` (§7) use the same set of expressions, cal
 - Equality, ordering (`<`, `<=`, `>`, `>=`), set membership, and range membership, including `== None` and `!= None` on a `Maybe`.
 - Conditions joined with `and` and `or`, and negated with `not`.
 
-Expressions may name parameters, `result`, their fields by dotted path, the bounds of an access parameter, `const` names, and `length` as a path (`xs.length`; in a `where`, `it.length`). Quantifiers, calls, and floats are not allowed. `any` and `all` (§3) are body forms only.
+Expressions may name parameters, `result`, their fields by dotted path, the bounds of an access parameter, `const` names, and `length` as a path (`xs.length`; in a `where`, `it.length`). In a `where`, `it` is the value and `it.field` its fields, at any depth (§7.1); a conditional field is read only as §9.4 allows. Quantifiers, calls, and floats are not allowed. `any` and `all` (§3) are body forms only.
 
 Every intermediate must be shown to fit `Int`, or the clause is not proven. Grouping follows §2.2. What the left operand of `and` establishes holds while checking its right operand.
 
