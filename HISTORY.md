@@ -170,6 +170,18 @@ One rule shaped every answer: Brass runs on WebAssembly, so each answer has to w
 - Should a function list the ways it can fail, so a caller can react to each one safely?
 - Should the time limit keep the name `cpu_ms` if it does not measure CPU time?
 
+## Week 13 — The first program
+
+Finished the remaining open questions. Most answers were "not yet": no new constructs, and contracts stay simple.
+
+Three small fixes went into the spec. One settles how the length of a text is counted. Each Unicode scalar value, the standard's unit for a character, counts as one. So a flag emoji counts as two, since it is stored as two letter codes, and the same text always gives the same count.
+
+Picked the first program the compiler must run: add two numbers. It is tiny, but it exercises every stage, from reading the source to running the result. The next target is the same function with a promise the checker must prove.
+
+**Questions at the time**
+
+- When a save fails because the record changed underneath it, is that a failure or a normal answer?
+
 ## Up next
 
 Brass today bounds what a program may ever do. Two failures remain, and the work after v0.3 goes at them.
